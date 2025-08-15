@@ -63,7 +63,7 @@ function EventDetail({ event }) {
                                 <figure>
                                     {event.image && event.image !== '' ? (
                                         <img
-                                            src={`/public/${event.image}`}
+                                            src={`/storage/${event.image}`}
                                             alt={event.title}
                                             className='w-full' />
                                     ) : (
@@ -199,7 +199,7 @@ function EventDetail({ event }) {
                                             </button>
                                         ) : (
                                             <Link href={route("transactions.checkout", event)} className="btn btn-primary w-full btn-lg">
-                                                Beli Tiket Sekarang
+                                                Daftar
                                             </Link>
                                         )}
 

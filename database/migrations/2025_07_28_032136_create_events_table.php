@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-             $table->string('title');
+            $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
             $table->enum('type', ['event', 'competition']);
@@ -25,7 +25,8 @@ return new class extends Migration
             $table->integer('quota');
             $table->integer('remainingQuota')->default(0);
             $table->string('image')->nullable();
-            $table->boolean('is_published')->default(false);
+            $table->boolean('is_highlight')->default(false);
+            $table->enum('status', ['valid', 'expired'])->default('valid');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

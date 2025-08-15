@@ -82,7 +82,7 @@ class TicketController extends Controller
 
     public function scan()
     {
-        return Inertia::render('QrScanner/Index');
+        return Inertia::render('Admin/QrScanner/Index');
     }
 
     public function validateQr(Request $request)

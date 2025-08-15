@@ -12,22 +12,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Event;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-        'listEvents' => Event::with('creator')->latest()->take(6)->get(),
-    ]);
-})->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
-     Route::get('/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
 
     Route::get('events', [EventController::class, 'userIndex'])->name('events.user.index');
     Route::get('/events/{event}', [EventController::class, 'userShow'])->name('events.users.show');
@@ -51,10 +43,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
 });
 
+
 Route::get('/tickets/used/{code}', [TicketController::class, 'ticket_used'])->name('tickets.used');
 
 
-
+Route::get('/event/lomba', [HomeController::class, 'lomba'])->name('events.lomba');
+Route::get('/event/workshop', [HomeController::class, 'workshop'])->name('events.workshop');
+Route::get('/event/webinar', [HomeController::class, 'webinar'])->name('events.webinar');
 Route::get('/event', [HomeController::class, 'event'])->name('events.guest');
 Route::get('/event/{event}', [HomeController::class, 'eventShow'])->name('events.guest.detail');
 

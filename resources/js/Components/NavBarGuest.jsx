@@ -9,13 +9,18 @@ function NavBarGuest() {
   return (
     <div className="navbar bg-primary text-primary-content shadow-lg">
       <div className="navbar-start">
-        <Link href="/" className="btn btn-ghost text-xl font-bold">
-          <ApplicationLogo className="w-full h-8" />
+        <Link href="/" className="btn btn-ghost text-xs lg:text-xl font-bold">
+          <ApplicationLogo className="w-full h-4 lg:h-8" />.EVENTS
         </Link>
       </div>
 
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
+          <li>
+            <Link href="/" className="hover:bg-primary-focus font-inter font-semibold">
+              Beranda
+            </Link>
+          </li>
           <li>
             <Link href="/event" className="hover:bg-primary-focus font-inter font-semibold">
               List Event
@@ -51,10 +56,10 @@ function NavBarGuest() {
         ) : (
           <div className='hidden lg:flex'>
             <Link href="/login" className="btn btn-ghost btn-sm font-inter font-semibold">
-              Login
+              Masuk
             </Link>
-            <Link href="/register" className="btn btn-ghost btn-sm font-inter font-semibold">
-              Register
+            <Link href="/register" className="btn border-none bg-gradient-to-t from-cyan-500 to-blue-500 btn-sm font-inter font-semibold">
+              Daftar
             </Link>
           </div>
 

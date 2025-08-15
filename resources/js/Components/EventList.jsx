@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 
 
-export default function EventList({ events }) {
+export default function EventList({  events }) {
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('id-ID', {
@@ -23,19 +23,14 @@ export default function EventList({ events }) {
     }
     return (
         <div className="container max-w-7xl mx-auto px-4 py-20">
-            <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold mb-4">Daftar Event & Lomba</h1>
-                <p className="text-lg text-base-content/70">
-                    Temukan event dan lomba menarik yang sesuai dengan minat Anda
-                </p>
-            </div>
+         
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {events.map((event) => (
                     <div key={event.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
                         <figure className="w-full h-48 bg-base-200 flex items-center justify-center overflow-hidden">
                             {event.image && event.image !== '' ? (
                                 <img
-                                    src={`/public/${event.image}`}
+                                    src={`/storage/${event.image}`}
                                     alt={event.title}
                                     className="object-cover w-full h-full"
                                 />
@@ -56,12 +51,8 @@ export default function EventList({ events }) {
                                 <div className="badge badge-outline">{event.category}</div>
                             </div>
 
-                            <h2 className="card-title text-lg mb-2">{event.title}</h2>
-                            <p className="text-sm text-base-content/70 mb-4 line-clamp-3">
-                                <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
-                            </p>
-
-                            <div className="space-y-2 mb-4">
+                            <h2 className="card-title text-lg mb-2 text-base-content">{event.title}</h2>
+                            <div className="space-y-2 mb-4 text-base-content">
                                 <div className="flex items-center text-sm">
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
