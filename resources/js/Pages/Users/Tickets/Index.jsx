@@ -63,7 +63,7 @@ function Index({ tickets }) {
                                     {tickets.map((ticket) => (
                                         <tr>
                                             <td>{ticket.ticket_code}</td>
-                                            <td><Link href={route('events.users.show', ticket.event)} className='btn btn-link text-blue-800'> {ticket.event.title}</Link></td>
+                                            <td><Link href={route('events.guest.detail', ticket.event)} className='btn btn-link text-blue-800'> {ticket.event.title}</Link></td>
                                             <td> {ticket.transaction.reference}</td>
                                             <td>{ticket.quantity}</td>
                                             <td>{getStatusBadge(ticket.status)}</td>
