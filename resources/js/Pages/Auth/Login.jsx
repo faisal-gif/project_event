@@ -35,7 +35,7 @@ export default function Login({ status, canResetPassword }) {
             <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" className='text-white'/>
+                    <InputLabel htmlFor="email" value="Email" className='text-white' />
 
                     <TextInput
                         id="email"
@@ -89,7 +89,7 @@ export default function Login({ status, canResetPassword }) {
                         {canResetPassword && (
                             <Link
                                 href={route('password.request')}
-                                className="btn btn-link btn-sm w-full text-white lg:text-base"
+                                className="btn btn-link btn-sm w-full text-white lg:text-black"
                             >
                                 Forgot your password?
                             </Link>
@@ -100,10 +100,11 @@ export default function Login({ status, canResetPassword }) {
 
                 </div>
                 <div className='mt-4 block'>
-                    <Link href={route('register')} className="btn btn-primary btn-sm w-full">
-                        Register
-                    </Link>
+                    <PrimaryButton className="w-full justify-center" disabled={processing}>
+                        Log in
+                    </PrimaryButton>
                 </div>
+               
                 <div className='mt-4 block'>
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
@@ -116,11 +117,12 @@ export default function Login({ status, canResetPassword }) {
                         </div>
                     </div>
                 </div>
-                <div className='mt-4 block'>
-                    <PrimaryButton className="w-full justify-center" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
+                 <div className='mt-4 block'>
+                    <Link href={route('register')} className="btn btn-link btn-sm w-full">
+                        Register
+                    </Link>
                 </div>
+
             </form>
         </AuthLayout>
     );

@@ -51,7 +51,7 @@ function EventDetail({ event }) {
                     <div className="text-sm breadcrumbs mb-6">
                         <ul>
                             <li><Link href="/">Home</Link></li>
-                            <li><Link href="/events">Event</Link></li>
+                            <li><Link href={route('events.guest')}>Event</Link></li>
                             <li>{event.title}</li>
                         </ul>
                     </div>
