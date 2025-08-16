@@ -18,6 +18,8 @@ class TripayCallbackController extends Controller
         $json = $request->getContent();
         $signature = hash_hmac('sha256', $json, env('TRIPAY_PRIVATE_KEY'));
 
+        return response()->json(['callback' => $callbackSignature, 'signature' => $signature, 'json' => $json], 200);
+
         if ($signature !== $callbackSignature) {
             Log::warning('Tripay callback invalid signature');
             return response()->json(['success' => false, 'message' => 'Invalid signature'], 403);
