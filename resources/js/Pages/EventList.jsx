@@ -114,10 +114,7 @@ function EventList({ events }) {
                                 </div>
 
                                 <h2 className="card-title text-lg mb-2">{event.title}</h2>
-                                <p className="text-sm text-base-content/70 mb-4 line-clamp-3">
-                                    <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
-                                </p>
-
+                               
                                 <div className="space-y-2 mb-4">
                                     <div className="flex items-center text-sm">
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

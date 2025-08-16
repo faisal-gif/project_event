@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import React, { useEffect } from 'react'
 
@@ -41,7 +42,7 @@ function Status({ trx, event }) {
 
 
     return (
-        <AuthenticatedLayout>
+        <GuestLayout>
             <Head title="Status Pembayaran" />
             <div className="container mx-auto px-4 py-8">
                 <div className=" mx-auto">
@@ -111,7 +112,7 @@ function Status({ trx, event }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </GuestLayout>
     )
 }
 

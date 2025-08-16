@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
 import React from 'react'
 
@@ -51,7 +52,7 @@ function Show({ ticket }) {
 
 
     return (
-        <AuthenticatedLayout>
+        <GuestLayout>
             <Head title="Detail Tiket" />
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-3xl mx-auto">
@@ -187,7 +188,7 @@ function Show({ ticket }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </GuestLayout>
 
     )
 }

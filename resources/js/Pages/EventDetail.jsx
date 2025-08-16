@@ -87,7 +87,7 @@ function EventDetail({ event }) {
                                     </div>
 
                                     <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
-                                    <div className="prose prose-lg max-w-none mb-6 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: event.description }} />
+                                    <div className="prose prose-lg max-w-none mb-6 text-lg leading-relaxed"  dangerouslySetInnerHTML={{ __html: event.description }} />
                                     
                                     {/* Event Details */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,7 +129,7 @@ function EventDetail({ event }) {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h3 className="text-xl font-semibold">Informasi Tiket</h3>
+                                            <h3 className="text-xl font-semibold">Informasi Event</h3>
 
                                             <div className="bg-base-200 rounded-lg p-4">
                                                 <div className="flex justify-between items-center mb-2">
@@ -172,7 +172,7 @@ function EventDetail({ event }) {
                         <div className="lg:col-span-1">
                             <div className="card bg-base-100 shadow-xl sticky top-8">
                                 <div className="card-body">
-                                    <h3 className="text-xl font-bold mb-4">Beli Tiket</h3>
+                                    <h3 className="text-xl font-bold mb-4">Daftar Event</h3>
 
                                     <div className="space-y-4">
                                         <div className="bg-base-200 rounded-lg p-4">
@@ -204,7 +204,7 @@ function EventDetail({ event }) {
                                         )}
 
                                         <div className="text-center">
-                                            <Link href="/events" className="btn btn-ghost btn-sm">
+                                            <Link href={route('events.guest')} className="btn btn-ghost btn-sm">
                                                 ← Kembali ke Daftar Event
                                             </Link>
                                         </div>

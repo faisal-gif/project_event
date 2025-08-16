@@ -37,7 +37,7 @@ export default function AuthLayout({ children }) {
             </div>
 
             {/* Right side - Login Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-gradient-hero">
+            <div className="flex-1 flex items-center justify-center p-8 bg-gradient-to-br from-[#7f0b1a] to-[#3f154f]  lg:bg-white lg:bg-none">
                 <div className="w-full max-w-md">
                     {children}
                 </div>

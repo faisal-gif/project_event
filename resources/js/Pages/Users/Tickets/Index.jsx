@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react'
 import { data } from 'autoprefixer';
 import { Eye } from 'lucide-react';
@@ -39,7 +40,7 @@ function Index({ tickets }) {
 
 
     return (
-        <AuthenticatedLayout>
+        <GuestLayout>
             <Head title="Tickets" />
             <div className="container mx-auto px-4 py-8">
                 <div className="card bg-base-200 shadow-sm mb-8">
@@ -83,7 +84,7 @@ function Index({ tickets }) {
                 </div>
 
             </div>
-        </AuthenticatedLayout >
+        </GuestLayout >
     )
 }
 

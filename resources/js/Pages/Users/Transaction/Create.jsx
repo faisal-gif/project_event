@@ -22,7 +22,7 @@ const Create = ({ event, channel }) => {
     if (!event) {
         return (
             <>
-                <AuthenticatedLayout>
+                <GuestLayout>
                     <Head title="Checkout" />
                     <div className="container mx-auto px-4 py-16 text-center">
                         <h1 className="text-4xl font-bold mb-4">Event Tidak Ditemukan</h1>
@@ -30,7 +30,7 @@ const Create = ({ event, channel }) => {
                             Kembali ke Daftar Event
                         </Link>
                     </div>
-                </AuthenticatedLayout>
+                </GuestLayout>
             </>
         );
     }
@@ -69,10 +69,10 @@ const Create = ({ event, channel }) => {
         });
 
     }
-    
+
     return (
         <>
-            <AuthenticatedLayout>
+            <GuestLayout>
                 <Head title="Checkout" />
                 <div className="container mx-auto px-4 py-8">
                     <div className=" mx-auto">
@@ -123,7 +123,7 @@ const Create = ({ event, channel }) => {
                                                 <div className="flex flex-col gap-2 w-full">
                                                     <label className="label cursor-pointer">
                                                         <input type="checkbox" checked={data.terms} onChange={(e) => setData('terms', e.target.checked)} className="checkbox checkbox-sm" required />
-                                                        <span className="mx-4 label-text">I agree with detikEvent Terms &amp; Conditions, and <a className="btn btn-link" href="https://www.detik.com/privacy-policy">detikEvent Privacy Policy</a>. Accept agreement and click continue to process your order.
+                                                        <span className="mx-4 text-xs">I agree with detikEvent Terms &amp; Conditions, and TIMES Event Privacy Policy. Accept agreement and click continue to process your order.
                                                         </span>
                                                     </label>
                                                     <InputError className={errors.terms ? 'invalid' : ''} message={errors.terms} />
@@ -251,7 +251,7 @@ const Create = ({ event, channel }) => {
                                         </button>
 
                                         <div className="text-center mt-4">
-                                            <Link to={`/events/${event.id}`} className="btn btn-ghost btn-sm">
+                                            <Link href={route('events.guest.detail', event)} className="btn btn-ghost btn-sm">
                                                 ← Kembali ke Detail Event
                                             </Link>
                                         </div>
@@ -263,7 +263,7 @@ const Create = ({ event, channel }) => {
                     </div>
                 </div>
 
-            </AuthenticatedLayout>
+            </GuestLayout>
         </>
 
     );

@@ -7,7 +7,7 @@ import ApplicationLogo from './ApplicationLogo';
 function NavBarGuest() {
   const user = usePage().props.auth.user;
   return (
-    <div className="navbar bg-primary text-primary-content shadow-lg">
+    <div className="navbar bg-gradient-to-br from-[#7f0b1a] to-[#3f154f] text-primary-content shadow-lg">
       <div className="navbar-start">
         <Link href="/" className="btn btn-ghost text-xs lg:text-xl font-bold">
           <ApplicationLogo className="w-full h-4 lg:h-8" />.EVENTS
@@ -23,9 +23,11 @@ function NavBarGuest() {
           </li>
           <li>
             <Link href="/event" className="hover:bg-primary-focus font-inter font-semibold">
-              List Event
+              Event
             </Link>
           </li>
+          <li><Link className="hover:bg-primary-focus font-inter font-semibold" href={route('tickets.index')}>Tiket</Link></li>
+          <li><Link className="hover:bg-primary-focus font-inter font-semibold" href={route('transactions.index')}>Transaksi</Link></li>
         </ul>
       </div>
 
@@ -42,12 +44,7 @@ function NavBarGuest() {
               </button>
             </Dropdown.Trigger>
             <Dropdown.Content>
-              <Dropdown.Link href={user.role === 'admin' ? route('admin.dashboard') : route('user.dashboard')}>
-                Dashboard
-              </Dropdown.Link>
-              <Dropdown.Link href={route('profile.edit')}>
-                Profile
-              </Dropdown.Link>
+            
               <Dropdown.Link href={route('logout')} method="post" as="button">
                 Log Out
               </Dropdown.Link>
@@ -67,7 +64,7 @@ function NavBarGuest() {
         }
 
 
-        <div className="dropdown dropdown-end lg:hidden">
+        {/* <div className="dropdown dropdown-end lg:hidden">
           <div tabIndex={0} role="button" className="btn btn-ghost">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16"></path>
@@ -75,6 +72,8 @@ function NavBarGuest() {
           </div>
           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 text-base-content">
             <li><Link href="/event">List Event</Link></li>
+            <li><Link href={route('tickets.index')}>Tiket</Link></li>
+            <li><Link href={route('transactions.index')}>Transaksi</Link></li>
             <li><Link href="/login" >
               Login
             </Link></li>
@@ -84,10 +83,10 @@ function NavBarGuest() {
               </Link>
             </li>
           </ul>
-        </div>
+        </div> */}
       </div >
     </div >
   )
 }
 
-export default NavBarGuest
+export default NavBarGuest;
