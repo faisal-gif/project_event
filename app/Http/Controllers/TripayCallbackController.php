@@ -14,7 +14,7 @@ class TripayCallbackController extends Controller
     public function handle(Request $request)
     {
         // Cek signature dari Tripay
-        $callbackSignature = $request->header('HTTP_X_CALLBACK_SIGNATURE');
+        $callbackSignature = $request->header('X-Callback-Signature');
         $json = $request->getContent();
         $signature = hash_hmac('sha256', $json, env('TRIPAY_PRIVATE_KEY'));
 
