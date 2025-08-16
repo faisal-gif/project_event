@@ -180,7 +180,7 @@ function Show({ ticket }) {
                                     Cetak Tiket
                                 </button>
 
-                                <Link href="/events" className="btn btn-primary flex-1">
+                                <Link href={route('events.guest')} className="btn btn-primary flex-1">
                                     Lihat Event Lainnya
                                 </Link>
                             </div>
