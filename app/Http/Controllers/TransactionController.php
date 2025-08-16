@@ -95,9 +95,12 @@ class TransactionController extends Controller
             return back()->with('error', 'Transaksi tidak ditemukan');
         }
 
+        $ticket = Ticket::where('transaction_id', $trx->id)->first();
+
         return Inertia::render('Users/Transaction/Status', [
             'trx' => $trx,
             'event' => $trx->event,
+            'ticket' => $ticket,
         ]);
     }
 

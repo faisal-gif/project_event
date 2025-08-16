@@ -3,7 +3,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import React, { useEffect } from 'react'
 
-function Status({ trx, event }) {
+function Status({ trx, event, ticket }) {
 
     const { flash } = usePage().props
 
@@ -104,9 +104,18 @@ function Status({ trx, event }) {
                                         Coba Bayar Lagi
                                     </a>
                                 )}
-                                <Link href={route('events.user.index')} className="btn btn-ghost">
+                                <Link href={route('events.guest')} className="btn btn-ghost">
                                     Kembali ke Event
                                 </Link>
+                                {trx.status && (
+                                    <Link
+                                        href={route('tickets.show', ticket)}
+                                        className="btn btn-primary"
+                                    >
+                                        Lihat Tiket
+                                    </Link >
+                                )}
+
                             </div>
                         </div>
                     </div>
