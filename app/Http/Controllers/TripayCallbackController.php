@@ -49,7 +49,7 @@ class TripayCallbackController extends Controller
 
             $code = strtoupper(uniqid('TKT'));
 
-            $qr = QrCode::format('png')->generate($code);
+            $qr = QrCode::format('png')->size(300)->generate($code);
             $qrImageName = 'qr/' . $code . '.png';
 
             Storage::disk('public')->put($qrImageName, $qr);
