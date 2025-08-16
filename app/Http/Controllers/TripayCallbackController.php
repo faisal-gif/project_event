@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TripayCallbackController extends Controller
@@ -15,7 +16,8 @@ class TripayCallbackController extends Controller
     {
         // Cek signature dari Tripay
         $callbackSignature = $request->server('HTTP_X_CALLBACK_SIGNATURE');
-      
+
+
         if (!$callbackSignature) {
             Log::warning('Tripay callback invalid signature');
             return response()->json(['success' => false, 'message' => 'Invalid signature'], 403);
@@ -47,16 +49,17 @@ class TripayCallbackController extends Controller
 
             $code = strtoupper(uniqid('TKT'));
 
-            $qr = QrCode::format('png')->generate(route('tickets.used',['code' => $code]));
-            $qrImageName = $code . '.png';
+            $qr = QrCode::format('png')->generate(route('tickets.used', ['code' => $code]));
+            $qrImageName = 'qr/' . $code . '.png';
 
-            $path = $qr->store($qrImageName, 'public');
+            Storage::disk('public')->put($qrImageName, 'public');
 
             $tiket = Ticket::create([
                 'user_id' => $transaction->user_id,
                 'event_id' => $transaction->event_id,
+                'detail_pendaftar_id' => $transaction->detail_pendaftar_id,
                 'ticket_code' => $code,
-                'qr_image' => $path,
+                'qr_image' => $qrImageName,
                 'transaction_id' => $transaction->id,
                 'quantity' => $transaction->quantity,
                 'status' => 'unused',
