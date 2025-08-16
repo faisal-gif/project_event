@@ -18,12 +18,12 @@ class TripayCallbackController extends Controller
         $json = $request->getContent();
         $signature = hash_hmac('sha256', $json, env('TRIPAY_PRIVATE_KEY'));
 
-        // if ($signature !== $callbackSignature) {
-        //     Log::warning('Tripay callback invalid signature');
-        //     return response()->json(['success' => false, 'message' => 'Invalid signature'], 403);
-        // }
+        if ($signature !== $callbackSignature) {
+            Log::warning('Tripay callback invalid signature');
+            return response()->json(['success' => false, 'message' => 'Invalid signature'], 403);
+        }
 
-        // $data = $request->all();
+        $data = $request->all();
 
         // // Validasi status dan reference
         // $reference = $data['reference'] ?? null;
@@ -67,6 +67,6 @@ class TripayCallbackController extends Controller
         //     DB::commit();
         // }
 
-        // return response()->json(['success' => true]);
+        return response()->json(['success' => true]);
     }
 }
