@@ -11,6 +11,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 class DisableCsrfForTripay extends Middleware
 {
     protected $except = [
-        '/tripay/callback',
+        'api/tripay/callback',
     ];
 }
