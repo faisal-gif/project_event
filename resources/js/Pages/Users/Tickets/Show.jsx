@@ -135,7 +135,7 @@ function Show({ ticket }) {
                                     <div className="bg-white p-6 rounded-lg border-2 border-dashed border-base-300 inline-block">
                                         {ticket.qr_image ? (
                                             <img
-                                                src={`/public/${ticket.qr_image}`}
+                                                src={`/storage/${ticket.qr_image}`}
                                                 alt="QR Code Tiket"
                                                 className="mx-auto"
                                             />
