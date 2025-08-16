@@ -49,10 +49,10 @@ class TripayCallbackController extends Controller
 
             $code = strtoupper(uniqid('TKT'));
 
-            $qr = QrCode::format('png')->generate(route('tickets.used', ['code' => $code]));
+            $qr = QrCode::format('png')->generate($code);
             $qrImageName = 'qr/' . $code . '.png';
 
-            Storage::disk('public')->put($qrImageName, 'public');
+            Storage::disk('public')->put($qrImageName, $qr);
 
             $tiket = Ticket::create([
                 'user_id' => $transaction->user_id,
