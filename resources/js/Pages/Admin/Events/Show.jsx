@@ -66,7 +66,7 @@ function Show({ event }) {
                                 <figure className="p-4">
                                     {event.image && event.image !== '' ? (
                                         <img
-                                            src={`/public/${event.image}`}
+                                            src={`/storage/${event.image}`}
                                             alt={event.title}
                                             className="w-64 h-full object-cover rounded"
                                         />

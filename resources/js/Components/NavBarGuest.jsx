@@ -51,7 +51,7 @@ function NavBarGuest() {
             </Dropdown.Content>
           </Dropdown>
         ) : (
-          <div className='hidden lg:flex'>
+          <div className='flex'>
             <Link href="/login" className="btn btn-ghost btn-sm font-inter font-semibold">
               Masuk
             </Link>

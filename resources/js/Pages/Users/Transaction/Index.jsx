@@ -48,10 +48,10 @@ function Index({ transactions }) {
                                 <thead>
                                     <tr>
                                         <th>No Transaksi</th>
-                                        <th>Event</th>
-                                        <th>Payment Method</th>
-                                        <th>Quantity</th>
-                                        <th>Total</th>
+                                        <th className='hidden lg:table-cell'>Event</th>
+                                        <th className='hidden lg:table-cell'>Payment Method</th>
+                                        <th className='hidden lg:table-cell'>Quantity</th>
+                                        <th className='hidden lg:table-cell'>Total</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -59,31 +59,35 @@ function Index({ transactions }) {
                                     {/* row 1 */}
                                     {transactions.map((transaction) => (
                                         <tr>
-                                            <td>{transaction.reference}</td>
-                                            <td>{transaction.event.title}</td>
-                                            <td>{transaction.payment_method}</td>
-                                            <td>{transaction.quantity}</td>
-                                            <td>{formatPrice(transaction.subtotal)}</td>
+                                            <td>
+                                                <Link className='btn btn-link' href={route('transactions.status', { 'tripay_reference': transaction.reference })} >
+                                                    {transaction.reference}
+                                                </Link>
+                                            </td>
+                                            <td className='hidden lg:table-cell'>{transaction.event.title}</td>
+                                            <td className='hidden lg:table-cell'>{transaction.payment_method}</td>
+                                            <td className='hidden lg:table-cell'>{transaction.quantity}</td>
+                                            <td className='hidden lg:table-cell'>{formatPrice(transaction.subtotal)}</td>
                                             <td><div className={`badge ${getStatusBadge(transaction.status)} badge-md mb-4 mx-auto`}>
                                                 {transaction.status}
                                             </div></td>
-                                            <td>
-                                                <Link className='btn btn-accent btn-sm text-white' href={route('transactions.status',{'tripay_reference' : transaction.reference})} >
-                                                Detail
-                                            </Link>
-                                        </td>
+                                            <td className='hidden lg:block'>
+                                                <Link className='btn btn-accent btn-sm text-white' href={route('transactions.status', { 'tripay_reference': transaction.reference })} >
+                                                    Detail
+                                                </Link>
+                                            </td>
                                         </tr>
                                     ))}
 
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                 </div>
 
             </div>
-
-        </div>
         </GuestLayout >
     )
 }

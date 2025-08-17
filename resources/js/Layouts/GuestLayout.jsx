@@ -9,7 +9,7 @@ export default function GuestLayout({ children }) {
             <NavBarGuest />
             {children}
 
-            <footer className="hidden lg:block bg-gray-900" aria-labelledby="footer-heading">
+            <footer className="hidden lg:block bg-gray-900 " aria-labelledby="footer-heading">
                 <h2 id="footer-heading" className="sr-only">
                     Footer
                 </h2>
@@ -73,7 +73,7 @@ export default function GuestLayout({ children }) {
                     </div>
                 </div>
             </footer>
-
+<div className='mb-20 sm:mb-0'></div>
             {/* Bottom Nav */}
             <BottomNav />
         </div>

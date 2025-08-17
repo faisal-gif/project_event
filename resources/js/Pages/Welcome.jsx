@@ -7,7 +7,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Ticket, Shield, Award, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Welcome({ listEvents, lomba, event }) {
+export default function Welcome({ listEvents, headlines, populars }) {
     const [selectedCategory, setSelectedCategory] = useState(1); // Default to ID 1 for "Semua"
 
     const filteredEvents = listEvents.filter(event => {
@@ -31,7 +31,7 @@ export default function Welcome({ listEvents, lomba, event }) {
                 <GuestLayout>
                     <div className='flex flex-col lg:flex-row'>
                         <SideBarLeft setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
-                        <HeroSection events={filteredEvents} />
+                        <HeroSection events={filteredEvents} headline={headlines} />
                         <SideBarRight />
                     </div>
                 </GuestLayout>

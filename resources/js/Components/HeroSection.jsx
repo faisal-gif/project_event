@@ -1,8 +1,14 @@
 import React from 'react'
 import { Link } from '@inertiajs/react';
 import FeaturedNewsCard from './FeaturedNewsCard';
+import Carousel from './ui/Carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import Fade from 'embla-carousel-fade';
+import HeadlineEvents from './HeadlineEvents';
 
-function HeroSection({ events }) {
+function HeroSection({ events, headline }) {
+    console.log(events);
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -39,10 +45,11 @@ function HeroSection({ events }) {
     return (
         <div className="container max-w-7xl mx-auto px-4 py-4">
             <div className='flex flex-col gap-8'>
-                <FeaturedNewsCard event={events[0]} />
+                <HeadlineEvents listHeadline={headline} />
 
+                <h2 className="text-2xl font-bold">Event Terkini</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events.slice(1).map((event) => (
+                    {events.map((event) => (
                         <div key={event.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
                             <figure className="w-full h-48 bg-base-200 flex items-center justify-center overflow-hidden">
                                 {event.image && event.image !== '' ? (

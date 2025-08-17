@@ -24,8 +24,9 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->integer('quota');
             $table->integer('remainingQuota')->default(0);
+            $table->integer('limit_ticket_user')->default(1);
             $table->string('image')->nullable();
-            $table->boolean('is_highlight')->default(false);
+            $table->boolean('is_headline')->default(false);
             $table->enum('status', ['valid', 'expired'])->default('valid');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();

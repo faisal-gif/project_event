@@ -122,9 +122,9 @@ const Create = ({ event, channel }) => {
 
                                                 <div className="flex flex-col gap-2 w-full">
                                                     <label className="label cursor-pointer">
-                                                        <input type="checkbox" checked={data.terms} onChange={(e) => setData('terms', e.target.checked)} className="checkbox checkbox-sm" required />
-                                                        <span className="mx-4 text-xs">I agree with detikEvent Terms &amp; Conditions, and TIMES Event Privacy Policy. Accept agreement and click continue to process your order.
-                                                        </span>
+                                                        <input type="checkbox" checked={data.terms} onChange={(e) => setData('terms', e.target.checked)} className="checkbox checkbox-sm mr-2" required />
+                                                        I agree with TIMESEvent Terms &amp; Conditions, and TIMESEvent Privacy Policy. Accept agreement and click continue to process your order.
+
                                                     </label>
                                                     <InputError className={errors.terms ? 'invalid' : ''} message={errors.terms} />
                                                 </div>
@@ -161,7 +161,7 @@ const Create = ({ event, channel }) => {
                                         <div className="form-control mb-6">
                                             <label className="label">
                                                 <span className="label-text font-medium">Jumlah Tiket</span>
-                                                <span className="label-text-alt">Max: {event.remainingQuota}</span>
+                                                <span className="label-text-alt">Max: {Math.min(event.limit_ticket_user, event.remainingQuota)}</span>
                                             </label>
                                             <div className="flex items-center space-x-4">
                                                 <button
@@ -174,14 +174,16 @@ const Create = ({ event, channel }) => {
                                                 <input
                                                     type="number"
                                                     value={data.quantity}
-                                                    onChange={(e) => setData('quantity', Math.max(1, Math.min(event.remainingQuota, parseInt(e.target.value) || 1)))}
+                                                    onChange={(e) => setData('quantity', Math.max(1, Math.min(event.limit_ticket_user, event.remainingQuota, parseInt(e.target.value) || 1)))}
                                                     className="input input-bordered w-20 text-center"
                                                     min="1"
-                                                    max={event.remainingQuota}
+                                                    max={event.limit_ticket_user}
                                                 />
                                                 <button
                                                     type="button"
-                                                    onClick={() => setData('quantity', Math.min(event.remainingQuota, data.quantity + 1))}
+                                                    onClick={() =>
+                                                        setData('quantity', Math.min(Math.min(event.limit_ticket_user, event.remainingQuota), data.quantity + 1))
+                                                    }
                                                     className="btn btn-circle btn-outline btn-sm"
                                                 >
                                                     +

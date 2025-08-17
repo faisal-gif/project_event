@@ -9,18 +9,18 @@ use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    
-    public function index(){
-        $events =  Event::with('creator')->latest()->take(3)->get();
-        $lomba = Event::where('type', 'competition')->with('creator')->latest()->take(3)->get();
-        $event = Event::where('type', 'event')->with('creator')->latest()->take(3)->get();
+
+    public function index()
+    {
+        $events =  Event::where('status', 'valid')->with('creator')->latest()->get();
+        $headline = Event::where('status', 'valid')->where('is_headline', 1)->with('creator')->latest()->get();
+        $popular = Event::where('status', 'valid')->whereColumn('remainingQuota', '<', 'quota')->with('creator')->latest()->take(3)->get();
 
         return Inertia::render('Welcome', [
             'listEvents' => $events,
-            'lomba' => $lomba,
-            'event' => $event,
+            'headlines' => $headline,
+            'populars' => $popular,
         ]);
-
     }
 
     public function event()

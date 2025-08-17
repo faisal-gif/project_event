@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Format;
+use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
 
 class EventController extends Controller
 {
@@ -44,15 +49,20 @@ class EventController extends Controller
             'price' => 'required|numeric',
             'quota' => 'required|integer',
             'lokasi' => 'required',
+            'limit' => 'required|integer',
+            'headline' => 'required|boolean',
         ]);
 
         $slug = Str::slug($request->title);
 
-        $path = $request->file('image')->store('images', 'public');
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($request->file('image'));
+        $encode = $image->toWebp();
+        Storage::disk('public')->put('images/' . $slug . '.webp', $encode);
 
         Event::create([
             'slug' => $slug,
-            'image' => $path,
+            'image' => 'images/' . $slug . '.webp',
             'title' => $request->title,
             'description' => $request->description,
             'type' => $request->type,
@@ -64,8 +74,9 @@ class EventController extends Controller
             'remainingQuota' => $request->quota,
             'location' => $request->lokasi,
             'created_by' => auth()->user()->id,
-            'is_published' => '1',
-
+            'status' => 'valid',
+            'is_headline' => $request->headline,
+            'limit_ticket_user' => $request->limit,
         ]);
         return redirect()->route('events.index')->with('success', 'Event created');
     }
@@ -104,16 +115,26 @@ class EventController extends Controller
             'price' => 'required|numeric',
             'quota' => 'required|integer',
             'lokasi' => 'required',
+            'limit' => 'required|integer',
+            'headline' => 'required|boolean',
         ]);
+
+        $slug = Str::slug($request->title);
 
         // Update image jika ada file baru
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 'public');
-            $event->image = $path;
+            Storage::disk('public')->delete($event->image);
+            
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($request->file('image'));
+            $encode = $image->toWebp();
+            Storage::disk('public')->put('images/' . $slug . '.webp', $encode);
+
+            $event->image = 'images/' . $slug . '.webp';
         }
 
         $event->update([
-            'slug' => Str::slug($request->title),
+            'slug' => $slug,
             'title' => $request->title,
             'description' => $request->description,
             'type' => $request->type,
@@ -124,6 +145,8 @@ class EventController extends Controller
             'quota' => $request->quota,
             'remainingQuota' => $request->quota,
             'location' => $request->lokasi,
+            'is_headline' => $request->headline,
+            'limit_ticket_user' => $request->limit,
         ]);
 
         $event->save();

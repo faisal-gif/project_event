@@ -24,6 +24,9 @@
         "vite": "^7.0.4"
     },
     "dependencies": {
+        "embla-carousel-autoplay": "^8.6.0",
+        "embla-carousel-fade": "^8.6.0",
+        "embla-carousel-react": "^8.6.0",
         "html5-qrcode": "^2.3.8",
         "lucide-react": "^0.534.0",
         "quill": "^2.0.3",

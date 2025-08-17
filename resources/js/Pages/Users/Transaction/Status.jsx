@@ -104,17 +104,18 @@ function Status({ trx, event, ticket }) {
                                         Coba Bayar Lagi
                                     </a>
                                 )}
-                                <Link href={route('events.guest')} className="btn btn-ghost">
-                                    Kembali ke Event
-                                </Link>
-                                {trx.status && (
+                                 {trx.status === 'PAID' && (
                                     <Link
-                                        href={route('tickets.show', ticket)}
+                                        href={route('tickets.show', ticket )}
                                         className="btn btn-primary"
                                     >
                                         Lihat Tiket
                                     </Link >
                                 )}
+                                <Link href={route('events.guest')} className="btn btn-ghost">
+                                    Kembali ke Event
+                                </Link>
+                               
 
                             </div>
                         </div>

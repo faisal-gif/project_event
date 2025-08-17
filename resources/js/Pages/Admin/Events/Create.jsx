@@ -31,6 +31,8 @@ function Create() {
         price: '',
         lokasi: '',
         description: '',
+        limit: '',
+        headline: '0',
     })
 
     const handleImageChange = (e) => {
@@ -72,11 +74,26 @@ function Create() {
 
                             </div>
                             {/* Title */}
-                            <div>
-                                <label className="label">Title</label>
-                                <input type="text" value={data.title} onChange={(e) => setData('title', e.target.value)}
-                                    className="input input-bordered w-full" />
-                                {errors.title && <div className="text-red-500 text-sm">{errors.title}</div>}
+                            <div className='grid md:grid-cols-3 gap-2'>
+                                <div className='col-span-2'>
+                                    <label className="label">Title</label>
+                                    <input type="text" value={data.title} onChange={(e) => setData('title', e.target.value)}
+                                        className="input input-bordered w-full" />
+                                    {errors.title && <div className="text-red-500 text-sm">{errors.title}</div>}
+                                </div>
+                                {/* Category */}
+                                <div>
+                                    <label className="label">Headline</label>
+                                    <select name="headline"
+                                        className='select select-bordered w-full'
+                                        value={data.headline}
+                                        onChange={(e) => setData('headline', e.target.value)} >
+                                        <option value="0">Tidak</option>
+                                        <option value="1">Iya</option>
+                                    </select>
+
+                                    {errors.headline && <div className="text-red-500 text-sm">{errors.headline}</div>}
+                                </div>
                             </div>
 
                             <div className='grid md:grid-cols-2 gap-2'>
@@ -130,7 +147,7 @@ function Create() {
                                 {/* Tanggal Mulai */}
                                 <div>
                                     <label className="label">Tanggal Mulai</label>
-                                    <input type="date" value={data.start_date} onChange={(e) => setData('start_date', e.target.value)}
+                                    <input type="datetime-local" value={data.start_date} onChange={(e) => setData('start_date', e.target.value)}
                                         className="input input-bordered w-full" />
                                     {errors.start_date && <div className="text-red-500 text-sm">{errors.start_date}</div>}
                                 </div>
@@ -138,7 +155,7 @@ function Create() {
                                 {/* Tanggal Selesai */}
                                 <div>
                                     <label className="label">Tanggal Selesai</label>
-                                    <input type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)}
+                                    <input type="datetime-local" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)}
                                         className="input input-bordered w-full" />
                                     {errors.end_date && <div className="text-red-500 text-sm">{errors.end_date}</div>}
                                 </div>
@@ -155,13 +172,21 @@ function Create() {
                                 {errors.description && <div className="text-red-500 text-sm">{errors.description}</div>}
                             </div>
 
-                            <div className='grid md:grid-cols-2 gap-2'>
+                            <div className='grid md:grid-cols-3 gap-2'>
                                 {/* Quota */}
                                 <div>
                                     <label className="label">Quota</label>
                                     <input type="number" value={data.quota} onChange={(e) => setData('quota', e.target.value)}
                                         className="input input-bordered w-full" />
                                     {errors.quota && <div className="text-red-500 text-sm">{errors.quota}</div>}
+                                </div>
+
+                                {/* Quota */}
+                                <div>
+                                    <label className="label">Limit Pembelian</label>
+                                    <input type="number" value={data.limit} onChange={(e) => setData('limit', e.target.value)}
+                                        className="input input-bordered w-full" />
+                                    {errors.limit && <div className="text-red-500 text-sm">{errors.limit}</div>}
                                 </div>
 
                                 {/* Harga */}
@@ -190,10 +215,10 @@ function Create() {
                             </button>
                         </form>
                     </div>
-                </div>
+                </div >
 
 
-            </AuthenticatedLayout>
+            </AuthenticatedLayout >
         </>
     )
 }
