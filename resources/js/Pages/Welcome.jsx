@@ -15,10 +15,10 @@ export default function Welcome({ listEvents, headlines, populars }) {
             return true;
         }
         if (selectedCategory === 2) { // "Training & Workshop"
-            return event.category === 'workshop' || event.category === 'webinar';
+            return event.category === 'lomba';
         }
         if (selectedCategory === 6) { // "Kontes & Olahraga"
-            return event.category === 'lomba';
+            return event.category === 'workshop' || event.category === 'webinar';
         }
         // No direct mapping for other category IDs from sidebar to data
         return false;
