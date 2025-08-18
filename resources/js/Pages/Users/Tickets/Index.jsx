@@ -52,9 +52,9 @@ function Index({ tickets }) {
                                 <thead>
                                     <tr>
                                         <th>No Ticket</th>
-                                        <th>Event</th>
-                                        <th>No Transaksi</th>
-                                        <th>Quantity</th>
+                                        <th className='hidden lg:table-cell'>Event</th>
+                                        <th className='hidden lg:table-cell'>No Transaksi</th>
+                                        <th className='hidden lg:table-cell'>Quantity</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -62,12 +62,12 @@ function Index({ tickets }) {
                                     {/* row 1 */}
                                     {tickets.map((ticket) => (
                                         <tr>
-                                            <td>{ticket.ticket_code}</td>
-                                            <td><Link href={route('tickets.show', ticket)} className='btn btn-link text-blue-800'> {ticket.event.title}</Link></td>
-                                            <td> {ticket.transaction.reference}</td>
-                                            <td>{ticket.quantity}</td>
+                                            <td><Link href={route('tickets.show', ticket)} className='btn btn-link text-blue-800'>{ticket.ticket_code}</Link></td>
+                                            <td className='hidden lg:table-cell'> {ticket.event.title}</td>
+                                            <td className='hidden lg:table-cell'> {ticket.transaction.reference}</td>
+                                            <td className='hidden lg:table-cell'>{ticket.quantity}</td>
                                             <td>{getStatusBadge(ticket.status)}</td>
-                                            <td>
+                                            <td className='hidden lg:table-cell'>
                                                 <Link className='btn btn-sm btn-primary' href={route('tickets.show', ticket)}>
                                                     Detail
                                                 </Link>
