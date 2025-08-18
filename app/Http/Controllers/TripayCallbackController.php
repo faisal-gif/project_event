@@ -65,6 +65,9 @@ class TripayCallbackController extends Controller
                 'status' => 'unused',
             ]);
 
+            $event = $transaction->event;
+            $event->update(['remainingQuota' => $event->remainingQuota - $transaction->quantity]);
+
             DB::commit();
         }
 
