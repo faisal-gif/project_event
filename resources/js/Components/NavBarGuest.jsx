@@ -14,7 +14,7 @@ function NavBarGuest() {
         </Link>
       </div>
 
-      <div className="navbar-center hidden lg:flex">
+      <div className="navbar-center hidden md:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
             <Link href="/" className="hover:bg-primary-focus font-inter font-semibold">
