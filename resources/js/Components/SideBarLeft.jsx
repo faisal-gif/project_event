@@ -16,7 +16,7 @@ function SideBarLeft({ setSelectedCategory, selectedCategory }) {
     const categories = [
         { id: 1, icon: Grid3X3, label: "Semua", count: null },
         { id: 2, icon: Trophy, label: "Kontes AI", count: null },
-        { id: 3, icon: Dumbbell, label: "Hiburan & Atrasi", count: null },
+        { id: 3, icon: Dumbbell, label: "Hiburan & Olahraga", count: null },
         { id: 4, icon: Music, label: "Konser & Festival", count: null },
         { id: 5, icon: Presentation, label: "Seminar & Talkshow", count: null },
         { id: 6, icon: GraduationCap, label: "Training & Workshop", count: null },
