@@ -25,7 +25,7 @@ function WidgetHorizontal({ events }) {
         <>
             <Head title="Widget Event" />
 
-            <div className='flex flex-col justify-center items-center gap-4'>
+            <div className='bg-transparent flex flex-col justify-center items-center gap-4'>
                 <h1 className='text-2xl lg:text-4xl font-bold'>Bosan dengan rutinitas?</h1>
                 <h4 className='text-sm lg:text-2xl'>Saatnya Pilih Event Seru yang Cocok untukmu!</h4>
                 <Carousel opts={{ align: "start", loop: true }} className="w-full" plugins={[Autoplay()]}>
