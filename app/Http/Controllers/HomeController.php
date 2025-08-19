@@ -37,4 +37,13 @@ class HomeController extends Controller
             'event' => $event,
         ]);
     }
+
+    public function widget()
+    {
+        $events = Event::where('status', 'valid')->with('creator')->get();
+
+        return Inertia::render('WidgetHorizontal', [
+            'events' => $events,
+        ]);
+    }
 }

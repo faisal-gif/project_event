@@ -7,7 +7,6 @@ import Fade from 'embla-carousel-fade';
 import HeadlineEvents from './HeadlineEvents';
 
 function HeroSection({ events, headline }) {
-    console.log(events);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('id-ID', {
