@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TripayCallbackController;
@@ -13,6 +14,8 @@ use Inertia\Inertia;
 use App\Models\Event;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/auth/{provider}', [SocialiteController::class, 'redirect'])->name('auth.provider');
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('auth.callback');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

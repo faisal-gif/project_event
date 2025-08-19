@@ -1,5 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Checkbox from '@/Components/Checkbox';
+import GoogleLogo from '@/Components/GoogleLogo';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -33,6 +34,11 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
             <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
+
+            <a href={route('auth.provider','google')} className="btn btn-outline bg-base-200 w-full h-12 text-base my-4">
+                <GoogleLogo size={20} />
+                Lanjutkan dengan Google
+            </a>
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" className='text-white' />
@@ -84,42 +90,33 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
-
                     <div>
-                        {canResetPassword && (
-                            <Link
-                                href={route('password.request')}
-                                className="btn btn-link btn-sm w-full text-white lg:text-black"
-                            >
-                                Forgot your password?
-                            </Link>
-                        )}
+
 
                     </div>
 
 
                 </div>
-                <div className='mt-4 block'>
+                <div className='mt-8 block'>
                     <PrimaryButton className="w-full justify-center" disabled={processing}>
                         Log in
                     </PrimaryButton>
                 </div>
-               
-                <div className='mt-4 block'>
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t border-border/20" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase text-white lg:text-white">
-                            <span className="bg-background px-2 text-muted-foreground">
-                                or
-                            </span>
-                        </div>
-                    </div>
+
+                <div className='mt-8 block'>
+                    {canResetPassword && (
+                        <Link
+                            href={route('password.request')}
+                            className="btn btn-link btn-sm w-full text-white lg:text-black"
+                        >
+                            Forgot your password?
+                        </Link>
+                    )}
                 </div>
-                 <div className='mt-4 block'>
-                    <Link href={route('register')} className="btn btn-link btn-sm w-full">
-                        Register
+                <div className='mt-8 text-white lg:text-black  flex items-center justify-center gap-2'>
+                    <span>Belum Punya Akun?</span>
+                    <Link href={route('register')} className="btn btn-link btn-sm p-0 text-white lg:text-black">
+                        Daftar Sekarang
                     </Link>
                 </div>
 
