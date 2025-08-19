@@ -125,7 +125,7 @@ const CarouselPrevious = forwardRef((props, ref) => {
             ref={ref}
             className={`absolute z-10 h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center
         ${orientation === "horizontal"
-                    ? "hidden sm:flex  sm:top-1/2 sm:-translate-y-1/2 sm:left-2"
+                    ? "hidden md:flex  sm:top-1/2 sm:-translate-y-1/2 sm:left-2"
                     : "-top-12 left-1/2 -translate-x-1/2 rotate-90"
                 }
       `}
@@ -148,7 +148,7 @@ const CarouselNext = forwardRef((props, ref) => {
             ref={ref}
             className={`absolute z-10 h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center
         ${orientation === "horizontal"
-                    ? "hidden sm:flex sm:top-1/2 sm:-translate-y-1/2 sm:right-2"
+                    ? "hidden md:flex sm:top-1/2 sm:-translate-y-1/2 sm:right-2"
                     : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90"
                 }
       `}

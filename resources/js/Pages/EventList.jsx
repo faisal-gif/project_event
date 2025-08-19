@@ -48,8 +48,7 @@ function EventList({ events }) {
                 </div>
 
                 {/* Filters */}
-                <div className="card bg-base-200 shadow-sm mb-8">
-                    <div className="card-body">
+                <div className="card bg-base-200 shadow-sm mb-8 p-4">
                         <div className="flex flex-wrap gap-4 items-center">
                             <div className="form-control">
                                 <label className="label">
@@ -83,7 +82,6 @@ function EventList({ events }) {
                             </div>
                         </div>
                     </div>
-                </div>
 
                 {/* Event Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,10 +105,10 @@ function EventList({ events }) {
                             </figure>
                             <div className="card-body">
                                 <div className="flex justify-between items-start mb-2">
-                                    <div className={`badge ${event.type === 'competition' ? 'badge-neutral' : 'badge-primary'}`}>
+                                    <div className={`badge ${event.type === 'competition' ? 'bg-[#3f154f]/60 py-3 text-white' : 'bg-[#7f0b1a]/60 text-white py-3'}`}>
                                         {event.type === 'competition' ? 'Competition' : 'Event'}
                                     </div>
-                                    <div className="badge badge-outline">{event.category}</div>
+                                    <div className="badge badge-outline py-3 capitalize">{event.category}</div>
                                 </div>
 
                                 <h2 className="card-title text-lg mb-2">{event.title}</h2>
