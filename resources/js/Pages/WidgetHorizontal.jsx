@@ -26,14 +26,14 @@ function WidgetHorizontal({ events }) {
             <Head title="Widget Event" />
 
             <div className='flex flex-col justify-center items-center gap-4'>
-                <h1 className='text-4xl font-bold'>Bosan dengan rutinitas?</h1>
-                <h4 className='text-2xl'>Saatnya Pilih Event Seru yang Cocok untukmu!</h4>
+                <h1 className='text-2xl lg:text-4xl font-bold'>Bosan dengan rutinitas?</h1>
+                <h4 className='text-sm lg:text-2xl'>Saatnya Pilih Event Seru yang Cocok untukmu!</h4>
                 <Carousel opts={{ align: "start", loop: true }} className="w-full" plugins={[Autoplay()]}>
                     <Carousel.Content className="-ml-4">
                         {events.map((event) => (
                             <Carousel.Item
                                 key={event.id}
-                                className="pl-4 min-w-0 shrink-0 grow-0 basis-full sm:basis-1/2 lg:basis-1/4"
+                                className="pl-4 min-w-0 shrink-0 grow-0 basis-full sm:basis-1/3 lg:basis-1/4"
                             >
                                 <div className="p-2 h-full">
                                     <div key={event.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
