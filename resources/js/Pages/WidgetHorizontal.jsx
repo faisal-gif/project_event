@@ -67,12 +67,13 @@ function WidgetHorizontal({ events }) {
                                                 <div className="text-xl font-bold text-primary">
                                                     {formatPrice(event.price)}
                                                 </div>
-                                                <Link
+                                                <a
+                                                target='_blank'
                                                     href={route('events.guest.detail', event)}
                                                     className="btn btn-primary btn-sm"
                                                 >
                                                     Lihat Detail
-                                                </Link>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
