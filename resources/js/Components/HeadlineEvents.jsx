@@ -22,7 +22,7 @@ function HeadlineEvents({ listHeadline }) {
         <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay()]}>
             <Carousel.Content>
                 {listHeadline.map((article) => (
-                    <Carousel.Item key={article.id}>
+                    <Carousel.Item key={article.id} className="basis-full">
                         <FeaturedNewsCard event={article} />
                     </Carousel.Item>
                 ))}
