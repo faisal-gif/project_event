@@ -49,39 +49,39 @@ function EventList({ events }) {
 
                 {/* Filters */}
                 <div className="card bg-base-200 shadow-sm mb-8 p-4">
-                        <div className="flex flex-wrap gap-4 items-center">
-                            <div className="form-control">
-                                <label className="label">
-                                    <span className="label-text font-medium">Jenis:</span>
-                                </label>
-                                <select
-                                    className="select select-bordered w-full max-w-xs"
-                                    value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
-                                >
-                                    <option value="all">Semua</option>
-                                    <option value="event">Event</option>
-                                    <option value="competition">Lomba</option>
-                                </select>
-                            </div>
+                    <div className="flex flex-wrap gap-4 items-center">
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text font-medium">Jenis:</span>
+                            </label>
+                            <select
+                                className="select select-bordered w-full max-w-xs"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                            >
+                                <option value="all">Semua</option>
+                                <option value="event">Event</option>
+                                <option value="competition">Lomba</option>
+                            </select>
+                        </div>
 
-                            <div className="form-control">
-                                <label className="label">
-                                    <span className="label-text font-medium">Kategori:</span>
-                                </label>
-                                <select
-                                    className="select select-bordered w-full max-w-xs"
-                                    value={categoryFilter}
-                                    onChange={(e) => setCategoryFilter(e.target.value)}
-                                >
-                                    <option value="all">Semua Kategori</option>
-                                    {categories.map(category => (
-                                        <option key={category} value={category}>{category}</option>
-                                    ))}
-                                </select>
-                            </div>
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text font-medium">Kategori:</span>
+                            </label>
+                            <select
+                                className="select select-bordered w-full max-w-xs"
+                                value={categoryFilter}
+                                onChange={(e) => setCategoryFilter(e.target.value)}
+                            >
+                                <option value="all">Semua Kategori</option>
+                                {categories.map(category => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
+                </div>
 
                 {/* Event Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,7 +112,7 @@ function EventList({ events }) {
                                 </div>
 
                                 <h2 className="card-title text-lg mb-2">{event.title}</h2>
-                               
+
                                 <div className="space-y-2 mb-4">
                                     <div className="flex items-center text-sm">
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,9 @@ function EventList({ events }) {
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                         </svg>
-                                        {event.remainingQuota} / {event.quota} tersisa
+                                        {event.remainingQuota === 0
+                                            ? 'Sold Out'
+                                            : `${event.remainingQuota} / ${event.quota} tersisa`}
                                     </div>
                                 </div>
 
