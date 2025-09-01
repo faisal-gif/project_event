@@ -22,7 +22,7 @@ function Edit({ event }) {
         event.image ? `/storage/${event.image}` : '/placeholder.svg'
     )
 
-    const { data: editData, setData: setEditData, post, processing, errors } = useForm({
+    const { data: editData, setData: setEditData, processing, errors } = useForm({
         image: null,
         title: event.title,
         category: event.category,

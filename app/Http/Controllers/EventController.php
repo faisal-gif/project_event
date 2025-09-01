@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoryEvents;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,7 @@ class EventController extends Controller
      */
     public function Index()
     {
-        $events = Event::with('creator')->latest()->get();
+        $events = Event::with('creator', 'category')->latest()->get();
         return Inertia::render('Admin/Events/Index', ['events' => $events]);
     }
 
@@ -29,7 +30,10 @@ class EventController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Events/Create');
+        $category = CategoryEvents::all();
+        return Inertia::render('Admin/Events/Create', [
+            'category' => $category
+        ]);
     }
 
     /**
@@ -41,14 +45,14 @@ class EventController extends Controller
             'image' => 'required|image',
             'title' => 'required',
             'description' => 'required',
-            'type' => 'required|in:event,competition',
+            'requirements' => 'nullable|string',
             'category' => 'required',
-            'type' => 'required',
+            'location_type' => 'required',
+            'location_details' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'price' => 'required|numeric',
             'quota' => 'required|integer',
-            'lokasi' => 'required',
             'limit' => 'required|integer',
             'headline' => 'required|boolean',
         ]);
@@ -65,14 +69,15 @@ class EventController extends Controller
             'image' => 'images/' . $slug . '.webp',
             'title' => $request->title,
             'description' => $request->description,
-            'type' => $request->type,
-            'category' => $request->category,
+            'requirements' => $request->requirements,
+            'category_id' => $request->category,
+            'location_type' => $request->location_type,
+            'location_details' => $request->location_details,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'price' => $request->price,
             'quota' => $request->quota,
             'remainingQuota' => $request->quota,
-            'location' => $request->lokasi,
             'created_by' => auth()->user()->id,
             'status' => 'valid',
             'is_headline' => $request->headline,
@@ -86,7 +91,7 @@ class EventController extends Controller
      */
     public function Show(Event $event)
     {
-        $event = Event::with('tickets')->findOrFail($event->id);
+        $event = Event::with('tickets', 'category')->findOrFail($event->id);
 
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
@@ -124,7 +129,7 @@ class EventController extends Controller
         // Update image jika ada file baru
         if ($request->hasFile('image')) {
             Storage::disk('public')->delete($event->image);
-            
+
             $manager = new ImageManager(new Driver());
             $image = $manager->read($request->file('image'));
             $encode = $image->toWebp();

@@ -25,4 +25,9 @@ class Event extends Model
     {
         return $this->hasMany(Announcement::class);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(CategoryEvents::class);
+    }
 }

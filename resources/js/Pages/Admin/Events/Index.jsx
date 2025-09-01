@@ -53,7 +53,7 @@ function Index({ events }) {
                                     <tr>
                                         <th></th>
                                         <th>Nama Event</th>
-                                        <th>Type</th>
+                                      
                                         <th>Category</th>
                                         <th>Price</th>
                                         <th>Quota</th>
@@ -66,8 +66,7 @@ function Index({ events }) {
                                         <tr>
                                             <td>{index + 1}</td>
                                             <td>{event.title}</td>
-                                            <td> {event.type}</td>
-                                            <td>{event.category}</td>
+                                            <td>{event.category.name}</td>
                                             <td>{formatPrice(event.price)}</td>
                                             <td>{event.quota}</td>
 

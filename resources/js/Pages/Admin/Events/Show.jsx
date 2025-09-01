@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
+import { LocateIcon, LocationEdit, MapPin, Video } from 'lucide-react';
 import React from 'react'
 
 function Show({ event }) {
@@ -81,10 +82,7 @@ function Show({ event }) {
 
                                 <div className="card-body">
                                     <div className="flex flex-wrap gap-2 mb-4">
-                                        <div className={`badge ${event.type === 'lomba' ? 'badge-secondary' : 'badge-primary'} badge-lg`}>
-                                            {event.type === 'lomba' ? 'Lomba' : 'Event'}
-                                        </div>
-                                        <div className="badge badge-outline badge-lg">{event.category}</div>
+                                        <div className="badge badge-outline badge-lg">{event.category.name}</div>
                                         {urgency === 'low' && (
                                             <div className="badge badge-error badge-lg">Hampir Penuh!</div>
                                         )}
@@ -119,15 +117,30 @@ function Show({ event }) {
                                                 </div>
                                             </div>
 
-                                            {event.location && (
-                                                <div className="flex items-start space-x-3">
-                                                    <svg className="w-5 h-5 mt-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    </svg>
+                                            {event.location_type && (
+                                                <div className="flex items-center space-x-3">
+                                                    {event.location_type === 'online' && (
+                                                        <Video size={20} className="text-primary" />
+                                                    )}
+                                                    {event.location_type === 'offline' && (
+                                                        <MapPin size={20} className="text-primary" />
+                                                    )}
+                                                    {event.location_type === 'hybrid' && (
+                                                        <LocationEdit size={20} className="text-primary" />
+                                                    )}
                                                     <div>
                                                         <p className="font-medium">Lokasi</p>
-                                                        <p className="text-sm text-base-content/70">{event.location}</p>
+                                                        <p className="capitalize text-sm text-base-content/70">{ event.location_type}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {event.location_details && (
+                                                <div className="flex items-center space-x-3">
+                                                    <LocateIcon size={20} className="text-primary" />
+                                                    <div>
+                                                        <p className="font-medium">Detail Lokasi</p>
+                                                        <p className="text-sm text-black/70">{event.location_details}</p>
                                                     </div>
                                                 </div>
                                             )}

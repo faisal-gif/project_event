@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryEventsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::resource('events', EventController::class);
+    Route::resource('category', CategoryEventsController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::post('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
 });

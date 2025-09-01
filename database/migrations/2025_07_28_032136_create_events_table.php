@@ -16,9 +16,10 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
-            $table->enum('type', ['event', 'competition']);
-            $table->string('category');
-            $table->string('location')->nullable();
+            $table->text('requirements')->nullable();
+            $table->foreignId('category_id')->constrained('category_events')->onDelete('cascade');
+            $table->enum('location_type',['online', 'offline', 'hybrid']);
+            $table->longText('location_details')->nullable();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->decimal('price', 10, 2);
