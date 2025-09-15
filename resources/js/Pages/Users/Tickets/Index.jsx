@@ -39,6 +39,8 @@ function Index({ tickets }) {
         }
     };
 
+    console.log(tickets);
+    
 
     return (
         <GuestLayout>
@@ -52,14 +54,14 @@ function Index({ tickets }) {
                             <Ticket className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                             <h3 className="text-lg font-medium mb-2">No tickets found</h3>
                             <p className="text-muted-foreground">
-                                {searchTerm ? "Try adjusting your search terms." : "You haven't purchased any tickets yet."}
+                                {tickets ? "Try adjusting your search terms." : "You haven't purchased any tickets yet."}
                             </p>
                         </Card.Body>
                     </Card>
                 ) : (
                     <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
                         {tickets.map((ticket) => (
-                            <Card key={ticket.id} className="shadow-medium hover:shadow-glow transition-all duration-300 group">
+                            <Card key={ticket.id} className="shadow-md hover:shadow-glow transition-all duration-300 group">
                                 <div className="pb-4">
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
