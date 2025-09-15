@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react'
 import { data } from 'autoprefixer';
-import { Calendar, Clock, Eye, Ticket } from 'lucide-react';
+import { Calendar, Clock, Eye, MapPin, Ticket } from 'lucide-react';
 import React from 'react'
 
 function Index({ tickets }) {
