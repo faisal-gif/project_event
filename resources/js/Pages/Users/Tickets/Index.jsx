@@ -78,7 +78,7 @@ function Index({ tickets }) {
                                     </div>
                                 </div>
 
-                                <CardContent className="space-y-4">
+                                <Card.Body className="space-y-4">
                                     {/* Event Details */}
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ function Index({ tickets }) {
                                         </button>
                                        
                                     </div>
-                                </CardContent>
+                                </Card.Body>
                             </Card>
                         ))}
                     </div>
