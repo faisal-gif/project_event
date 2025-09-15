@@ -38,8 +38,6 @@ function Index({ tickets }) {
                 return <div className="badge badge-ghost">UNKNOWN</div>;
         }
     };
-
-    console.log(tickets);
     
 
     return (
@@ -66,7 +64,7 @@ function Index({ tickets }) {
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
                                             <Card.Title className="text-lg leading-tight mb-2">
-                                                {ticket.event.name}
+                                                {ticket.event.title}
                                             </Card.Title>
                                             <div className="flex items-center gap-2">
                                                 {getStatusBadge(ticket.status)}
