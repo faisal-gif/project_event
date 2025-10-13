@@ -78,19 +78,24 @@ class TripayCallbackController extends Controller
 
             // Process and store event field responses
             if (!empty($transaction->field_responses)) {
-                $eventFields = EventField::where('event_id', $transaction->event_id)
-                    ->whereIn('name', array_keys($transaction->field_responses))
-                    ->get()
-                    ->keyBy('name');
+                $responses = json_decode($transaction->field_responses, true);
 
-                foreach ($transaction->field_responses as $fieldName => $fieldValue) {
-                    if (isset($eventFields[$fieldName])) {
-                        EventFieldResponse::create([
-                            'event_field_id' => $eventFields[$fieldName]->id,
-                            'ticket_id' => $ticket->id,
-                            'field_name' => $fieldName,
-                            'field_value' => $fieldValue,
-                        ]);
+                if (is_array($responses) && !empty($responses)) {
+                    $eventFields = EventField::where('event_id', $transaction->event_id)
+                        ->whereIn('name', array_keys($responses))
+                        ->get()
+                        ->keyBy('name');
+
+                    // 3. Lakukan looping pada array yang sudah di-decode
+                    foreach ($responses as $fieldName => $fieldValue) {
+                        if (isset($eventFields[$fieldName])) {
+                            EventFieldResponse::create([
+                                'event_field_id' => $eventFields[$fieldName]->id,
+                                'ticket_id' => $ticket->id,
+                                'field_name' => $fieldName,
+                                'field_value' => $fieldValue,
+                            ]);
+                        }
                     }
                 }
             }
