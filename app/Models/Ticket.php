@@ -31,4 +31,9 @@ class Ticket extends Model
     {
         return $this->belongsTo(DetailPendaftar::class);
     }
+
+    public function event_field_responses()
+    {
+        return $this->hasMany(EventFieldResponse::class);
+    }
 }

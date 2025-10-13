@@ -33,6 +33,21 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+
+        $eventFields = $request->input('event_fields', []);
+        if (!empty($eventFields)) {
+            foreach ($eventFields as $key => $field) {
+                // Cek jika 'options' ada dan merupakan string
+                if (isset($field['options']) && is_string($field['options'])) {
+                    // Ubah string "M,L,XL" menjadi array ['M', 'L', 'XL']
+                    $eventFields[$key]['options'] = array_map('trim', explode(',', $field['options']));
+                }
+            }
+            // Gabungkan kembali data yang sudah diubah ke dalam request
+            $request->merge(['event_fields' => $eventFields]);
+        }
+
+
         $data = $this->validateEventData($request);
 
         $slug = Str::slug($request->title);
@@ -57,6 +72,7 @@ class EventController extends Controller
             'needs_submission' => $data['needs_submission'] ?? false,
         ]);
 
+
         $this->syncRelatedData($event, $data);
 
         return redirect()->route('events.index')->with('success', 'Event created successfully.');
@@ -64,7 +80,7 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('tickets', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+        $event->load('tickets.user', 'tickets.detail_pendaftar', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
 
@@ -78,6 +94,20 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
+
+        $eventFields = $request->input('event_fields', []);
+        if (!empty($eventFields)) {
+            foreach ($eventFields as $key => $field) {
+                // Cek jika 'options' ada dan merupakan string
+                if (isset($field['options']) && is_string($field['options'])) {
+                    // Ubah string "M,L,XL" menjadi array ['M', 'L', 'XL']
+                    $eventFields[$key]['options'] = array_map('trim', explode(',', $field['options']));
+                }
+            }
+            // Gabungkan kembali data yang sudah diubah ke dalam request
+            $request->merge(['event_fields' => $eventFields]);
+        }
+
         $data = $this->validateEventData($request, $event);
 
         $updateData = [
@@ -105,6 +135,7 @@ class EventController extends Controller
         }
 
         $event->update($updateData);
+
 
         $this->syncRelatedData($event, $data);
 
@@ -134,11 +165,21 @@ class EventController extends Controller
             'need_additional_questions' => 'boolean',
             'event_fields' => ['nullable', 'array'],
             'event_fields.*.label' => ['required_with:event_fields', 'string'],
-            'event_fields.*.type' => ['required_with:event_fields', 'string'],
+            'event_fields.*.type' => ['required_with:event_fields', 'string', 'in:text,textarea,select,radio,checkbox,date,file,url'],
+            'event_fields.*.is_required' => ['boolean'],
+            'event_fields.*.options' => [
+                'required_if:event_fields.*.type,select',
+                'required_if:event_fields.*.type,radio',
+                'required_if:event_fields.*.type,checkbox',
+                'nullable',
+                'array'
+            ],
             'needs_submission' => 'boolean',
             'submission_fields' => ['nullable', 'array'],
             'submission_fields.*.label' => ['required_with:submission_fields', 'string'],
             'submission_fields.*.type' => ['required_with:submission_fields', 'string'],
+            'submission_fields.*.options' => ['nullable', 'string'],
+            'submission_fields.*.is_required' => ['boolean'],
         ]);
     }
 
@@ -168,6 +209,7 @@ class EventController extends Controller
             }
         }
 
+
         // Sync Event Fields
         $event->eventFields()->delete();
         if ($data['need_additional_questions'] && !empty($data['event_fields'])) {
@@ -177,7 +219,7 @@ class EventController extends Controller
                     'name' => Str::snake($field['label']),
                     'type' => $field['type'],
                     'is_required' => $field['is_required'] ?? false,
-                    'options' => $field['options'] ?? null,
+                    'options' => $field['options'],
                 ]);
             }
         }

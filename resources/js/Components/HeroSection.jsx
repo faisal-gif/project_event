@@ -39,7 +39,7 @@ function HeroSection({ events, headline }) {
 
     if (events.length === 0) {
         return (
-            <div className="container max-w-7xl mx-auto px-4 py-4">
+            <div className="container max-w-7xl mx-auto py-4">
                 <div className="flex flex-col gap-4">
                     <h1 className="text-4xl font-bold text-center">
                         Event
@@ -54,12 +54,12 @@ function HeroSection({ events, headline }) {
 
 
     return (
-        <div className="container max-w-7xl mx-auto px-4 py-4">
+        <div className="w-full  col-span-2 mx-auto py-4">
             <div className='flex flex-col gap-8'>
                 <HeadlineEvents listHeadline={headline} />
 
                 <h2 className="text-2xl font-bold">Event Terkini</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
                     {events.map((event) => (
                         <div key={event.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
                             <figure className="w-full h-48 bg-base-200 flex items-center justify-center overflow-hidden">
@@ -86,7 +86,7 @@ function HeroSection({ events, headline }) {
                                     <div className="badge badge-outline">{event.category.name}</div>
                                 </div>
 
-                                <h2 className="card-title text-sm mb-2 text-base-content">{event.title}</h2>
+                                <h2 className="card-title text-sm mb-2 text-base-content h-10 line-clamp-2">{event.title}</h2>
                                 <div className="space-y-2 mb-4 text-base-content">
                                     <div className="flex items-center text-xs">
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -6,10 +6,10 @@ import FeaturedNewsCard from './FeaturedNewsCard'
 function HeadlineEvents({ listHeadline }) {
     if (listHeadline.length === 0) {
         return (
-            <div className="container max-w-7xl mx-auto px-4 py-4">
+            <div className="container max-w-4xl mx-auto px-4 py-4">
                 <div className="flex flex-col gap-4">
                     <h1 className="text-4xl font-bold text-center">
-                        Headline Event 
+                        Headline Event
                     </h1>
                     <p className="text-lg text-center text-gray-500">
                         Tidak ada Headline Event yang tersedia.
@@ -19,18 +19,20 @@ function HeadlineEvents({ listHeadline }) {
         )
     }
     return (
-        <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay()]}>
-            <Carousel.Content>
-                {listHeadline.map((article) => (
-                    <Carousel.Item key={article.id} className="basis-full">
-                        <FeaturedNewsCard event={article} />
-                    </Carousel.Item>
-                ))}
+        <div className='container max-w-4xl px-4 md:px-0 mx-auto'>
+            <Carousel opts={{ align: "start", loop: true }} plugins={[Autoplay()]}>
+                <Carousel.Content>
+                    {listHeadline.map((article) => (
+                        <Carousel.Item key={article.id} className="basis-full">
+                            <FeaturedNewsCard event={article} />
+                        </Carousel.Item>
+                    ))}
+                </Carousel.Content>
+                <Carousel.Previous />
+                <Carousel.Next />
+            </Carousel>
+        </div>
 
-            </Carousel.Content>
-            <Carousel.Previous />
-            <Carousel.Next />
-        </Carousel>
     )
 }
 

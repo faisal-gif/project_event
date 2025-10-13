@@ -8,4 +8,9 @@ class EventField extends Model
 {
     protected $table = 'event_fields';
     protected $guarded = [];
+
+    protected $casts = [
+        'options' => 'array', 
+        'is_required' => 'boolean',
+    ];
 }

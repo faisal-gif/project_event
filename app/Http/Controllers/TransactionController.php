@@ -57,6 +57,8 @@ class TransactionController extends Controller
             'terms' => 'accepted',
         ];
 
+
+
         $fieldRules = [];
         if ($event->need_additional_questions) {
             foreach ($event->eventFields as $field) {
@@ -67,6 +69,7 @@ class TransactionController extends Controller
 
         $validated = $request->validate(array_merge($mainRules, $fieldRules));
 
+
         if ($ticketType->remaining_quota < $validated['quantity']) {
             return back()->with('error', 'Sorry, the remaining tickets are not enough.');
         }
@@ -74,16 +77,17 @@ class TransactionController extends Controller
         $user = auth()->user();
         $result = $tripay->createTransaction($ticketType, $user, $validated);
 
+        dd($result);
+
         if (isset($result['success']) && $result['success']) {
 
-            // Note: DetailPendaftar seems redundant now if we use field_responses.
-            // For now, we keep it to avoid breaking other parts of the app.
             $detailPendaftar = DetailPendaftar::create([
                 'nama' => $validated['name'],
                 'email' => $validated['email'],
                 'no_hp' => $validated['phone'],
             ]);
 
+          
             $trx = Transaction::create([
                 'user_id'       => $user->id,
                 'event_id'     => $ticketType->event->id,
@@ -99,6 +103,8 @@ class TransactionController extends Controller
                 'checkout_url'  => $result['data']['checkout_url'],
                 'field_responses' => json_encode($validated['field_responses'] ?? []), // Store field responses as JSON
             ]);
+
+
 
             return redirect()->route('transactions.status', ['tripay_reference' => $trx->reference])->with('checkout_url', $trx->checkout_url);
         }

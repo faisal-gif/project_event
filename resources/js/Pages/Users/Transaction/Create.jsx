@@ -38,8 +38,124 @@ const Create = ({ ticketType, event, channel, quantity }) => {
         }).format(price);
     };
 
-    const handleFieldChange = (fieldName, value) => {
-        setData('field_responses', { ...data.field_responses, [fieldName]: value });
+    const handleFieldChange = (field, event) => {
+        const { name, type } = field;
+        const target = event.target;
+
+        let value;
+        if (type === 'checkbox' && !field.options) {
+            value = target.checked;
+        } else if (type === 'file') {
+            value = target.files[0];
+        } else {
+            value = target.value;
+        }
+
+        setData('field_responses', { ...data.field_responses, [name]: value });
+    };
+
+    const RenderField = ({ field, value, onChange, error }) => {
+        // Props for inputs that need immediate updates (radio, checkbox, file)
+        const interactiveProps = {
+            id: field.name,
+            name: field.name,
+            onChange: (e) => onChange(field, e),
+            required: field.is_required,
+        };
+
+        // Props for inputs that can be updated on blur for better performance
+        const delayedProps = {
+            id: field.name,
+            name: field.name,
+            onBlur: (e) => onChange(field, e), // Update on blur
+            required: field.is_required,
+            defaultValue: value || '', // Use defaultValue
+        };
+
+        const label = (
+            <label htmlFor={field.name} className="label-text font-medium">
+                {field.label}
+                {field.is_required ? <span className="text-red-500">*</span> : ''}
+            </label>
+        );
+
+        let inputElement;
+
+        switch (field.type) {
+            case 'textarea':
+                inputElement = <textarea {...delayedProps} placeholder={field.label} className="textarea textarea-bordered w-full"></textarea>;
+                break;
+            case 'select':
+                const options = field.options ? field.options.map(opt => opt.trim()) : [];
+                inputElement = (
+                    <select {...delayedProps} className="select select-bordered w-full">
+                        <option value="" disabled>Pilih {field.label}</option>
+                        {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                );
+                break;
+            case 'checkbox':
+                const radioOptions = field.options ? field.options.map(opt => opt.trim()) : [];
+
+                if (radioOptions.length > 0) {
+                    // Render as a RADIO GROUP for single choice
+                    return (
+                        <div className="flex flex-col gap-2 w-full">
+                            {label}
+                            <div className="flex flex-col gap-2 p-3 rounded-md border border-base-300">
+                                {radioOptions.map(option => (
+                                    <label key={option} className="label cursor-pointer justify-start">
+                                        <input
+                                            type="radio"
+                                            name={field.name}
+                                            value={option}
+                                            checked={value === option}
+                                            onChange={(e) => onChange(field, e)} // Uses onChange
+                                            className="radio radio-primary mr-2"
+                                            required={field.is_required}
+                                        />
+                                        <span className="label-text">{option}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            <InputError message={error} />
+                        </div>
+                    );
+                } else {
+                    // Render as a single boolean checkbox
+                    return (
+                        <div className="form-control">
+                            <label className="label cursor-pointer justify-start">
+                                <input
+                                    type="checkbox"
+                                    {...interactiveProps}
+                                    checked={!!value}
+                                    className="checkbox checkbox-primary mr-2"
+                                />
+                                <span className="label-text">
+                                    {field.label}
+                                    {field.is_required ? <span className="text-red-500">*</span> : ''}
+                                </span>
+                            </label>
+                            <InputError message={error} />
+                        </div>
+                    );
+                }
+            case 'file':
+                inputElement = <input type="file" {...interactiveProps} className="file-input file-input-bordered w-full" />;
+                break;
+            default: // 'text', 'email', 'number', 'url' etc.
+                inputElement = <input type={field.type} {...delayedProps} placeholder={field.label} className="input input-bordered w-full" />;
+                break;
+        }
+
+        return (
+            <div className="flex flex-col gap-2 w-full">
+                {label}
+                {inputElement}
+                <InputError message={error} />
+            </div>
+        );
     };
 
     const totalPrice = ticketType.price * data.quantity;
@@ -103,25 +219,18 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                         <h3 className="text-xl font-semibold mb-6">Informasi Tambahan</h3>
                                         <div className="rounded-lg p-4 mb-6 space-y-4">
                                             {event.event_fields.map(field => (
-                                                <div key={field.id} className="flex flex-col gap-2 w-full">
-                                                    <label className="label-text font-medium">
-                                                        {field.label}
-                                                        {field.is_required ? <span className="text-red-500">*</span> : ''}
-                                                    </label>
-                                                    <input 
-                                                        type={field.type} 
-                                                        value={data.field_responses[field.name] || ''}
-                                                        onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                                                        placeholder={field.label}
-                                                        className="input input-bordered w-full" 
-                                                        required={field.is_required} 
-                                                    />
-                                                    <InputError message={errors[`field_responses.${field.name}`]} />
-                                                </div>
+                                                <RenderField 
+                                                    key={field.id} 
+                                                    field={field} 
+                                                    value={data.field_responses[field.name] || ''} 
+                                                    onChange={handleFieldChange} 
+                                                    error={errors[`field_responses.${field.name}`]} 
+                                                />
                                             ))}
                                         </div>
                                     </>
                                 )}
+                 
 
                                 <div className="flex flex-col gap-2 w-full mt-4">
                                     <label className="label cursor-pointer">

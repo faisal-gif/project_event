@@ -32,9 +32,9 @@ export default function Welcome({ listEvents, headlines, populars }) {
                 <meta property="og:title" content="Home" />
                 <meta property="og:description" content="TIMES Event" />
             </Head>
-            <div className="bg-gray-50 text-gray-800">
+            <div className="bg-gray-50 text-gray-800 ">
                 <GuestLayout>
-                    <div className='flex flex-col lg:flex-row'>
+                    <div className='flex flex-col lg:flex-row '>
                         <SideBarLeft setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
                         <HeroSection events={filteredEvents} headline={headlines} />
                         <SideBarRight />
