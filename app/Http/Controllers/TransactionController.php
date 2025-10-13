@@ -77,8 +77,6 @@ class TransactionController extends Controller
         $user = auth()->user();
         $result = $tripay->createTransaction($ticketType, $user, $validated);
 
-        dd($result);
-
         if (isset($result['success']) && $result['success']) {
 
             $detailPendaftar = DetailPendaftar::create([
