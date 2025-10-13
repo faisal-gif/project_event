@@ -64,6 +64,14 @@ class TicketController extends Controller
         //
     }
 
+    public function additonal(Request $request, Ticket $ticket)
+    {
+        $ticket->ticket_additional_questions = $request->all();
+        $ticket->status = 'used';
+        $ticket->save();
+        
+        return redirect()->back();
+    }
     /**
      * Remove the specified resource from storage.
      */

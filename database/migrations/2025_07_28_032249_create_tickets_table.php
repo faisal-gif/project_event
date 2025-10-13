@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('detail_pendaftar_id')->constrained()->onDelete('cascade');
             $table->string('ticket_code')->unique();
             $table->string('qr_image');
-            $table->json('ticket_additional_questions');
             $table->enum('status', ['unused', 'used', 'expired'])->default('unused');
             $table->integer('quantity');
             $table->timestamps();

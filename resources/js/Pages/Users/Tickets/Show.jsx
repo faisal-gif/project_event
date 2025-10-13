@@ -1,3 +1,4 @@
+import FormAditionalQuestion from '@/Components/FormAditionalQuestion';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
@@ -95,7 +96,7 @@ function Show({ ticket }) {
                                             <label className="text-sm font-medium text-base-content/70">Harga Tiket</label>
                                             <p className="font-medium text-primary text-lg">{formatPrice(ticket.event.price)}</p>
                                         </div>
-                                         <div>
+                                        <div>
                                             <label className="text-sm font-medium text-base-content/70">Quantity</label>
                                             <p className="font-medium text-primary text-lg">{ticket.quantity}</p>
                                         </div>
@@ -115,13 +116,13 @@ function Show({ ticket }) {
                                                 </svg>
                                                 {formatDate(ticket.event.start_date)}
                                             </div>
-                                            {ticket.event.location && (
+                                            {ticket.event.location_type == 'online' && (
                                                 <div className="flex items-center">
                                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                     </svg>
-                                                    {ticket.event.location}
+                                                    {ticket.event.location_type}
                                                 </div>
                                             )}
                                         </div>
@@ -129,9 +130,10 @@ function Show({ ticket }) {
                                 </div>
 
                                 {/* QR Code Section */}
-                                <div className="text-center">
+                                {ticket.event.location_type == 'online' ? (
+                                    <FormAditionalQuestion ticket={ticket} />
+                                ) : (<div className="text-center">
                                     <h3 className="text-xl font-semibold mb-4">QR Code Tiket</h3>
-
                                     <div className="bg-white p-6 rounded-lg border-2 border-dashed border-base-300 inline-block">
                                         {ticket.qr_image ? (
                                             <img
@@ -149,7 +151,8 @@ function Show({ ticket }) {
                                     <p className="text-sm text-base-content/70 mt-4">
                                         Tunjukkan QR Code ini kepada panitia saat masuk event
                                     </p>
-                                </div>
+                                </div>)}
+
                             </div>
 
                             {/* Important Notes */}
@@ -160,12 +163,20 @@ function Show({ ticket }) {
                                     </svg>
                                     Penting untuk Diperhatikan
                                 </h4>
-                                <ul className="text-sm space-y-1 text-base-content/70">
-                                    <li>• Simpan tiket ini dengan baik sampai hari event</li>
-                                    <li>• QR Code hanya dapat digunakan sekali</li>
-                                    <li>• Datang 30 menit sebelum event dimulai</li>
-                                    <li>• Bawa identitas diri yang sesuai dengan nama pemegang tiket</li>
-                                </ul>
+                                {ticket.event.location_type == 'online' ? (
+                                    <ul className="text-sm space-y-1 text-base-content/70">
+                                        <li>• Isi Form Yang sudah disediakan</li>
+                                        <li>• Jika sudah tinggal menunggu pemberitahuan pemenang di sistem atau Instagram TIMES Indonesia</li>
+                                      
+                                    </ul>
+                                ) : (
+                                    <ul className="text-sm space-y-1 text-base-content/70">
+                                        <li>• Simpan tiket ini dengan baik sampai hari event</li>
+                                        <li>• QR Code hanya dapat digunakan sekali</li>
+                                        <li>• Datang 30 menit sebelum event dimulai</li>
+                                        <li>• Bawa identitas diri yang sesuai dengan nama pemegang tiket</li>
+                                    </ul>)}
+
                             </div>
 
                             {/* Action Buttons */}

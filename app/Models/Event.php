@@ -11,6 +11,8 @@ class Event extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['price_range', 'total_quota', 'total_remaining_quota'];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -29,5 +31,58 @@ class Event extends Model
     public function category()
     {
         return $this->belongsTo(CategoryEvents::class);
+    }
+
+    public function eventFields()
+    {
+        return $this->hasMany(EventField::class);
+    }
+
+    public function eventSubmissionFields()
+    {
+        return $this->hasMany(EventSubmissionField::class);
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(Submission::class);
+    }
+
+    public function ticketTypes()
+    {
+        return $this->hasMany(TicketType::class);
+    }
+
+    public function getTotalQuotaAttribute()
+    {
+        // Ensure ticketTypes relationship is loaded to avoid N+1 problems
+        if (!$this->relationLoaded('ticketTypes')) {
+            $this->load('ticketTypes');
+        }
+        return $this->ticketTypes->sum('quota');
+    }
+
+    public function getTotalRemainingQuotaAttribute()
+    {
+        if (!$this->relationLoaded('ticketTypes')) {
+            $this->load('ticketTypes');
+        }
+        return $this->ticketTypes->sum('remaining_quota');
+    }
+
+    public function getPriceRangeAttribute()
+    {
+        if (!$this->relationLoaded('ticketTypes')) {
+            $this->load('ticketTypes');
+        }
+
+        if ($this->ticketTypes->isEmpty()) {
+            return null; // Or return a default like [0, 0]
+        }
+
+        $min = $this->ticketTypes->min('price');
+        $max = $this->ticketTypes->max('price');
+
+        return [$min, $max];
     }
 }

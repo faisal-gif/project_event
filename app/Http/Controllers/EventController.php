@@ -4,30 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryEvents;
 use App\Models\Event;
+use App\Models\EventField;
+use App\Models\EventSubmissionField;
+use App\Models\TicketType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Format;
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
 class EventController extends Controller
 {
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function Index()
+    public function index()
     {
-        $events = Event::with('creator', 'category')->latest()->get();
+        $events = Event::with('creator', 'category', 'ticketTypes')->latest()->get();
         return Inertia::render('Admin/Events/Index', ['events' => $events]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $category = CategoryEvents::all();
@@ -36,143 +31,240 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'image' => 'required|image',
-            'title' => 'required',
-            'description' => 'required',
-            'requirements' => 'nullable|string',
-            'category' => 'required',
-            'location_type' => 'required',
-            'location_details' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'price' => 'required|numeric',
-            'quota' => 'required|integer',
-            'limit' => 'required|integer',
-            'headline' => 'required|boolean',
-        ]);
+        $data = $this->validateEventData($request);
 
         $slug = Str::slug($request->title);
+        $imagePath = $this->storeImage($request);
 
-        $manager = new ImageManager(new Driver());
-        $image = $manager->read($request->file('image'));
-        $encode = $image->toWebp();
-        Storage::disk('public')->put('images/' . $slug . '.webp', $encode);
-
-        Event::create([
+        $event = Event::create([
             'slug' => $slug,
-            'image' => 'images/' . $slug . '.webp',
-            'title' => $request->title,
-            'description' => $request->description,
-            'requirements' => $request->requirements,
-            'category_id' => $request->category,
-            'location_type' => $request->location_type,
-            'location_details' => $request->location_details,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'price' => $request->price,
-            'quota' => $request->quota,
-            'remainingQuota' => $request->quota,
-            'created_by' => auth()->user()->id,
+            'image' => $imagePath,
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'requirements' => $data['requirements'],
+            'category_id' => $data['category_id'],
+            'location_type' => $data['location_type'],
+            'location_details' => $data['location_details'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'created_by' => auth()->id(),
             'status' => 'valid',
-            'is_headline' => $request->headline,
-            'limit_ticket_user' => $request->limit,
+            'is_headline' => $data['is_headline'],
+            'limit_ticket_user' => $data['limit_ticket_user'],
+            'need_additional_questions' => $data['need_additional_questions'] ?? false,
+            'needs_submission' => $data['needs_submission'] ?? false,
         ]);
-        return redirect()->route('events.index')->with('success', 'Event created');
+
+        $this->syncRelatedData($event, $data);
+
+        return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function Show(Event $event)
+    public function show(Event $event)
     {
-        $event = Event::with('tickets', 'category')->findOrFail($event->id);
-
+        $event->load('tickets', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Event $event)
     {
-        return Inertia::render('Admin/Events/Edit', ['event' => $event]);
+        $category = CategoryEvents::all();
+        $event->load('eventFields', 'eventSubmissionFields', 'ticketTypes');
+
+        return Inertia::render('Admin/Events/Edit', ['event' => $event, 'category' => $category]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Event $event)
     {
-        $data = $request->validate([
-            'image' => 'nullable|image',
-            'title' => 'required',
-            'description' => 'required',
-            'type' => 'required|in:event,competition',
-            'category' => 'required',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'price' => 'required|numeric',
-            'quota' => 'required|integer',
-            'lokasi' => 'required',
-            'limit' => 'required|integer',
-            'headline' => 'required|boolean',
-        ]);
+        $data = $this->validateEventData($request, $event);
 
-        $slug = Str::slug($request->title);
+        $updateData = [
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'requirements' => $data['requirements'],
+            'category_id' => $data['category_id'],
+            'location_type' => $data['location_type'],
+            'location_details' => $data['location_details'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'is_headline' => $data['is_headline'],
+            'limit_ticket_user' => $data['limit_ticket_user'],
+            'need_additional_questions' => $data['need_additional_questions'] ?? false,
+            'needs_submission' => $data['needs_submission'] ?? false,
+        ];
 
-        // Update image jika ada file baru
-        if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($event->image);
-
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($request->file('image'));
-            $encode = $image->toWebp();
-            Storage::disk('public')->put('images/' . $slug . '.webp', $encode);
-
-            $event->image = 'images/' . $slug . '.webp';
+        if ($request->title !== $event->title) {
+            $updateData['slug'] = Str::slug($request->title);
         }
 
-        $event->update([
-            'slug' => $slug,
-            'title' => $request->title,
-            'description' => $request->description,
-            'type' => $request->type,
-            'category' => $request->category,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'price' => $request->price,
-            'quota' => $request->quota,
-            'remainingQuota' => $request->quota,
-            'location' => $request->lokasi,
-            'is_headline' => $request->headline,
-            'limit_ticket_user' => $request->limit,
-        ]);
+        if ($request->hasFile('image')) {
+            Storage::disk('public')->delete($event->image);
+            $updateData['image'] = $this->storeImage($request);
+        }
 
-        $event->save();
+        $event->update($updateData);
 
-        return redirect()->route('events.index')->with('success', 'Event updated');
+        $this->syncRelatedData($event, $data);
+
+        return redirect()->route('events.index')->with('success', 'Event updated successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    private function validateEventData(Request $request, Event $event = null)
+    {
+        $imageRule = $event ? 'nullable|image' : 'required|image';
+
+        return $request->validate([
+            'image' => $imageRule,
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'requirements' => 'nullable|string',
+            'category_id' => 'required|exists:category_events,id',
+            'location_type' => 'required|in:online,offline,hybrid',
+            'location_details' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'limit_ticket_user' => 'required|integer|min:1',
+            'is_headline' => 'required|boolean',
+            'ticket_types' => 'required|array|min:1',
+            'ticket_types.*.name' => 'required|string|max:255',
+            'ticket_types.*.price' => 'required|numeric|min:0',
+            'ticket_types.*.quota' => 'required|integer|min:1',
+            'need_additional_questions' => 'boolean',
+            'event_fields' => ['nullable', 'array'],
+            'event_fields.*.label' => ['required_with:event_fields', 'string'],
+            'event_fields.*.type' => ['required_with:event_fields', 'string'],
+            'needs_submission' => 'boolean',
+            'submission_fields' => ['nullable', 'array'],
+            'submission_fields.*.label' => ['required_with:submission_fields', 'string'],
+            'submission_fields.*.type' => ['required_with:submission_fields', 'string'],
+        ]);
+    }
+
+    private function storeImage(Request $request)
+    {
+        $slug = Str::slug($request->title);
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($request->file('image'));
+        $encode = $image->toWebp();
+        $path = 'images/' . $slug . '-' . time() . '.webp';
+        Storage::disk('public')->put($path, $encode);
+        return $path;
+    }
+
+    private function syncRelatedData(Event $event, array $data)
+    {
+        // Sync Ticket Types
+        $event->ticketTypes()->delete();
+        if (!empty($data['ticket_types'])) {
+            foreach ($data['ticket_types'] as $ticketType) {
+                $event->ticketTypes()->create([
+                    'name' => $ticketType['name'],
+                    'price' => $ticketType['price'],
+                    'quota' => $ticketType['quota'],
+                    'remaining_quota' => $ticketType['quota'], // Set remaining_quota to full quota
+                ]);
+            }
+        }
+
+        // Sync Event Fields
+        $event->eventFields()->delete();
+        if ($data['need_additional_questions'] && !empty($data['event_fields'])) {
+            foreach ($data['event_fields'] as $field) {
+                $event->eventFields()->create([
+                    'label' => $field['label'],
+                    'name' => Str::snake($field['label']),
+                    'type' => $field['type'],
+                    'is_required' => $field['is_required'] ?? false,
+                    'options' => $field['options'] ?? null,
+                ]);
+            }
+        }
+
+        // Sync Submission Fields
+        $event->eventSubmissionFields()->delete();
+        if ($data['needs_submission'] && !empty($data['submission_fields'])) {
+            foreach ($data['submission_fields'] as $field) {
+                $event->eventSubmissionFields()->create([
+                    'label' => $field['label'],
+                    'name' => Str::snake($field['label']),
+                    'type' => $field['type'],
+                    'is_required' => $field['is_required'] ?? false,
+                    'options' => $field['options'] ?? null,
+                ]);
+            }
+        }
+    }
+
+    // ... other methods like userIndex, userShow, validateStep etc. remain here ...
+
     public function userIndex()
     {
         $events = Event::with('creator')->latest()->get();
         return Inertia::render('Users/Events/Index', ['events' => $events]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function userShow(Event $event)
     {
         return Inertia::render('Users/Events/Show', ['event' => $event]);
+    }
+
+    public function validateStep(Request $request)
+    {
+        $step = $request->input('step');
+        $rules = [];
+
+        if ($step === 1) {
+            $rules = [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'category_id' => 'required|exists:category_events,id',
+                'location_type' => 'required|in:online,offline,hybrid',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ];
+        } elseif ($step === 2) {
+            $rules = [
+                'ticket_types' => 'required|array|min:1',
+                'ticket_types.*.name' => 'required|string|max:255',
+                'ticket_types.*.price' => 'required|numeric|min:0',
+                'ticket_types.*.quota' => 'required|integer|min:1',
+                'limit_ticket_user' => 'required|integer|min:1',
+            ];
+        }
+
+        $validatedData = $request->validate($rules);
+
+        return response()->json(['success' => true, 'data' => $validatedData]);
+    }
+
+    public function validateStepEdit(Request $request, Event $event)
+    {
+        $step = $request->input('step');
+        $rules = [];
+
+        if ($step === 1) {
+            $rules = [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'category_id' => 'required|exists:category_events,id',
+                'location_type' => 'required|in:online,offline,hybrid',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ];
+        } elseif ($step === 2) {
+            $rules = [
+                'ticket_types' => 'required|array|min:1',
+                'ticket_types.*.name' => 'required|string|max:255',
+                'ticket_types.*.price' => 'required|numeric|min:0',
+                'ticket_types.*.quota' => 'required|integer|min:1',
+                'limit_ticket_user' => 'required|integer|min:1',
+            ];
+        }
+
+        $validatedData = $request->validate($rules);
+
+        return response()->json(['success' => true, 'data' => $validatedData]);
     }
 }

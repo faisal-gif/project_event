@@ -1,26 +1,30 @@
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import React from 'react'
+import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content'
+import withReactContent from 'sweetalert2-react-content';
+import { Ticket, Calendar, MapPin, Minus, Plus } from 'lucide-react';
+import Card from '@/Components/ui/Card';
 
 function EventDetail({ event }) {
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [quantity, setQuantity] = useState(1);
 
     if (!event) {
         return (
-            <div className="min-h-screen bg-base-100">
-                <Navbar />
+            <GuestLayout>
                 <div className="container mx-auto px-4 py-16 text-center">
                     <h1 className="text-4xl font-bold mb-4">Event Tidak Ditemukan</h1>
-                    <Link to="/guest/events" className="btn btn-primary">
+                    <Link href={route('events.guest')} className="btn btn-primary">
                         Kembali ke Daftar Event
                     </Link>
                 </div>
-            </div>
+            </GuestLayout>
         );
     }
 
     const formatPrice = (price) => {
+        if (price === 0) return 'Gratis';
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -38,16 +42,24 @@ function EventDetail({ event }) {
         });
     };
 
-    const isEventFull = event.remainingQuota === 0;
-    const urgency = event.remainingQuota <= 10 ? 'low' : event.remainingQuota <= 50 ? 'medium' : 'high';
+    const handleTicketSelect = (ticketType) => {
+        setSelectedTicket(ticketType);
+        setQuantity(1); // Reset quantity to 1 when a new ticket is selected
+    };
 
+    const handleQuantityChange = (amount) => {
+        setQuantity(prev => {
+            const newQuantity = prev + amount;
+            // Clamp the quantity between 1 and the available quota/limit
+            return Math.max(1, Math.min(newQuantity, selectedTicket.remaining_quota, event.limit_ticket_user));
+        });
+    };
 
     return (
         <>
-            <Head title="Event" />
+            <Head title={event.title} />
             <GuestLayout>
-                <div className="container mx-auto px-4 py-8">
-                    {/* Breadcrumb */}
+                <div className="container max-w-7xl mx-auto px-4 py-8">
                     <div className="text-sm breadcrumbs mb-6">
                         <ul>
                             <li><Link href="/">Home</Link></li>
@@ -56,163 +68,140 @@ function EventDetail({ event }) {
                         </ul>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Main Content */}
-                        <div className="lg:col-span-2">
-                            <div className="card bg-base-100 shadow-xl">
-                                <figure>
-                                    {event.image && event.image !== '' ? (
-                                        <img
-                                            src={`/storage/${event.image}`}
-                                            alt={event.title}
-                                            className='w-full' />
-                                    ) : (
-                                        <img
-                                            src={'https://picsum.photos/400/200'}
-                                            alt={event.title}
-                                            className='w-full' />
-                                    )
-                                    }
-                                </figure>
+                    <div className='grid md:grid-cols-5 gap-4'>
 
+                        <Card className={'bg-base-100 shadow-xl rounded-xl md:col-span-2'}>
+                            <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-cover rounded-xl" />
+                        </Card>
+                        <div className='flex flex-col gap-4 w-full md:col-span-3'>
+                            <Card className="bg-base-100 shadow-xl  border border-base-300 ">
                                 <div className="card-body">
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        <div className={`badge ${event.type === 'lomba' ? 'badge-secondary' : 'badge-primary'} badge-lg`}>
-                                            {event.type === 'lomba' ? 'Lomba' : 'Event'}
-                                        </div>
-                                        <div className="badge badge-outline badge-lg">{event.category}</div>
-                                        {urgency === 'low' && (
-                                            <div className="badge badge-error badge-lg">Hampir Penuh!</div>
-                                        )}
+                                    <div className="badge badge-outline">{event.category.name}</div>
+                                    <h1 className="card-title text-3xl font-bold">{event.title}</h1>
+                                    <div className="flex items-center space-x-4 text-sm text-gray-500 my-2">
+                                        <div className="flex items-center"><Calendar size={16} className="mr-1" /> {formatDate(event.start_date)}</div>
+                                        <div className="flex items-center"><MapPin size={16} className="mr-1" /> {event.location_type}</div>
                                     </div>
 
-                                    <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
-                                    <div className="prose prose-lg max-w-none mb-6 text-lg leading-relaxed"  dangerouslySetInnerHTML={{ __html: event.description }} />
-                                    
-                                    {/* Event Details */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <h3 className="text-xl font-semibold">Detail Event</h3>
-
-                                            <div className="flex items-start space-x-3">
-                                                <svg className="w-5 h-5 mt-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                                <div>
-                                                    <p className="font-medium">Tanggal Mulai</p>
-                                                    <p className="text-sm text-base-content/70">{formatDate(event.start_date)}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start space-x-3">
-                                                <svg className="w-5 h-5 mt-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                                <div>
-                                                    <p className="font-medium">Tanggal Selesai</p>
-                                                    <p className="text-sm text-base-content/70">{formatDate(event.end_date)}</p>
-                                                </div>
-                                            </div>
-
-                                            {event.location && (
-                                                <div className="flex items-start space-x-3">
-                                                    <svg className="w-5 h-5 mt-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    </svg>
-                                                    <div>
-                                                        <p className="font-medium">Lokasi</p>
-                                                        <p className="text-sm text-base-content/70">{event.location}</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <h3 className="text-xl font-semibold">Informasi Event</h3>
-
-                                            <div className="bg-base-200 rounded-lg p-4">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="font-medium">Harga Tiket</span>
-                                                    <span className="text-2xl font-bold text-primary">{formatPrice(event.price)}</span>
-                                                </div>
-
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="font-medium">Kuota Total</span>
-                                                    <span>{event.quota} orang</span>
-                                                </div>
-
-                                                <div className="flex justify-between items-center">
-                                                    <span className="font-medium">Sisa Kuota</span>
-                                                    <span className={`font-bold ${urgency === 'low' ? 'text-error' : urgency === 'medium' ? 'text-warning' : 'text-success'}`}>
-                                                        {event.remainingQuota} orang
-                                                    </span>
-                                                </div>
-
-                                                {/* Progress bar */}
-                                                <div className="mt-4">
-                                                    <div className="flex justify-between text-sm mb-1">
-                                                        <span>Terisi</span>
-                                                        <span>{Math.round(((event.quota - event.remainingQuota) / event.quota) * 100)}%</span>
-                                                    </div>
-                                                    <progress
-                                                        className={`progress w-full ${urgency === 'low' ? 'progress-error' : urgency === 'medium' ? 'progress-warning' : 'progress-success'}`}
-                                                        value={event.quota - event.remainingQuota}
-                                                        max={event.quota}
-                                                    ></progress>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
+                            </Card>
+                            {/* Deskrpsi */}
+                            <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
+                                <input type="checkbox" defaultChecked />
+                                <div className="collapse-title font-semibold">Deskripsi</div>
+                                <div className="collapse-content text-sm">
+                                    <div className="prose m-4" dangerouslySetInnerHTML={{ __html: event.description }} />
+                                </div>
+                            </div>
+
+                            {/* Requirements*/}
+                            <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
+                                <input type="checkbox" />
+                                <div className="collapse-title font-semibold">Requirements</div>
+                                <div className="collapse-content text-sm">
+                                    <div className="prose m-4" dangerouslySetInnerHTML={{ __html: event.requirements }} />
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    <div className='grid md:grid-cols-5 gap-4'>
+                        {/* Ticket Selection Section */}
+                        <div className="mt-8 md:col-span-3">
+                            <h2 className="text-2xl font-bold mb-4 flex items-center"><Ticket className="mr-2" /> Pilih Tiket Anda</h2>
+                            <div className="space-y-4">
+                                {event.ticket_types && event.ticket_types.length > 0 ? (
+                                    event.ticket_types.map(ticketType => {
+                                        const isSoldOut = ticketType.remaining_quota === 0;
+                                        const isSelected = selectedTicket && selectedTicket.id === ticketType.id;
+
+                                        return (
+                                            <div
+                                                key={ticketType.id}
+                                                className={`card bg-base-200 shadow-md transition-all hover:shadow-lg cursor-pointer ${isSelected ? 'ring-2 ring-primary' : ''} ${isSoldOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                onClick={() => !isSoldOut && handleTicketSelect(ticketType)}
+                                            >
+                                                <div className="card-body flex-row justify-between items-center">
+                                                    <div>
+                                                        <h3 className="card-title text-xl">{ticketType.name}</h3>
+                                                        <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
+                                                        <p className="text-sm text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
+                                                        {isSoldOut && <span className="badge badge-error badge-lg mt-2">Habis</span>}
+                                                    </div>
+                                                    <input
+                                                        type="radio"
+                                                        name="ticket-type"
+                                                        className="radio radio-primary"
+                                                        checked={isSelected}
+                                                        onChange={() => !isSoldOut && handleTicketSelect(ticketType)}
+                                                        disabled={isSoldOut}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="card bg-base-200"><div className="card-body"><p>Tiket untuk event ini belum tersedia.</p></div></div>
+                                )}
                             </div>
                         </div>
 
-                        {/* Sidebar */}
-                        <div className="lg:col-span-1">
-                            <div className="card bg-base-100 shadow-xl sticky top-8">
-                                <div className="card-body">
-                                    <h3 className="text-xl font-bold mb-4">Daftar Event</h3>
-
-                                    <div className="space-y-4">
-                                        <div className="bg-base-200 rounded-lg p-4">
-                                            <div className="text-center">
-                                                <div className="text-3xl font-bold text-primary mb-1">
-                                                    {formatPrice(event.price)}
-                                                </div>
-                                                <div className="text-sm text-base-content/70">per tiket</div>
+                        {/* Purchase Summary Section */}
+                        <div className=" md:col-span-2 mt-8 card bg-base-100 shadow-xl border border-base-300">
+                            <div className="card-body">
+                                <h2 className="card-title text-2xl">Detail Pembelian</h2>
+                                <div className='divider'></div>
+                                {selectedTicket ? (
+                                    <>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <div>
+                                                <p className='font-semibold text-lg'>{selectedTicket.name}</p>
+                                                <p className="font-bold text-primary text-xl">{formatPrice(selectedTicket.price)}</p>
+                                            </div>
+                                            <div className="join">
+                                                <button onClick={() => handleQuantityChange(-1)} className="btn join-item" disabled={quantity <= 1}>-</button>
+                                                <input type="text" readOnly value={quantity} className="input input-bordered join-item w-16 text-center" />
+                                                <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button>
                                             </div>
                                         </div>
-
-                                        {urgency === 'low' && (
-                                            <div className="alert alert-warning">
-                                                <svg className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
-                                                </svg>
-                                                <span className="text-sm">Hanya tersisa {event.remainingQuota} tiket!</span>
-                                            </div>
-                                        )}
-
-                                        {isEventFull ? (
-                                            <button className="btn btn-disabled w-full">
-                                                Tiket Habis
-                                            </button>
-                                        ) : (
-                                            <Link href={route("transactions.checkout", event)} className="btn btn-primary w-full btn-lg">
-                                                Daftar
-                                            </Link>
-                                        )}
-
-                                        <div className="text-center">
-                                            <Link href={route('events.guest')} className="btn btn-ghost btn-sm">
-                                                ← Kembali ke Daftar Event
+                                        <div className="divider"></div>
+                                        <div className="flex justify-between items-center font-bold text-xl">
+                                            <span>Total Harga</span>
+                                            <span>{formatPrice(selectedTicket.price * quantity)}</span>
+                                        </div>
+                                        <div className="card-actions justify-end mt-4">
+                                            <Link
+                                                href={route('transactions.checkout', { ticket_type: selectedTicket.id, quantity: quantity })}
+                                                className={`btn btn-primary ${quantity === 0 ? 'btn-disabled' : ''}`}
+                                                as="button"
+                                                disabled={quantity === 0}
+                                            >
+                                                Beli Tiket
                                             </Link>
                                         </div>
-                                    </div>
-                                </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-500">Pilih salah satu tiket untuk melanjutkan.</p>
+                                        </div>
+                                        <div className="divider"></div>
+                                        <div className="flex justify-between items-center font-bold text-xl">
+                                            <span>Total Harga</span>
+                                            <span>{formatPrice(0)}</span>
+                                        </div>
+                                        <div className="card-actions justify-end mt-4">
+                                            <button className="btn btn-primary" disabled>Beli Tiket</button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
+
                 </div>
             </GuestLayout>
         </>

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EventField;
+use App\Models\EventFieldResponse;
 use App\Models\Ticket;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -47,6 +49,9 @@ class TripayCallbackController extends Controller
         if ($status === 'PAID') {
             DB::beginTransaction();
 
+            // Load the relationships to ensure data is available
+            $transaction->load('ticketType');
+
             $code = strtoupper(uniqid('TKT'));
 
             $qr = QrCode::format('png')->size(100)->generate($code);
@@ -54,9 +59,10 @@ class TripayCallbackController extends Controller
 
             Storage::disk('public')->put($qrImageName, $qr);
 
-            $tiket = Ticket::create([
+            $ticket = Ticket::create([
                 'user_id' => $transaction->user_id,
                 'event_id' => $transaction->event_id,
+                'ticket_type_id' => $transaction->ticket_type_id,
                 'detail_pendaftar_id' => $transaction->detail_pendaftar_id,
                 'ticket_code' => $code,
                 'qr_image' => $qrImageName,
@@ -65,8 +71,29 @@ class TripayCallbackController extends Controller
                 'status' => 'unused',
             ]);
 
-            $event = $transaction->event;
-            $event->update(['remainingQuota' => $event->remainingQuota - $transaction->quantity]);
+            // Decrement quota from the specific ticket type
+            if ($transaction->ticketType) {
+                $transaction->ticketType->decrement('remaining_quota', $transaction->quantity);
+            }
+
+            // Process and store event field responses
+            if (!empty($transaction->field_responses)) {
+                $eventFields = EventField::where('event_id', $transaction->event_id)
+                    ->whereIn('name', array_keys($transaction->field_responses))
+                    ->get()
+                    ->keyBy('name');
+
+                foreach ($transaction->field_responses as $fieldName => $fieldValue) {
+                    if (isset($eventFields[$fieldName])) {
+                        EventFieldResponse::create([
+                            'event_field_id' => $eventFields[$fieldName]->id,
+                            'ticket_id' => $ticket->id,
+                            'field_name' => $fieldName,
+                            'field_value' => $fieldValue,
+                        ]);
+                    }
+                }
+            }
 
             DB::commit();
         }

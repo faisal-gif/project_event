@@ -9,20 +9,29 @@ function EventList({ events }) {
 
     const filteredEvents = events.filter(event => {
         const typeMatch = filter === 'all' || event.type === filter;
-        const categoryMatch = categoryFilter === 'all' || event.category === categoryFilter;
+        const categoryMatch = categoryFilter === 'all' || event.category.name === categoryFilter;
         return typeMatch && categoryMatch;
     });
 
-
-
-    const categories = Array.from(new Set(events.map(event => event.category)));
+    const categories = Array.from(new Set(events.map(event => event.category.name)));
 
     const formatPrice = (price) => {
+        if (price === 0) return 'Gratis';
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0
         }).format(price);
+    };
+
+    const formatPriceRange = (range) => {
+        if (!range || range.length === 0) return "N/A";
+        const [min, max] = range;
+
+        if (min === max) {
+            return formatPrice(min);
+        }
+        return <><span className="text-sm font-normal">Mulai dari</span> {formatPrice(min)}</>;
     };
 
     const formatDate = (dateString) => {
@@ -108,7 +117,7 @@ function EventList({ events }) {
                                     <div className={`badge ${event.type === 'competition' ? 'bg-[#3f154f]/60 py-3 text-white' : 'bg-[#7f0b1a]/60 text-white py-3'}`}>
                                         {event.type === 'competition' ? 'Competition' : 'Event'}
                                     </div>
-                                    <div className="badge badge-outline py-3 capitalize">{event.category}</div>
+                                    <div className="badge badge-outline py-3 capitalize">{event.category.name}</div>
                                 </div>
 
                                 <h2 className="card-title text-lg mb-2">{event.title}</h2>
@@ -121,13 +130,13 @@ function EventList({ events }) {
                                         {formatDate(event.start_date)}
                                     </div>
 
-                                    {event.location && (
+                                    {event.location_details && (
                                         <div className="flex items-center text-sm">
                                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
-                                            {event.location}
+                                            {event.location_type}
                                         </div>
                                     )}
 
@@ -135,15 +144,15 @@ function EventList({ events }) {
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                         </svg>
-                                        {event.remainingQuota === 0
+                                        {event.total_remaining_quota === 0
                                             ? 'Sold Out'
-                                            : `${event.remainingQuota} / ${event.quota} tersisa`}
+                                            : `${event.total_remaining_quota} / ${event.total_quota} tersisa`}
                                     </div>
                                 </div>
 
                                 <div className="card-actions justify-between items-center">
                                     <div className="text-xl font-bold text-primary">
-                                        {formatPrice(event.price)}
+                                        {formatPriceRange(event.price_range)}
                                     </div>
                                     <Link
                                         href={route('events.guest.detail', event)}

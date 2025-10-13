@@ -32,11 +32,12 @@ class TripayService
         return json_decode($response)->data;
     }
 
-    public function createTransaction($event, $user, $validated)
+    public function createTransaction($ticketType, $user, $validated)
     {
+        $event = $ticketType->event;
 
         $ref = 'INV-' . time();
-        $amount = (int) number_format($event->price, 0, '', '');
+        $amount = (int) number_format($ticketType->price, 0, '', '');
         $total = $amount * $validated['quantity'];
         $payload = [
             'method'         => $validated['paymentMethod'], // atau gunakan inputan dari user
@@ -45,8 +46,8 @@ class TripayService
             'customer_name'  => $user->name,
             'customer_email' => $user->email,
             'order_items'    => [[
-                'sku'         => 'EVENT-' . $event->id,
-                'name'        => $event->title,
+                'sku'         => 'TICKET-' . $ticketType->id,
+                'name'        => $event->title . ' - ' . $ticketType->name,
                 'price'       => $amount,
                 'quantity'    => $validated['quantity'],
                 'sub_total' => $total,

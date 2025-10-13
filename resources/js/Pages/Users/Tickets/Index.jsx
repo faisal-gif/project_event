@@ -38,12 +38,12 @@ function Index({ tickets }) {
                 return <div className="badge badge-ghost">UNKNOWN</div>;
         }
     };
-    
+
 
     return (
         <GuestLayout>
             <Head title="Tickets" />
-            <div className="container mx-auto px-4 py-8">
+            <div className="mx-auto px-4 py-8">
 
                 {/* Tickets Grid */}
                 {tickets.length === 0 ? (
@@ -60,25 +60,24 @@ function Index({ tickets }) {
                     <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
                         {tickets.map((ticket) => (
                             <Card key={ticket.id} className="shadow-md hover:shadow-glow transition-all duration-300 group">
-                                <div className="pb-4">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <Card.Title className="text-lg leading-tight mb-2">
-                                                {ticket.event.title}
-                                            </Card.Title>
-                                            <div className="flex items-center gap-2">
-                                                {getStatusBadge(ticket.status)}
-                                                <div
-                                                    className={'badge '}
-                                                >
-                                                    {ticket.locationType}
-                                                </div>
+
+                                <div className="p-6 flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <Card.Title className="text-lg leading-tight mb-2">
+                                            {ticket.event.title}
+                                        </Card.Title>
+                                        <div className="flex items-center gap-2">
+                                            {getStatusBadge(ticket.status)}
+                                            <div
+                                                className={'badge '}
+                                            >
+                                                {ticket.locationType}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <Card.Body className="space-y-4">
+                                <div className="px-6 pb-4 space-y-4">
                                     {/* Event Details */}
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -120,13 +119,13 @@ function Index({ tickets }) {
 
                                     {/* Actions */}
                                     <div className="flex gap-2 pt-2">
-                                        <button className="btn btn-primary flex-1 gap-2">
+                                        <Link href={route('tickets.show',ticket)} className="btn btn-primary flex-1 gap-2">
                                             <Eye className="h-4 w-4" />
                                             View Details
-                                        </button>
-                                       
+                                        </Link>
+
                                     </div>
-                                </Card.Body>
+                                </div>
                             </Card>
                         ))}
                     </div>

@@ -15,6 +15,16 @@ function Index({ events }) {
         }).format(price);
     };
 
+    const formatPriceRange = (range) => {
+        if (!range || range.length === 0) return "N/A";
+        const [min, max] = range;
+
+        if (min === max) {
+            return min > 0 ? formatPrice(min) : 'Gratis';
+        }
+        return `${formatPrice(min)} - ${formatPrice(max)}`;
+    };
+
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: 'numeric',
@@ -53,22 +63,21 @@ function Index({ events }) {
                                     <tr>
                                         <th></th>
                                         <th>Nama Event</th>
-                                      
                                         <th>Category</th>
-                                        <th>Price</th>
-                                        <th>Quota</th>
-                                        <th>Status</th>
+                                        <th>Price Range</th>
+                                        <th>Total Quota</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {/* row 1 */}
                                     {events.map((event, index) => (
-                                        <tr>
+                                        <tr key={event.id}>
                                             <td>{index + 1}</td>
                                             <td>{event.title}</td>
                                             <td>{event.category.name}</td>
-                                            <td>{formatPrice(event.price)}</td>
-                                            <td>{event.quota}</td>
+                                            <td>{formatPriceRange(event.price_range)}</td>
+                                            <td>{event.total_quota}</td>
 
                                             <td> <div className='flex gap-2'>
                                                 <Link className='btn btn-sm btn-primary' href={route('events.show', event)}>

@@ -12,9 +12,16 @@ class HomeController extends Controller
 
     public function index()
     {
-        $events =  Event::where('status', 'valid')->with('creator')->latest()->get();
-        $headline = Event::where('status', 'valid')->where('is_headline', 1)->with('creator')->latest()->get();
-        $popular = Event::where('status', 'valid')->whereColumn('remainingQuota', '<', 'quota')->with('creator')->latest()->take(3)->get();
+        $events =  Event::where('status', 'valid')->with('creator', 'ticketTypes','category')->latest()->get();
+        $headline = Event::where('status', 'valid')->where('is_headline', 1)->with('creator', 'ticketTypes','category')->latest()->get();
+        $popular = Event::where('status', 'valid')
+            ->withSum('ticketTypes as total_quota', 'quota')
+            ->withSum('ticketTypes as total_remaining_quota', 'remaining_quota')
+            ->havingRaw('total_remaining_quota < total_quota')
+            ->with('creator', 'ticketTypes')
+            ->latest()
+            ->take(3)
+            ->get();
 
         return Inertia::render('Welcome', [
             'listEvents' => $events,
@@ -25,7 +32,7 @@ class HomeController extends Controller
 
     public function event()
     {
-        $events = Event::with('creator')->latest()->get();
+        $events = Event::with('creator', 'ticketTypes','category')->latest()->get();
         return Inertia::render('EventList', [
             'events' => $events,
         ]);
@@ -33,6 +40,7 @@ class HomeController extends Controller
 
     public function eventShow(Event $event, TripayService $tripayService)
     {
+        $event->load('ticketTypes','category');
         return Inertia::render('EventDetail', [
             'event' => $event,
         ]);
@@ -40,7 +48,7 @@ class HomeController extends Controller
 
     public function widget()
     {
-        $events = Event::where('status', 'valid')->with('creator')->get();
+        $events = Event::where('status', 'valid')->with('creator', 'ticketTypes')->get();
 
         return Inertia::render('WidgetHorizontal', [
             'events' => $events,

@@ -22,13 +22,11 @@ return new class extends Migration
             $table->longText('location_details')->nullable();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->decimal('price', 10, 2);
-            $table->integer('quota');
-            $table->integer('remainingQuota')->default(0);
             $table->integer('limit_ticket_user')->default(1);
             $table->string('image')->nullable();
             $table->boolean('is_headline')->default(false);
-            $table->boolean('ticket_additional_questions')->default(false);
+            $table->boolean('need_additional_questions')->default(false);
+            $table->boolean('needs_submission')->default(false);
             $table->enum('status', ['valid', 'expired'])->default('valid');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();

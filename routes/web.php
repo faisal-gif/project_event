@@ -29,9 +29,10 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     Route::get('/events/{event}', [EventController::class, 'userShow'])->name('events.users.show');
 
     Route::resource('tickets', TicketController::class);
-    Route::get('checkout/{event}', [TransactionController::class, 'create'])->name('transactions.checkout');
+    Route::post('tickets/additional/{ticket}', [TicketController::class,'additonal'])->name('ticket.additional');
+    Route::get('checkout/{ticket_type}', [TransactionController::class, 'create'])->name('transactions.checkout');
     Route::get('transactions/', [TransactionController::class, 'index'])->name('transactions.index');
-    Route::post('transactions/{event}', [TransactionController::class, 'store'])->name('transactions.store');
+    Route::post('transactions/{ticket_type}', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('transactions/status', [TransactionController::class, 'status'])->name('transactions.status');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -43,6 +44,8 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::resource('events', EventController::class);
+    Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
+    Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::resource('category', CategoryEventsController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::post('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
