@@ -98,7 +98,7 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                     </div>
                                 </div>
 
-                                {event.need_additional_questions && event.event_fields.length > 0 && (
+                                {event.need_additional_questions != 0 && event.event_fields.length > 0 && (
                                     <>
                                         <h3 className="text-xl font-semibold mb-6">Informasi Tambahan</h3>
                                         <div className="rounded-lg p-4 mb-6 space-y-4">
