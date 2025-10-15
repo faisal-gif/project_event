@@ -1,27 +1,13 @@
-import React from 'react'
-import {
-    Calendar,
-    GraduationCap,
-    Trophy,
-    Music,
-    Presentation,
-    Dumbbell,
-    Star,
-    Grid3X3
-} from "lucide-react";
+import React from 'react';
+import { Grid3X3 } from "lucide-react";
 import Card from './ui/Card';
+import DynamicIcon from './DynamicIcon';
 
-function SideBarLeft({ setSelectedCategory, selectedCategory }) {
+function SideBarLeft({ setSelectedCategory, selectedCategory, categories }) {
 
-    const categories = [
-        { id: 1, icon: Grid3X3, label: "Semua", count: null },
-        { id: 2, icon: Trophy, label: "Kontes AI", count: null },
-        { id: 3, icon: Dumbbell, label: "Hiburan & Olahraga", count: null },
-        { id: 4, icon: Music, label: "Konser & Festival", count: null },
-        { id: 5, icon: Presentation, label: "Seminar & Talkshow", count: null },
-        { id: 6, icon: GraduationCap, label: "Training & Workshop", count: null },
-        { id: 7, icon: Calendar, label: "Kuis", count: null },
-        { id: 8, icon: Star, label: "Lain-lain", count: null }
+    const allCategories = [
+        { id: 1, icon: 'Grid3x3', name: "Semua" },
+        ...categories
     ];
 
     return (
@@ -31,8 +17,7 @@ function SideBarLeft({ setSelectedCategory, selectedCategory }) {
                     <h2 className="text-lg font-semibold text-primary mb-4">Kategori</h2>
 
                     <div className="space-y-2">
-                        {categories.map((category, index) => {
-                            const Icon = category.icon;
+                        {allCategories.map((category, index) => {
                             const isActive = selectedCategory === category.id;
                             return (
                                 <button
@@ -40,9 +25,9 @@ function SideBarLeft({ setSelectedCategory, selectedCategory }) {
                                     className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left hover:bg-base-200 transition-colors group ${isActive ? 'bg-secondary' : ''}`}
                                     onClick={() => setSelectedCategory(category.id)}
                                 >
-                                    <Icon className="w-4 h-4 text-primary" />
+                                    <DynamicIcon name={category.icon} className="w-4 h-4 text-primary" />
                                     <span className={`text-sm font-medium group-hover:text-primary ${isActive ? 'text-primary' : 'text-base-content'}`}>
-                                        {category.label}
+                                        {category.name}
                                     </span>
                                 </button>
                             );
@@ -50,13 +35,8 @@ function SideBarLeft({ setSelectedCategory, selectedCategory }) {
                     </div>
                 </div>
             </Card>
-
-
-
         </aside>
-
-
-    )
+    );
 }
 
 export default SideBarLeft;

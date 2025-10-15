@@ -65,7 +65,19 @@ export default function GuestLayout({ children }) {
                                         </li>
                                     </ul>
                                 </div>
+                                <div>
+                                    <h3 className="text-sm font-semibold leading-6 text-white">Kontak Kami</h3>
+                                    <ul role="list" className="mt-6 space-y-4">
+                                        <li>
+                                            <a href="#" className="text-sm leading-6 text-gray-300 hover:text-white">
+                                                Privacy Policy
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
+                            
+                          
                         </div>
                     </div>
                     <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">

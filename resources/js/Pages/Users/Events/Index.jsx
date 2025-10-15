@@ -149,7 +149,7 @@ function Index({ events }) {
                                             Edit
                                         </Link> */}
                                         <Link
-                                            href={route('events.users.show', event)}
+                                            href={route('events.guest.detail', { event: event.id, slug: event.slug })}
                                             className="btn btn-primary btn-sm"
                                         >
                                             Lihat Detail

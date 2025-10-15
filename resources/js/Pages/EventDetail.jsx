@@ -70,7 +70,7 @@ function EventDetail({ event }) {
 
                     <div className='grid md:grid-cols-5 gap-4'>
 
-                        <Card className={'bg-base-100 shadow-xl rounded-xl md:col-span-2'}>
+                        <Card className={'bg-base-100 shadow-xl rounded-xl h-[50vw] md:col-span-2'}>
                             <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-cover rounded-xl" />
                         </Card>
                         <div className='flex flex-col gap-4 w-full md:col-span-3'>
@@ -82,15 +82,22 @@ function EventDetail({ event }) {
                                         <div className="flex items-center"><Calendar size={16} className="mr-1" /> {formatDate(event.start_date)}</div>
                                         <div className="flex items-center"><MapPin size={16} className="mr-1" /> {event.location_type}</div>
                                     </div>
-
+                                    {event.location_details && (
+                                        <div className='space-y-4'>
+                                            <div className="flex items-center gap-2"><MapPin size={16} className="my-2" /> Location Details </div>
+                                            <div className='text-sm'>
+                                                {event.location_details}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </Card>
                             {/* Deskrpsi */}
                             <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
                                 <input type="checkbox" defaultChecked />
                                 <div className="collapse-title font-semibold">Deskripsi</div>
-                                <div className="collapse-content text-sm">
-                                    <div className="prose m-4" dangerouslySetInnerHTML={{ __html: event.description }} />
+                                <div className="collapse-content text-sm w-full">
+                                    <div className="prose prose-sm prose-p:my-2 prose-h2:mb-1 prose-li:my-0 m-4 max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
                                 </div>
                             </div>
 
@@ -99,7 +106,7 @@ function EventDetail({ event }) {
                                 <input type="checkbox" />
                                 <div className="collapse-title font-semibold">Requirements</div>
                                 <div className="collapse-content text-sm">
-                                    <div className="prose m-4" dangerouslySetInnerHTML={{ __html: event.requirements }} />
+                                    <div className="prose prose-sm prose-p:my-2 prose-h2:mb-1 prose-li:my-0 prose-ul:list-disc prose-ul:pl-5 m-4 max-w-none" dangerouslySetInnerHTML={{ __html: event.requirements }} />
                                 </div>
                             </div>
 

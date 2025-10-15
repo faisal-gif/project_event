@@ -7,21 +7,14 @@ import { Head, Link } from '@inertiajs/react';
 import { Ticket, Shield, Award, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Welcome({ listEvents, headlines, populars }) {
+export default function Welcome({ listEvents, headlines, populars, categories }) {
     const [selectedCategory, setSelectedCategory] = useState(1); // Default to ID 1 for "Semua"
 
     const filteredEvents = listEvents.filter(event => {
         if (selectedCategory === 1) { // "Semua"
             return true;
         }
-        if (selectedCategory === 2) { // "Training & Workshop"
-            return event.category === 'lomba';
-        }
-        if (selectedCategory === 6) { // "Kontes & Olahraga"
-            return event.category === 'workshop' || event.category === 'webinar';
-        }
-        // No direct mapping for other category IDs from sidebar to data
-        return false;
+        return event.category_id === selectedCategory;
     });
 
     return (
@@ -35,7 +28,7 @@ export default function Welcome({ listEvents, headlines, populars }) {
             <div className="bg-gray-50 text-gray-800 ">
                 <GuestLayout>
                     <div className='flex flex-col lg:flex-row '>
-                        <SideBarLeft setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
+                        <SideBarLeft setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} categories={categories} />
                         <HeroSection events={filteredEvents} headline={headlines} />
                         <SideBarRight />
                     </div>

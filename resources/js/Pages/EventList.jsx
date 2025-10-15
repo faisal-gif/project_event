@@ -59,20 +59,6 @@ function EventList({ events }) {
                 {/* Filters */}
                 <div className="card bg-base-200 shadow-sm mb-8 p-4">
                     <div className="flex flex-wrap gap-4 items-center">
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text font-medium">Jenis:</span>
-                            </label>
-                            <select
-                                className="select select-bordered w-full max-w-xs"
-                                value={filter}
-                                onChange={(e) => setFilter(e.target.value)}
-                            >
-                                <option value="all">Semua</option>
-                                <option value="event">Event</option>
-                                <option value="competition">Lomba</option>
-                            </select>
-                        </div>
 
                         <div className="form-control">
                             <label className="label">
@@ -155,7 +141,7 @@ function EventList({ events }) {
                                         {formatPriceRange(event.price_range)}
                                     </div>
                                     <Link
-                                        href={route('events.guest.detail', event)}
+                                         href={route('events.guest.detail', { event: event.id, slug: event.slug })}
                                         className="btn btn-primary btn-sm"
                                     >
                                         Lihat Detail

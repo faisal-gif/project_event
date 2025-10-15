@@ -15,11 +15,11 @@ export default {
             fontFamily: {
                 'inter': ['Inter', 'sans-serif'],
             },
-            
+
         },
     },
     darkMode: ["class"],
-    plugins: [require('daisyui')],
+    plugins: [require('daisyui'), require('@tailwindcss/typography'),],
 
     daisyui: {
         themes: [
@@ -40,9 +40,9 @@ export default {
                     "warning": "#f59e0b",
                     "error": "#ef4444",
                 },
-                
+
             },
-           
+
         ],
         base: true,
         styled: true,

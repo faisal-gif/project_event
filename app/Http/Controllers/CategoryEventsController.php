@@ -35,6 +35,7 @@ class CategoryEventsController extends Controller
     {
         $data = $request->validate([
             'name' => 'required',
+            'icon' => 'required|string',
         ]);
 
         $slug = Str::slug($request->name);
@@ -42,6 +43,7 @@ class CategoryEventsController extends Controller
         CategoryEvents::create([
             'name' => $request->name,
             'slug' => $slug,
+            'icon' => $request->icon,
         ]);
 
         return redirect()->route('category.index')->with('success', 'Category created');
@@ -70,8 +72,9 @@ class CategoryEventsController extends Controller
      */
     public function update(Request $request, CategoryEvents $category)
     {
-           $data = $request->validate([
+        $data = $request->validate([
             'name' => 'required',
+            'icon' => 'required|string',
         ]);
 
         $slug = Str::slug($request->name);
@@ -79,6 +82,7 @@ class CategoryEventsController extends Controller
         $category->update([
             'name' => $request->name,
             'slug' => $slug,
+            'icon' => $request->icon,
         ]);
 
         return redirect()->route('category.index')->with('success', 'Category updated');

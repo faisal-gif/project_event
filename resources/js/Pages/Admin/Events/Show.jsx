@@ -72,8 +72,8 @@ function Show({ event }) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
                     <div className='grid md:grid-cols-5 gap-4'>
-                        <Card className={'bg-base-100 shadow-xl rounded-xl md:col-span-2'}>
-                            <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-cover rounded" />
+                        <Card className={'h-[50vw] md:col-span-2'}>
+                            <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-contain rounded" />
                         </Card>
 
                         <div className='flex flex-col gap-4 md:col-span-3'>

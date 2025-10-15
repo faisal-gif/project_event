@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoryEvents;
 use App\Models\Event;
 use App\Services\TripayService;
 use Illuminate\Http\Request;
@@ -22,11 +23,13 @@ class HomeController extends Controller
             ->latest()
             ->take(3)
             ->get();
+        $categories = CategoryEvents::all();
 
         return Inertia::render('Welcome', [
             'listEvents' => $events,
             'headlines' => $headline,
             'populars' => $popular,
+            'categories' => $categories,
         ]);
     }
 

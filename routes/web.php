@@ -26,7 +26,7 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
 
     Route::get('events', [EventController::class, 'userIndex'])->name('events.user.index');
-    Route::get('/events/{event}', [EventController::class, 'userShow'])->name('events.users.show');
+    Route::get('/events/{event}/{slug}', [EventController::class, 'userShow'])->name('events.users.show');
 
     Route::resource('tickets', TicketController::class);
     Route::post('tickets/additional/{ticket}', [TicketController::class,'additonal'])->name('ticket.additional');
@@ -59,6 +59,6 @@ Route::get('/event/lomba', [HomeController::class, 'lomba'])->name('events.lomba
 Route::get('/event/workshop', [HomeController::class, 'workshop'])->name('events.workshop');
 Route::get('/event/webinar', [HomeController::class, 'webinar'])->name('events.webinar');
 Route::get('/event', [HomeController::class, 'event'])->name('events.guest');
-Route::get('/event/{event}', [HomeController::class, 'eventShow'])->name('events.guest.detail');
+Route::get('/event/{event}/{slug}', [HomeController::class, 'eventShow'])->name('events.guest.detail');
 
 require __DIR__ . '/auth.php';
