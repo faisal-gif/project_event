@@ -70,7 +70,7 @@ function EventDetail({ event }) {
 
                     <div className='grid md:grid-cols-5 gap-4'>
 
-                        <Card className={'bg-base-100 shadow-xl rounded-xl h-[50vw] md:col-span-2'}>
+                        <Card className={'bg-base-100 shadow-xl rounded-xl h-full lg:h-[50vw] md:col-span-2'}>
                             <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-cover rounded-xl" />
                         </Card>
                         <div className='flex flex-col gap-4 w-full md:col-span-3'>
