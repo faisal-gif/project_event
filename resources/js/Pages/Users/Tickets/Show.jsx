@@ -93,8 +93,12 @@ function Show({ ticket }) {
                                         </div>
 
                                         <div>
-                                            <label className="text-sm font-medium text-base-content/70">Harga Tiket</label>
-                                            <p className="font-medium text-primary text-lg">{formatPrice(ticket.event.price)}</p>
+                                            <label className="text-sm font-medium text-base-content/70">Jenis Tiket</label>
+                                            <p className="font-medium">{ticket.transaction.ticket_type.name}</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-base-content/70">Harga Satuan</label>
+                                            <p className="font-medium text-primary text-lg">{formatPrice(ticket.transaction.ticket_type.price)}</p>
                                         </div>
                                         <div>
                                             <label className="text-sm font-medium text-base-content/70">Quantity</label>
@@ -129,30 +133,41 @@ function Show({ ticket }) {
                                     </div>
                                 </div>
 
-                                {/* QR Code Section */}
-                                {ticket.event.location_type == 'online' ? (
-                                    <FormAditionalQuestion ticket={ticket} />
-                                ) : (<div className="text-center">
-                                    <h3 className="text-xl font-semibold mb-4">QR Code Tiket</h3>
-                                    <div className="bg-white p-6 rounded-lg border-2 border-dashed border-base-300 inline-block">
-                                        {ticket.qr_image ? (
-                                            <img
-                                                src={`/storage/${ticket.qr_image}`}
-                                                alt="QR Code Tiket"
-                                                className="mx-auto"
-                                            />
-                                        ) : (
-                                            <div className="w-48 h-48 flex items-center justify-center">
-                                                <span className="loading loading-spinner loading-lg"></span>
-                                            </div>
-                                        )}
+                                {/* Conditional Rendering: Submission Form or QR Code */}
+                                {ticket.event.event_submission_fields && ticket.event.event_submission_fields.length > 0 ? (
+                                    // This event requires submission
+                                    ticket.status === 'unused' ? (
+                                        <FormAditionalQuestion ticket={ticket} fields={ticket.event.event_submission_fields} />
+                                    ) : (
+                                        <div className="text-center p-6 bg-base-200 rounded-lg flex flex-col items-center justify-center h-full">
+                                            <h3 className="text-xl font-semibold mb-4">Submission Selesai</h3>
+                                            <p className="text-base-content/70">
+                                                Anda telah menyelesaikan submission untuk event ini. Terima kasih.
+                                            </p>
+                                        </div>
+                                    )
+                                ) : (
+                                    // Standard event: Show QR Code
+                                    <div className="text-center">
+                                        <h3 className="text-xl font-semibold mb-4">QR Code Tiket</h3>
+                                        <div className="bg-white p-6 rounded-lg border-2 border-dashed border-base-300 inline-block">
+                                            {ticket.qr_image ? (
+                                                <img
+                                                    src={`/storage/${ticket.qr_image}`}
+                                                    alt="QR Code Tiket"
+                                                    className="mx-auto"
+                                                />
+                                            ) : (
+                                                <div className="w-48 h-48 flex items-center justify-center">
+                                                    <span className="loading loading-spinner loading-lg"></span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-base-content/70 mt-4">
+                                            Tunjukkan QR Code ini kepada panitia saat masuk event.
+                                        </p>
                                     </div>
-
-                                    <p className="text-sm text-base-content/70 mt-4">
-                                        Tunjukkan QR Code ini kepada panitia saat masuk event
-                                    </p>
-                                </div>)}
-
+                                )}
                             </div>
 
                             {/* Important Notes */}
@@ -163,19 +178,19 @@ function Show({ ticket }) {
                                     </svg>
                                     Penting untuk Diperhatikan
                                 </h4>
-                                {ticket.event.location_type == 'online' ? (
+                                {ticket.event.event_submission_fields && ticket.event.event_submission_fields.length > 0 ? (
                                     <ul className="text-sm space-y-1 text-base-content/70">
-                                        <li>• Isi Form Yang sudah disediakan</li>
-                                        <li>• Jika sudah tinggal menunggu pemberitahuan pemenang di sistem atau Instagram TIMES Indonesia</li>
-                                      
+                                        <li>• Pastikan Anda mengisi semua data yang diperlukan pada form submission.</li>
+                                        <li>• Setelah data dikirim, status tiket akan berubah menjadi "Digunakan" dan tidak dapat diubah.</li>
+                                        <li>• Pengumuman lebih lanjut akan diinformasikan melalui sistem atau media sosial kami.</li>
                                     </ul>
                                 ) : (
                                     <ul className="text-sm space-y-1 text-base-content/70">
-                                        <li>• Simpan tiket ini dengan baik sampai hari event</li>
-                                        <li>• QR Code hanya dapat digunakan sekali</li>
-                                        <li>• Datang 30 menit sebelum event dimulai</li>
-                                        <li>• Bawa identitas diri yang sesuai dengan nama pemegang tiket</li>
-                                    </ul>)}
+                                        <li>• Simpan tiket ini dengan baik sampai hari H.</li>
+                                        <li>• QR Code hanya dapat digunakan sekali untuk check-in.</li>
+                                        <li>• Bawa identitas diri yang sesuai dengan nama pemegang tiket.</li>
+                                    </ul>
+                                )}
 
                             </div>
 

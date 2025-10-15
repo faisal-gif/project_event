@@ -35,6 +35,7 @@ const getStatusBadge = (status) => {
 
 function Show({ event }) {
     const [isDetailModalOpen, setDetailModalOpen] = useState(false);
+    const [isSubmissionModalOpen, setSubmissionModalOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
 
     if (!event) {
@@ -53,6 +54,16 @@ function Show({ event }) {
     const closeDetailModal = () => {
         setDetailModalOpen(false);
         setSelectedTicket(null);
+    };
+
+    const openSubmissionModal = (ticket) => {
+        setSelectedTicket(ticket);
+        setSubmissionModalOpen(true);
+    };
+
+    const closeSubmissionModal = () => {
+        setDetailModalOpen(false);
+        setSubmissionModalOpen(null);
     };
 
     return (
@@ -156,7 +167,7 @@ function Show({ event }) {
                                                     <td className="space-x-2">
                                                         <button onClick={() => openDetailModal(ticket)} className="btn btn-sm btn-info">Detail</button>
                                                         {event.needs_submission && (
-                                                            <Link href={'#'} className="btn btn-sm btn-secondary">Submission</Link>
+                                                            <button onClick={() => openSubmissionModal(ticket)} className="btn btn-sm btn-accent">Submission</button>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -214,6 +225,50 @@ function Show({ event }) {
                     )}
                     <div className="mt-6 flex justify-end">
                         <button onClick={closeDetailModal} className="btn">Close</button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
+                <div className="p-6">
+                    <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
+                    {selectedTicket ? (
+                        <>
+                            {selectedTicket.detail_pendaftar && (
+                                <div className="space-y-3 pb-4 border-b mb-4">
+                                    <div className="flex">
+                                        <div className="font-semibold w-32">Name</div>
+                                        <div>: {selectedTicket.detail_pendaftar.nama}</div>
+                                    </div>
+                                    <div className="flex">
+                                        <div className="font-semibold w-32">Email</div>
+                                        <div>: {selectedTicket.detail_pendaftar.email}</div>
+                                    </div>
+                                    <div className="flex">
+                                        <div className="font-semibold w-32">Phone</div>
+                                        <div>: {selectedTicket.detail_pendaftar.no_hp}</div>
+                                    </div>
+                                </div>
+                            )}
+                            <h3 className="text-xl font-bold mb-2">Jawaban Pendaftar</h3>
+                            {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
+                                <div className="space-y-3">
+                                    {selectedTicket.submission.submission_custom_fields.map(response => (
+                                        <div key={response.id} className="flex">
+                                            <div className="font-semibold w-32 capitalize">{response.field_name.replace(/_/g, ' ')}</div>
+                                            <div>: {response.field_value}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No additional questions answered.</p>
+                            )}
+                        </>
+                    ) : (
+                        <p>Details not available.</p>
+                    )}
+                    <div className="mt-6 flex justify-end">
+                        <button onClick={closeSubmissionModal} className="btn">Close</button>
                     </div>
                 </div>
             </Modal>

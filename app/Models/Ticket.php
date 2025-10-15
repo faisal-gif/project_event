@@ -36,4 +36,9 @@ class Ticket extends Model
     {
         return $this->hasMany(EventFieldResponse::class);
     }
+
+    public function submission()
+    {
+        return $this->hasOne(Submission::class);
+    }
 }

@@ -1,63 +1,94 @@
-import { router, useForm } from '@inertiajs/react'
-import React from 'react'
+import { router, useForm } from '@inertiajs/react';
+import React, { useEffect } from 'react';
 
-function FormAditionalQuestion({ ticket }) {
 
-    const additional = ticket?.ticket_additional_questions ?? {}
+function FormAditionalQuestion({ ticket, fields }) {
 
-    const { data: editData, setData: setEditData, processing, errors } = useForm({
-        url: additional.url || '',
-        prompt: additional.prompt || '',
-    })
+    // Membuat state awal untuk form dari fields yang diberikan
+    const initialFormState = fields.reduce((acc, field) => {
+        acc[field.name] = ticket?.ticket_additional_questions?.[field.name] || '';
+        return acc;
+    }, {});
+
+    const { data, setData, processing, errors, post } = useForm(initialFormState);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setData(name, value);
+    };
+
+    const handleFileChange = (name, file) => {
+        setData(name, file);
+    };
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-        router.post(route('ticket.additional', ticket),
-            {
-                ...editData,
-            },
-            {
-                preserveScroll: true,
-            })
-    }
+        e.preventDefault();
+        // Gunakan method POST dari useForm yang sudah menangani multipart data
+        post(route('ticket.additional', ticket), {
+            preserveScroll: true,
+        });
+    };
+
+    // Helper untuk merender input berdasarkan tipe field
+    const renderField = (field) => {
+        switch (field.type) {
+            case 'textarea':
+                return (
+                    <textarea
+                        id={field.name}
+                        name={field.name}
+                        placeholder={field.placeholder || ''}
+                        className="textarea border-0 bg-secondary/50 focus:bg-white w-full"
+                        value={data[field.name]}
+                        onChange={handleInputChange}
+                    />
+                );
+            case 'url':
+            case 'text':
+            default:
+                return (
+                    <input
+                        type={field.type}
+                        id={field.name}
+                        name={field.name}
+                        placeholder={field.placeholder || ''}
+                        value={data[field.name]}
+                        onChange={handleInputChange}
+                        className="input border-0 bg-secondary/50 focus:bg-white w-full"
+                    />
+                );
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className="py-6">
             <div>
                 <h2 className='font-semibold text-lg'>
-                    Form Karya
+                    {ticket.event.submission_title || 'Form Karya'}
                 </h2>
+                <p className="text-sm text-base-content/70">
+                    {ticket.event.submission_description || 'Lengkapi data-data berikut untuk menyelesaikan pendaftaran Anda.'}
+                </p>
             </div>
-            <div className="space-y-2 py-2">
-                <label htmlFor="url_karya" className="text-sm text-black/50">Url</label>
-                <input
-                    type='url'
-                    id="url_karya"
-                    placeholder="Isi Url Karya anda disini"
-                    value={editData.url}
-                    onChange={(e) => setEditData('url', e.target.value)}
-                    className="input border-0 bg-secondary/50 focus:bg-white w-full"
 
-                />
-                {/* {errors.location_details && <div className="text-red-500 text-sm font-semibold mt-2">{errors.location_details}</div>} */}
-            </div>
-            <div className="space-y-2 py-2">
-                <label htmlFor="promptDetail" className="text-sm text-black/50">Prompt</label>
-                <textarea
-                    id="locationDetail"
-                    placeholder="Isi Prompt karya anda disini"
-                    className="textarea border-0 bg-secondary/50 focus:bg-white w-full"
-                    value={editData.prompt}
-                    onChange={(e) => setEditData('prompt', e.target.value)}
-                />
-                {/* {errors.location_details && <div className="text-red-500 text-sm font-semibold mt-2">{errors.location_details}</div>} */}
-            </div>
+            {fields.map((field) => (
+                <div key={field.id} className="space-y-2 py-2">
+                    <label htmlFor={field.name} className="text-sm font-semibold text-black/70">
+                        {field.label}
+                        {field.is_required ? <span className="text-red-500">*</span> : ''}
+                    </label>
+                    {renderField(field)}
+                    {errors[field.name] && <div className="text-red-500 text-sm font-semibold mt-1">{errors[field.name]}</div>}
+                </div>
+            ))}
+
             <div className="space-y-2 py-2 flex justify-end">
-                <button type='submit' className='btn btn-sm btn-primary'>
-                    Simpan
+                <button type='submit' className='btn btn-sm btn-primary' disabled={processing}>
+                    {processing ? 'Menyimpan...' : 'Simpan'}
                 </button>
             </div>
         </form>
-    )
+    );
 }
 
-export default FormAditionalQuestion
+export default FormAditionalQuestion;

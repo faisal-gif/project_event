@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Submission;
+use App\Models\SubmissionCustomFields;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -42,9 +44,10 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
+        $ticket->load(['event.eventSubmissionFields', 'transaction.ticketType', 'user']);
 
         return Inertia::render('Users/Tickets/Show', [
-            'ticket' => $ticket::with(['event', 'transaction', 'user'])->find($ticket->id)
+            'ticket' => $ticket
         ]);
     }
 
@@ -66,10 +69,42 @@ class TicketController extends Controller
 
     public function additonal(Request $request, Ticket $ticket)
     {
-        $ticket->ticket_additional_questions = $request->all();
+
+        $event = $ticket->event->load('eventSubmissionFields');
+        $user = auth()->user();
+
+        $fieldRules = [];
+        if ($event->needs_submission) {
+            foreach ($event->eventSubmissionFields as $field) {
+                $rules = $field->is_required ? ['required'] : ['nullable'];
+                $fieldRules[$field->name] = $rules;
+            }
+        }
+
+        $validated = $request->validate(array_merge($fieldRules));
+
+        $submision = Submission::create([
+            'event_id' => $event->id,
+            'ticket_id' => $ticket->id,
+            'user_id' => $user->id,
+            'status' => 'reviewed',
+        ]);
+
+        foreach ($validated  as $fieldName => $fieldValue) {
+            if (isset($submision)) {
+                SubmissionCustomFields::create([
+                    'submission_id' => $submision->id,
+                    'field_name' => $fieldName,
+                    'field_value' => $fieldValue,
+                ]);
+            }
+        }
+
+
+
         $ticket->status = 'used';
         $ticket->save();
-        
+
         return redirect()->back();
     }
     /**
