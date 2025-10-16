@@ -298,7 +298,7 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                     {processing ? 'Memproses...' : 'Bayar Sekarang'}
                                 </button>
                                 <div className="text-center mt-4">
-                                    <Link href={route('events.guest.detail', event)} className="btn btn-ghost btn-sm">
+                                    <Link href={route('events.guest.detail', { event: event.id, slug: event.slug })} className="btn btn-ghost btn-sm">
                                         ← Kembali ke Detail Event
                                     </Link>
                                 </div>

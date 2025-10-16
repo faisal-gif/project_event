@@ -10,7 +10,7 @@ function NavBarGuest() {
     <div className="navbar bg-gradient-to-br from-[#7f0b1a] to-[#3f154f] text-primary-content shadow-lg">
       <div className="navbar-start">
         <Link href="/" className="btn btn-ghost text-xs lg:text-xl font-bold">
-          <ApplicationLogo className="w-full h-4 lg:h-8" />.EVENTS
+          <ApplicationLogo className="w-full h-8 " />
         </Link>
       </div>
 

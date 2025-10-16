@@ -18,9 +18,6 @@ Route::get('/', [HomeController::class, 'index'])->name('welcome');
 Route::get('/auth/{provider}', [SocialiteController::class, 'redirect'])->name('auth.provider');
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('auth.callback');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
@@ -29,7 +26,7 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     Route::get('/events/{event}/{slug}', [EventController::class, 'userShow'])->name('events.users.show');
 
     Route::resource('tickets', TicketController::class);
-    Route::post('tickets/additional/{ticket}', [TicketController::class,'additonal'])->name('ticket.additional');
+    Route::post('tickets/additional/{ticket}', [TicketController::class, 'additonal'])->name('ticket.additional');
     Route::get('checkout/{ticket_type}', [TransactionController::class, 'create'])->name('transactions.checkout');
     Route::get('transactions/', [TransactionController::class, 'index'])->name('transactions.index');
     Route::post('transactions/{ticket_type}', [TransactionController::class, 'store'])->name('transactions.store');
@@ -42,6 +39,10 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
 
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
+
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::resource('events', EventController::class);
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
@@ -60,5 +61,25 @@ Route::get('/event/workshop', [HomeController::class, 'workshop'])->name('events
 Route::get('/event/webinar', [HomeController::class, 'webinar'])->name('events.webinar');
 Route::get('/event', [HomeController::class, 'event'])->name('events.guest');
 Route::get('/event/{event}/{slug}', [HomeController::class, 'eventShow'])->name('events.guest.detail');
+
+Route::get('/about', function () {
+    return Inertia::render('Guest/About');
+})->name('about');
+
+Route::get('/partnership', function () {
+    return Inertia::render('Guest/Partnership');
+})->name('partnership');
+
+Route::get('/faq', function () {
+    return Inertia::render('Guest/Faq');
+})->name('faq');
+
+Route::get('/contact', function () {
+    return Inertia::render('Guest/Contact');
+})->name('contact');
+
+Route::get('/privacy-policy', function () {
+    return Inertia::render('Guest/PrivacyPolicy');
+})->name('privacy-policy');
 
 require __DIR__ . '/auth.php';
