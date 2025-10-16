@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'user' => \App\Http\Middleware\IsUser::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'users/tripay/callback', 
+            'api/tripay/callback',   
+            'stripe/*',              
+        ]);
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
