@@ -17,7 +17,7 @@ class TripayService
 
     public function __construct()
     {
-        $this->apiKey = config('services.tripay.api_key');
+        $this->apiKey = 'Pc31aRKKzWaJxWmeIn9740kwzLbFm3Hl3fvD24T0';
         $this->merchantCode = config('services.tripay.merchant_code');
         $this->privateKey = config('services.tripay.private_key');
         $this->baseUrl = 'https://tripay.co.id/api'; // ganti ke production kalau live
@@ -28,7 +28,7 @@ class TripayService
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
         ])->get($this->baseUrl . '/merchant/payment-channel');
-            dd($response);
+        
         return json_decode($response)->data;
     }
 
