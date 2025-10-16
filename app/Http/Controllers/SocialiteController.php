@@ -12,38 +12,21 @@ use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
 {
-    public function redirectToLogin($provider)
+    public function redirect($provider)
     {
         return Socialite::driver($provider)->redirect();
     }
 
-    public function handleLoginCallback($provider)
+    public function callback($provider)
     {
         $socialUser = Socialite::driver($provider)->user();
+        // Cari user berdasarkan email
         $user = User::where('email', $socialUser->getEmail())->first();
-
         if ($user) {
             Auth::login($user);
             return redirect()->intended(route('welcome'));
         }
 
-        return Redirect::route('login')->withErrors(['email' => 'Your email is not registered.']);
-    }
-
-    public function redirectToRegister($provider)
-    {
-        return Socialite::driver($provider)->redirect();
-    }
-
-    public function handleRegisterCallback($provider)
-    {
-        $socialUser = Socialite::driver($provider)->user();
-
-        // Check if user already exists
-        $existingUser = User::where('email', $socialUser->getEmail())->first();
-        if ($existingUser) {
-            return Redirect::route('login')->withErrors(['email' => 'This email is already registered. Please login.']);
-        }
 
         session(['socialite_user' => $socialUser]);
 
