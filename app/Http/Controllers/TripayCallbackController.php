@@ -9,21 +9,43 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TripayCallbackController extends Controller
 {
+    protected $privateKey = 'Pc31aRKKzWaJxWmeIn9740kwzLbFm3Hl3fvD24T0';
+
     public function handle(Request $request)
     {
-        // Cek signature dari Tripay
         $callbackSignature = $request->server('HTTP_X_CALLBACK_SIGNATURE');
+        $json = $request->getContent();
+        $signature = hash_hmac('sha256', $json, $this->privateKey);
 
-
-        if (!$callbackSignature) {
-            Log::warning('Tripay callback invalid signature');
-            return response()->json(['success' => false, 'message' => 'Invalid signature'], 403);
+        if ($signature !== (string) $callbackSignature) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid signature',
+            ]);
         }
+
+        if ('payment_status' !== (string) $request->server('HTTP_X_CALLBACK_EVENT')) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Unrecognized callback event, no action was taken',
+            ]);
+        }
+
+        $data = json_decode($json);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Invalid data sent by tripay',
+            ]);
+        }
+        dd($data);
 
         $data = $request->all();
 
