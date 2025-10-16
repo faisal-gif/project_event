@@ -28,7 +28,7 @@ class TripayService
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
         ])->get($this->baseUrl . '/merchant/payment-channel');
-
+            dd($response);
         return json_decode($response)->data;
     }
 
