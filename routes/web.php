@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TripayCallbackController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -81,5 +82,7 @@ Route::get('/contact', function () {
 Route::get('/privacy-policy', function () {
     return Inertia::render('Guest/PrivacyPolicy');
 })->name('privacy-policy');
+
+Route::post('/users/tripay/callback', [TripayCallbackController::class, 'handle']);
 
 require __DIR__ . '/auth.php';
