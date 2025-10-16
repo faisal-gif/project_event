@@ -12,5 +12,6 @@ class DisableCsrfForTripay extends Middleware
 {
     protected $except = [
         'api/tripay/callback',
+        'users/tripay/callback',
     ];
 }
