@@ -17,7 +17,7 @@ class TripayService
 
     public function __construct()
     {
-        $this->apiKey = 'Pc31aRKKzWaJxWmeIn9740kwzLbFm3Hl3fvD24T0';
+        $this->apiKey = config('services.tripay.api_key');
         $this->merchantCode = config('services.tripay.merchant_code');
         $this->privateKey = config('services.tripay.private_key');
         $this->baseUrl = 'https://tripay.co.id/api'; // ganti ke production kalau live
