@@ -35,7 +35,7 @@ export default function Login({ status, canResetPassword }) {
             )}
             <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
 
-            <a href={route('auth.provider','google')} className="btn btn-outline bg-base-200 w-full h-12 text-base my-4">
+            <a href={route('socialite.login','google')} className="btn btn-outline bg-base-200 w-full h-12 text-base my-4">
                 <GoogleLogo size={20} />
                 Lanjutkan dengan Google
             </a>

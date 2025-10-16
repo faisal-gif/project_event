@@ -1,17 +1,13 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import GoogleLogo from '@/Components/GoogleLogo';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import AuthLayout from '@/Layouts/AuthLayout';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
-export default function Register() {
+export default function CompleteSocialiteRegistration({ name, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
+        phone_number: '',
         password: '',
         password_confirmation: '',
     });
@@ -19,27 +15,14 @@ export default function Register() {
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('register'), {
+        post(route('socialite.register.complete'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
 
     return (
         <AuthLayout>
-            <Head title="Register" />
-
-
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
-            <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
-
-            <a href={route('socialite.register', 'google')} className="btn btn-outline bg-base-200 w-full h-12 text-base my-4">
-                <GoogleLogo size={20} />
-                Lanjutkan dengan Google
-            </a>
+            <Head title="Complete Registration" />
 
             <form onSubmit={submit}>
                 <div>
@@ -48,15 +31,11 @@ export default function Register() {
                     <TextInput
                         id="name"
                         name="name"
-                        value={data.name}
-                        className="mt-1 input-bordered w-full input-sm"
+                        value={name}
+                        className="mt-1 input-bordered w-full input-sm bg-gray-100"
                         autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                        disabled
                     />
-
-                    <InputError message={errors.name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -66,18 +45,32 @@ export default function Register() {
                         id="email"
                         type="email"
                         name="email"
-                        value={data.email}
-                        className="mt-1 input-bordered w-full input-sm"
+                        value={email}
+                        className="mt-1 input-bordered w-full input-sm bg-gray-100"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        disabled
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" className='text-white' />
+                    <InputLabel htmlFor="phone_number" value="Phone Number" className='text-white' />
+
+                    <TextInput
+                        id="phone_number"
+                        name="phone_number"
+                        value={data.phone_number}
+                        className="mt-1 input-bordered w-full input-sm"
+                        autoComplete="tel"
+                        isFocused={true}
+                        onChange={(e) => setData('phone_number', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.phone_number} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="password" value="Password" className='text-white'/>
 
                     <TextInput
                         id="password"
@@ -120,13 +113,6 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="btn btn-sm btn-link text-white lg:text-black"
-                    >
-                        Already registered?
-                    </Link>
-
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Register
                     </PrimaryButton>

@@ -15,8 +15,12 @@ use Inertia\Inertia;
 use App\Models\Event;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
-Route::get('/auth/{provider}', [SocialiteController::class, 'redirect'])->name('auth.provider');
-Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('auth.callback');
+Route::get('/auth/{provider}/login', [SocialiteController::class, 'redirectToLogin'])->name('socialite.login');
+Route::get('/auth/{provider}/callback/login', [SocialiteController::class, 'handleLoginCallback']);
+Route::get('/auth/{provider}/register', [SocialiteController::class, 'redirectToRegister'])->name('socialite.register');
+Route::get('/auth/{provider}/callback/register', [SocialiteController::class, 'handleRegisterCallback']);
+Route::get('/auth/register/complete', [SocialiteController::class, 'showCompleteRegistrationForm'])->name('socialite.register.complete');
+Route::post('/auth/register/complete', [SocialiteController::class, 'processCompleteRegistration']);
 
 
 Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
