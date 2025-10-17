@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryEvents;
 use App\Models\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -53,8 +54,8 @@ class HomeController extends Controller
             'image' => $event->image ? asset('storage/' . $event->image) : null,
             'url' => url()->current(),
         ];
-        
 
+        Log::info('DATA SEO DARI SERVER UNTUK EVENT ID ' . $event->id, $seoData);
         return Inertia::render('EventDetail', [
             'event' => $event,
             'seo' => $seoData,
