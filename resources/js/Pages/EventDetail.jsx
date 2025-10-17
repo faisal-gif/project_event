@@ -5,8 +5,9 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { Ticket, Calendar, MapPin, Minus, Plus } from 'lucide-react';
 import Card from '@/Components/ui/Card';
+import Seo from '@/Components/Seo';
 
-function EventDetail({ event }) {
+function EventDetail({ event, seo }) {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
@@ -57,7 +58,14 @@ function EventDetail({ event }) {
 
     return (
         <>
-            <Head title={event.title} />
+            <Seo
+                title={seo.title}
+                description={seo.description}
+                image={seo.image}
+                url={seo.url}
+                type="article"
+            />
+
             <GuestLayout>
                 <div className="container max-w-7xl mx-auto px-4 py-8">
                     <div className="text-sm breadcrumbs mb-6">
