@@ -46,15 +46,17 @@ class HomeController extends Controller
 
         $plainTextBody = strip_tags($event->description);
         $description = Str::limit($plainTextBody, 155);
-        
+
+        $seoData = [
+            'title' => $event->title,
+            'description' => $description, // Gunakan deskripsi yang sudah bersih
+            'image' => $event->image ? asset('storage/' . $event->image) : null,
+            'url' => url()->current(),
+        ];
+
         return Inertia::render('EventDetail', [
             'event' => $event,
-            'seo' => [
-                'title' => $event->title,
-                'description' => $description, // Gunakan deskripsi yang sudah bersih
-                'image' => $event->image ? asset('storage/' . $event->image) : null,
-                'url' => url()->current(),
-            ],
+            'seo' => $seoData,
         ]);
     }
 
