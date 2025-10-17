@@ -53,6 +53,7 @@ class HomeController extends Controller
             'image' => $event->image ? asset('storage/' . $event->image) : null,
             'url' => url()->current(),
         ];
+        
 
         return Inertia::render('EventDetail', [
             'event' => $event,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 
-export default function Seo({ title, description, image, url, type = 'website' }) {
+export default function Seo({ title, description, image, url, type = 'article' }) {
     const siteName = "TIMESEvents"; 
 
     return (

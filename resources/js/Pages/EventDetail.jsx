@@ -63,7 +63,6 @@ function EventDetail({ event, seo }) {
                 description={seo.description}
                 image={seo.image}
                 url={seo.url}
-                type="article"
             />
 
             <GuestLayout>
