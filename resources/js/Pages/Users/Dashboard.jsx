@@ -45,7 +45,7 @@ export default function Dashboard({ tickets_count, transactions_count, participa
                                         <p className="mt-1 text-sm text-gray-500">
                                             {new Date(event.start_date).toLocaleDateString()}
                                         </p>
-                                        <Link href={route('events.users.show', { event: event.id, slug: event.slug })} className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                                        <Link href={route('events.guest.detail', { event: event.id, slug: event.slug })} className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                                             View Event
                                         </Link>
                                     </div>
