@@ -50,7 +50,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::resource('category', CategoryEventsController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
-    Route::post('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
+    Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
+    Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('admin.transactions.index');
 });
 
 

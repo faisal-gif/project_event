@@ -50,6 +50,7 @@ class EventController extends Controller
 
         $data = $this->validateEventData($request);
 
+
         $slug = Str::slug($request->title);
         $imagePath = $this->storeImage($request);
 
@@ -80,7 +81,7 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('tickets.user', 'tickets.detail_pendaftar','tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+        $event->load('tickets.user', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
 
@@ -146,7 +147,8 @@ class EventController extends Controller
     {
         $imageRule = $event ? 'nullable|image' : 'required|image';
 
-        return $request->validate([
+        // 1. Definisikan semua rules Anda
+        $rules = [
             'image' => $imageRule,
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -162,6 +164,9 @@ class EventController extends Controller
             'ticket_types.*.name' => 'required|string|max:255',
             'ticket_types.*.price' => 'required|numeric|min:0',
             'ticket_types.*.quota' => 'required|integer|min:1',
+            'ticket_types.*.purchase_date' => 'required|date',
+            'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
+            'ticket_types.*.description' => 'required|string',
             'need_additional_questions' => 'boolean',
             'event_fields' => ['nullable', 'array'],
             'event_fields.*.label' => ['required_with:event_fields', 'string'],
@@ -180,7 +185,32 @@ class EventController extends Controller
             'submission_fields.*.type' => ['required_with:submission_fields', 'string'],
             'submission_fields.*.options' => ['nullable', 'string'],
             'submission_fields.*.is_required' => ['boolean'],
-        ]);
+        ];
+
+        // 2. Definisikan pesan kustom Anda
+        $messages = [
+            'title.required' => 'Judul event tidak boleh kosong.',
+            'title.max' => 'Judul event terlalu panjang, maksimal 255 karakter.',
+            'description.required' => 'Deskripsi event wajib diisi.',
+            'category_id.required' => 'Silakan pilih kategori event.',
+            'category_id.exists' => 'Kategori yang dipilih tidak valid.',
+            'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh sebelum tanggal mulai.',
+            'ticket_types.min' => 'Anda harus menambahkan minimal 1 jenis tiket.',
+
+            // Contoh untuk array (menggunakan wildcard *)
+            'ticket_types.*.name.required' => 'Nama tiket wajib diisi.',
+            'ticket_types.*.price.numeric' => 'Harga tiket harus berupa angka.',
+            'ticket_types.*.quota.min' => 'Kuota tiket minimal adalah 1.',
+            'ticket_types.*.end_purchase_date.after_or_equal' => 'Tanggal akhir penjualan tiket tidak boleh sebelum tanggal mulainya.',
+
+            // Contoh untuk event_fields
+            'event_fields.*.label.required_with' => 'Label pertanyaan tambahan wajib diisi.',
+            'event_fields.*.type.in' => 'Tipe pertanyaan tambahan tidak valid.',
+            'event_fields.*.options.required_if' => 'Opsi jawaban wajib diisi untuk tipe select, radio, atau checkbox.',
+        ];
+
+        // 3. Masukkan $rules dan $messages ke method validate()
+        return $request->validate($rules, $messages);
     }
 
     private function storeImage(Request $request)
@@ -204,7 +234,10 @@ class EventController extends Controller
                     'name' => $ticketType['name'],
                     'price' => $ticketType['price'],
                     'quota' => $ticketType['quota'],
-                    'remaining_quota' => $ticketType['quota'], // Set remaining_quota to full quota
+                    'remaining_quota' => $ticketType['quota'],
+                    'description' => $ticketType['description'],
+                    'purchase_date' => $ticketType['purchase_date'],
+                    'end_purchase_date' => $ticketType['end_purchase_date'],
                 ]);
             }
         }
@@ -257,6 +290,7 @@ class EventController extends Controller
         $step = $request->input('step');
         $rules = [];
 
+
         if ($step === 1) {
             $rules = [
                 'title' => 'required|string|max:255',
@@ -272,11 +306,40 @@ class EventController extends Controller
                 'ticket_types.*.name' => 'required|string|max:255',
                 'ticket_types.*.price' => 'required|numeric|min:0',
                 'ticket_types.*.quota' => 'required|integer|min:1',
+                'ticket_types.*.purchase_date' => 'required|date',
+                'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
+                'ticket_types.*.description' => 'required|string',
                 'limit_ticket_user' => 'required|integer|min:1',
             ];
         }
 
-        $validatedData = $request->validate($rules);
+
+        $messages = [
+            // Pesan untuk Step 1
+            'title.required' => 'Judul event tidak boleh kosong.',
+            'description.required' => 'Deskripsi event wajib diisi.',
+            'category_id.required' => 'Silakan pilih kategori.',
+            'start_date.required' => 'Tanggal mulai event wajib diisi',
+            'end_date.required' => 'Tanggal berakhir event wajib diisi',
+            'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh kurang dari tanggal mulai.',
+
+            // Pesan untuk Step 2
+            'ticket_types.min' => 'Anda harus menambahkan minimal 1 jenis tiket.',
+            'ticket_types.*.name.required' => 'Nama tiket wajib diisi.',
+            'ticket_types.*.price.required' => 'Harga tiket wajib diisi.',
+            'ticket_types.*.quota.required' => 'Quota tiket wajib diisi.',
+            'ticket_types.*.purchase_date.required' => 'Tanggal awal pembelian tiket wajib diisi.',
+            'ticket_types.*.end_purchase_date.required' => 'Tanggal akhir pembelian tiket wajib diisi.',
+            'ticket_types.*.description.required' => 'Deskripsi tiket wajib diisi.',
+            'ticket_types.*.price.numeric' => 'Harga tiket harus berupa angka.',
+            'ticket_types.*.quota.min' => 'Kuota tiket minimal adalah 1.',
+
+
+            'limit_ticket_user.min' => 'Batas tiket per pengguna minimal 1.',
+        ];
+
+
+        $validatedData = $request->validate($rules, $messages);
 
         return response()->json(['success' => true, 'data' => $validatedData]);
     }
@@ -286,6 +349,7 @@ class EventController extends Controller
         $step = $request->input('step');
         $rules = [];
 
+
         if ($step === 1) {
             $rules = [
                 'title' => 'required|string|max:255',
@@ -301,11 +365,40 @@ class EventController extends Controller
                 'ticket_types.*.name' => 'required|string|max:255',
                 'ticket_types.*.price' => 'required|numeric|min:0',
                 'ticket_types.*.quota' => 'required|integer|min:1',
+                'ticket_types.*.purchase_date' => 'required|date',
+                'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
+                'ticket_types.*.description' => 'required|string',
                 'limit_ticket_user' => 'required|integer|min:1',
             ];
         }
 
-        $validatedData = $request->validate($rules);
+
+        $messages = [
+            // Pesan untuk Step 1
+            'title.required' => 'Judul event tidak boleh kosong.',
+            'description.required' => 'Deskripsi event wajib diisi.',
+            'category_id.required' => 'Silakan pilih kategori.',
+            'start_date.required' => 'Tanggal mulai event wajib diisi',
+            'end_date.required' => 'Tanggal berakhir event wajib diisi',
+            'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh kurang dari tanggal mulai.',
+
+            // Pesan untuk Step 2
+            'ticket_types.min' => 'Anda harus menambahkan minimal 1 jenis tiket.',
+            'ticket_types.*.name.required' => 'Nama tiket wajib diisi.',
+            'ticket_types.*.price.required' => 'Harga tiket wajib diisi.',
+            'ticket_types.*.quota.required' => 'Quota tiket wajib diisi.',
+            'ticket_types.*.purchase_date.required' => 'Tanggal awal pembelian tiket wajib diisi.',
+            'ticket_types.*.end_purchase_date.required' => 'Tanggal akhir pembelian tiket wajib diisi.',
+            'ticket_types.*.description.required' => 'Deskripsi tiket wajib diisi.',
+            'ticket_types.*.price.numeric' => 'Harga tiket harus berupa angka.',
+            'ticket_types.*.quota.min' => 'Kuota tiket minimal adalah 1.',
+
+
+            'limit_ticket_user.min' => 'Batas tiket per pengguna minimal 1.',
+        ];
+
+
+        $validatedData = $request->validate($rules, $messages);
 
         return response()->json(['success' => true, 'data' => $validatedData]);
     }

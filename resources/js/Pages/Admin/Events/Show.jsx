@@ -84,7 +84,7 @@ function Show({ event }) {
                                     <h1 className="text-3xl font-bold my-4">{event.title}</h1>
                                     <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
                                     <div className="divider"></div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 gap-6">
                                         <div className="space-y-4">
                                             <h3 className="text-xl font-semibold">Event Details</h3>
                                             <div className="space-y-3">
@@ -122,7 +122,13 @@ function Show({ event }) {
                                                 <li key={ticketType.id} className="p-3 bg-base-200 rounded-lg flex justify-between items-center">
                                                     <div>
                                                         <span className="font-semibold">{ticketType.name}</span>
+                                                        <p className='text-xs'>{ticketType.description}</p>
                                                         <div className="text-sm text-gray-500">Quota: {ticketType.quota}</div>
+                                                        <div className="flex items-start">
+                                                            <span className="flex-1 text-xs">{formatDate(ticketType.purchase_date)} - {formatDate(ticketType.end_purchase_date)}</span>
+                                                        </div>
+                                                     
+                                                     
                                                     </div>
                                                     <div className="font-bold text-lg">{formatPrice(ticketType.price)}</div>
                                                 </li>

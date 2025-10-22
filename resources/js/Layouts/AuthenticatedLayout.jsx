@@ -84,7 +84,10 @@ export default function AuthenticatedLayout({ children }) {
                             </li>
 
                             {user.role === 'admin' && (
-                                <li><Link href={route('ticket.scan')}>QR Scanner</Link></li>
+                                <>
+                                    <li><Link href={route('ticket.scan')}>QR Scanner</Link></li>
+                                    <li><Link href={route('admin.transactions.index')}>Transaction</Link></li>
+                                </>
                             )}
                         </ul>
                     </li>

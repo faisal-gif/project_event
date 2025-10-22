@@ -29,7 +29,7 @@ function Create({ category }) {
         requirements: '',
         is_headline: false,
         // Step 2
-        ticket_types: [{ name: 'Regular', price: '0', quota: '100' }],
+        ticket_types: [{ name: 'Regular', price: '0', quota: '100', purchase_date: '', end_purchase_date: '', description: '' }],
         limit_ticket_user: 1,
         // Step 3
         need_additional_questions: false,

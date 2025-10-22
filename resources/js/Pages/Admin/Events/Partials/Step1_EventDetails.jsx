@@ -104,7 +104,7 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
                         </div>
                         <div className="space-y-2">
                             <InputLabel htmlFor="locationDetail" value="Location Details" />
-                            <textarea id="locationDetail" placeholder="Enter venue details, address, or online platform info" className="textarea min-h-[80px] w-full" value={data.location_details} onChange={(e) => setData("location_details", e.target.value)} />
+                            <textarea id="locationDetail" placeholder="Enter venue details, address, or online platform info" className="textarea textarea-bordered min-h-[80px] w-full" value={data.location_details} onChange={(e) => setData("location_details", e.target.value)} />
                             <InputError message={errors.location_details} />
                         </div>
                     </div>

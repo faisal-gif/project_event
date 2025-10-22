@@ -11,6 +11,9 @@ function EventDetail({ event, seo }) {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
+    // Definisikan 'now' sekali di luar map untuk efisiensi
+    const now = new Date();
+
     if (!event) {
         return (
             <GuestLayout>
@@ -132,27 +135,51 @@ function EventDetail({ event, seo }) {
                                         const isSoldOut = ticketType.remaining_quota === 0;
                                         const isSelected = selectedTicket && selectedTicket.id === ticketType.id;
 
+                                        // --- LOGIKA TANGGAL DIMULAI ---
+                                        const startDate = new Date(ticketType.purchase_date);
+                                        const endDate = new Date(ticketType.end_purchase_date);
+                                        
+                                        const isBeforePurchase = now < startDate;
+                                        const isAfterPurchase = now > endDate;
+                                        
+                                        // Gabungkan semua kondisi disabled
+                                        const isDisabled = isSoldOut || isBeforePurchase || isAfterPurchase;
+                                        // --- LOGIKA TANGGAL SELESAI ---
+
                                         return (
                                             <div
                                                 key={ticketType.id}
-                                                className={`card bg-base-200 shadow-md transition-all hover:shadow-lg cursor-pointer ${isSelected ? 'ring-2 ring-primary' : ''} ${isSoldOut ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                onClick={() => !isSoldOut && handleTicketSelect(ticketType)}
+                                                className={`card bg-base-200 shadow-md transition-all ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'} ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                                                onClick={() => !isDisabled && handleTicketSelect(ticketType)}
                                             >
                                                 <div className="card-body flex-row justify-between items-center">
                                                     <div>
                                                         <h3 className="card-title text-xl">{ticketType.name}</h3>
-                                                        <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
-                                                        <p className="text-sm text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
-                                                        {isSoldOut && <span className="badge badge-error badge-lg mt-2">Habis</span>}
+                                                        <p className='text-sm'>{ticketType.description}</p>
+                                                        <div className="flex items-start">
+                                                            <span className="flex-1 text-sm">{formatDate(ticketType.purchase_date)} - {formatDate(ticketType.end_purchase_date)}</span>
+                                                        </div>
+                                                        <p className="text-xs text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
+                                                        
+                                                        {/* --- TAMBAHKAN BADGE KONDISI --- */}
+                                                        {isSoldOut && <span className="badge badge-error badge-sm mt-2">Habis</span>}
+                                                        {!isSoldOut && isBeforePurchase && <span className="badge badge-outline badge-warning badge-sm mt-2">Belum dibuka</span>}
+                                                        {!isSoldOut && isAfterPurchase && <span className="badge badge-outline badge-error badge-sm mt-2">Sudah ditutup</span>}
+                                                        {/* --- BADGE SELESAI --- */}
+
                                                     </div>
-                                                    <input
-                                                        type="radio"
-                                                        name="ticket-type"
-                                                        className="radio radio-primary"
-                                                        checked={isSelected}
-                                                        onChange={() => !isSoldOut && handleTicketSelect(ticketType)}
-                                                        disabled={isSoldOut}
-                                                    />
+                                                    <div className='flex gap-2 items-center'>
+                                                        <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
+                                                        <input
+                                                            type="radio"
+                                                            name="ticket-type"
+                                                            className="radio radio-primary"
+                                                            checked={isSelected}
+                                                            onChange={() => !isDisabled && handleTicketSelect(ticketType)}
+                                                            disabled={isDisabled} // Gunakan isDisabled
+                                                        />
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         );

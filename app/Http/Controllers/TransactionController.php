@@ -124,5 +124,11 @@ class TransactionController extends Controller
         ]);
     }
 
-    // ... other methods
+    public function adminIndex()
+    {
+        $transactions = Transaction::with(['event', 'user'])->latest()->get();
+        return Inertia::render('Admin/Transaction/Index', [
+            'transactions' => $transactions,
+        ]);
+    }
 }

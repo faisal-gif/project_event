@@ -15,6 +15,9 @@ class TicketType extends Model
         'price',
         'quota',
         'remaining_quota',
+        'description',
+        'purchase_date',
+        'end_purchase_date'
     ];
 
     public function event()
