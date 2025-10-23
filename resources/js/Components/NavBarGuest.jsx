@@ -2,7 +2,7 @@ import { Link, usePage } from '@inertiajs/react'
 import React from 'react'
 import Dropdown from './Dropdown'
 import { User } from 'lucide-react'
-import ApplicationLogo from './ApplicationLogo';
+import ApplicationLogoWhite from './ApplicationLogoWhite';
 
 function NavBarGuest() {
   const user = usePage().props.auth.user;
@@ -10,7 +10,7 @@ function NavBarGuest() {
     <div className="navbar bg-gradient-to-br from-[#7f0b1a] to-[#3f154f] text-primary-content shadow-lg">
       <div className="navbar-start">
         <Link href="/" className="btn btn-ghost text-xs lg:text-xl font-bold">
-          <ApplicationLogo className="w-full h-8 " />
+          <ApplicationLogoWhite className="w-full h-8 " />
         </Link>
       </div>
 

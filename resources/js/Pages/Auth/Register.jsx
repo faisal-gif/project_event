@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import ApplicationLogoWhite from '@/Components/ApplicationLogoWhite';
 import GoogleLogo from '@/Components/GoogleLogo';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -34,7 +35,12 @@ export default function Register() {
                     {status}
                 </div>
             )}
-            <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
+            <div className='block md:hidden'>
+                <ApplicationLogoWhite className="h-full w-52 my-8 mx-auto" />
+            </div>
+              <div className='hidden md:block'>
+                <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
+            </div>
 
             <a href={route('auth.provider', 'google')} className="btn btn-outline bg-base-200 w-full h-12 text-base my-4">
                 <GoogleLogo size={20} />

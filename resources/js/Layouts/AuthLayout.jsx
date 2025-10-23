@@ -1,4 +1,4 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
+import ApplicationLogoWhite from '@/Components/ApplicationLogoWhite';
 import { Link } from '@inertiajs/react';
 
 export default function AuthLayout({ children }) {
@@ -15,7 +15,7 @@ export default function AuthLayout({ children }) {
                 <div className="relative  p-12 text-center text-white">
 
                     <div className="max-w-md flex flex-col justify-center items-center space-y-6 animate-float">
-                        <ApplicationLogo className="relative w-60 h-full " />
+                        <ApplicationLogoWhite className="relative w-60 h-full " />
                         <h1 className="text-4xl font-bold text-foreground">
                             Discover Amazing Events
                         </h1>
