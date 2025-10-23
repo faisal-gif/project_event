@@ -1,3 +1,5 @@
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import ApplicationLogoWhite from '@/Components/ApplicationLogoWhite';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
@@ -19,6 +21,13 @@ export default function ForgotPassword({ status }) {
     return (
         <AuthLayout>
             <Head title="Forgot Password" />
+
+            <div className='block md:hidden'>
+                <ApplicationLogoWhite className="h-full w-52 my-8 mx-auto" />
+            </div>
+            <div className='hidden md:block'>
+                <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
+            </div>
 
             <div className="mb-4 text-sm text-white md:text-gray-600">
                 Forgot your password? No problem. Just let us know your email

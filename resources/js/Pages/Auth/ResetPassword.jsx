@@ -1,3 +1,5 @@
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import ApplicationLogoWhite from '@/Components/ApplicationLogoWhite';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -25,6 +27,12 @@ export default function ResetPassword({ token, email }) {
     return (
         <AuthLayout>
             <Head title="Reset Password" />
+            <div className='block md:hidden'>
+                <ApplicationLogoWhite className="h-full w-52 my-8 mx-auto" />
+            </div>
+            <div className='hidden md:block'>
+                <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
+            </div>
 
             <form onSubmit={submit}>
                 <div>
