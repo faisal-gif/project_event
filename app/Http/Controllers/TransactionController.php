@@ -61,6 +61,8 @@ class TransactionController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'phone' => 'required',
+            'usia' => 'required|integer|min:0',
+            'pekerjaan' => 'required|string|max:255',
             'terms' => 'accepted',
         ];
 
@@ -86,6 +88,9 @@ class TransactionController extends Controller
                     'nama' => $validated['name'],
                     'email' => $validated['email'],
                     'no_hp' => $validated['phone'],
+                    'usia' => $validated['usia'],
+                    'pekerjaan' => $validated['pekerjaan'],
+                    'terms_and_condition' => $validated['terms'],
                 ]);
 
                 if ($ticketType->price == 0) {
@@ -107,8 +112,6 @@ class TransactionController extends Controller
                     ]);
 
                     $ticketServices->issueTicket($transaction);
-
-                    return $transaction;
                 } else {
                     // Berbayar
                     $result = $tripay->createTransaction($ticketType, $user, $validated);
@@ -133,10 +136,8 @@ class TransactionController extends Controller
                         'field_responses' => json_encode($validated['field_responses'] ?? []),
                     ]);
                 }
-
                 return $transaction;
             });
-
             return redirect()->route('transactions.status', ['tripay_reference' => $trx->reference])->with('checkout_url', $trx->checkout_url);
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());

@@ -12,6 +12,8 @@ const Create = ({ ticketType, event, channel, quantity }) => {
         name: '',
         email: '',
         phone: '',
+        usia: '',
+        pekerjaan: '',
         field_responses: {},
         terms: false,
     });
@@ -210,6 +212,16 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                             <label className="label-text font-medium">Nomor HP</label>
                                             <input type="text" value={data.phone} onChange={(e) => setData('phone', e.target.value)} placeholder="0895389118844" className="input input-bordered w-full " required />
                                             <InputError className={errors.phone ? 'invalid' : ''} message={errors.phone} />
+                                        </div>
+                                         <div className="flex flex-col gap-2 w-full">
+                                            <label className="label-text font-medium">Usia</label>
+                                            <input type="number" value={data.usia} onChange={(e) => setData('usia', e.target.value)} placeholder="Usia" className="input input-bordered w-full " required />
+                                            <InputError className={errors.usia ? 'invalid' : ''} message={errors.usia} />
+                                        </div>
+                                         <div className="flex flex-col gap-2 w-full">
+                                            <label className="label-text font-medium">Pekerjaan</label>
+                                            <input type="text" value={data.pekerjaan} onChange={(e) => setData('pekerjaan', e.target.value)} placeholder="Pekerjaan" className="input input-bordered w-full " required />
+                                            <InputError className={errors.pekerjaan ? 'invalid' : ''} message={errors.pekerjaan} />
                                         </div>
                                     </div>
                                 </div>
