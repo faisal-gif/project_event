@@ -47,6 +47,16 @@ export default function AuthenticatedLayout({ children }) {
                                 </button>
                             </Dropdown.Trigger>
                             <Dropdown.Content>
+                                 {user.role === 'admin' && (
+                                    <Dropdown.Link href={route('admin.dashboard')}>
+                                        Admin Dashboard
+                                    </Dropdown.Link>
+                                )}
+                                {user.role === 'organizer' && (
+                                    <Dropdown.Link href={route('organizer.dashboard')}>
+                                        Organizer Dashboard
+                                    </Dropdown.Link>
+                                )}
                                 <Dropdown.Link href={route('profile.edit')}>
                                     Profile
                                 </Dropdown.Link>
@@ -71,22 +81,50 @@ export default function AuthenticatedLayout({ children }) {
                     <li className='mb-3 pt-10'>
                         <h2 className="menu-title">Menu</h2>
                         <ul>
-                            <li>
-                                <Link href={route('category.index')}>
-                                    Category
-                                </Link>
-                            </li>
-
-                            <li>
-                                <Link href={user.role === 'admin' ? route('events.index') : route('events.user.index')}>
-                                    Event
-                                </Link>
-                            </li>
-
                             {user.role === 'admin' && (
                                 <>
+                                    <li>
+                                        <Link href={route('category.index')}>
+                                            Category
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('events.index')}>
+                                            Event
+                                        </Link>
+                                    </li>
                                     <li><Link href={route('ticket.scan')}>QR Scanner</Link></li>
                                     <li><Link href={route('admin.transactions.index')}>Transaction</Link></li>
+                                </>
+                            )}
+
+                            {user.role === 'organizer' && (
+                                <>
+                                    <li>
+                                        <Link href={route('organizer.dashboard')}>
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('organizer.events.index')}>
+                                            My Events
+                                        </Link>
+                                    </li>
+                                </>
+                            )}
+
+                             {user.role === 'user' && (
+                                <>
+                                    <li>
+                                        <Link href={route('user.dashboard')}>
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('events.user.index')}>
+                                            Events
+                                        </Link>
+                                    </li>
                                 </>
                             )}
                         </ul>

@@ -4,6 +4,8 @@ use App\Http\Controllers\CategoryEventsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Organizer\OrganizerDashboardController;
+use App\Http\Controllers\Organizer\OrganizerEventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketController;
@@ -85,5 +87,15 @@ Route::get('/privacy-policy', function () {
 })->name('privacy-policy');
 
 Route::post('/users/tripay/callback', [TripayCallbackController::class, 'handle']);
+
+
+Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.')->group(function () {
+    Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('events', OrganizerEventController::class);
+    Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
+    Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
+    Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
+    Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
+});
 
 require __DIR__ . '/auth.php';

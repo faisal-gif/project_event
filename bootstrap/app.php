@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'user' => \App\Http\Middleware\IsUser::class,
+            'organizer' => \App\Http\Middleware\IsOrganizer::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'users/tripay/callback', 

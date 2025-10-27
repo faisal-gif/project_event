@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsAdmin
+class IsOrganizer
 {
     /**
      * Handle an incoming request.
@@ -15,18 +15,18 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->role === 'admin') {
+        if (auth()->check() && auth()->user()->role === 'organizer') {
             return $next($request);
         }
 
-        if (auth()->check() && auth()->user()->role === 'organizer') {
-            return redirect('/organizer/dashboard');
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return redirect('/admin/dashboard');
         }
 
         if (auth()->check() && auth()->user()->role === 'user') {
             return redirect('/');
         }
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

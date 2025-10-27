@@ -13,9 +13,9 @@ export default function Dashboard({ users_count, events_count, tickets_count, tr
             <Head title="Dashboard" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl px-6 md:px-8">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className="overflow-hidden bg-white shadow-sm rounded-lg">
                             <div className="p-6 text-gray-900">
                                 <h3 className="text-lg font-medium leading-6 text-gray-900">
                                     Total Users
@@ -25,7 +25,7 @@ export default function Dashboard({ users_count, events_count, tickets_count, tr
                                 </p>
                             </div>
                         </div>
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className="overflow-hidden bg-white shadow-sm rounded-lg">
                             <div className="p-6 text-gray-900">
                                 <h3 className="text-lg font-medium leading-6 text-gray-900">
                                     Total Events
@@ -35,7 +35,7 @@ export default function Dashboard({ users_count, events_count, tickets_count, tr
                                 </p>
                             </div>
                         </div>
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className="overflow-hidden bg-white shadow-sm rounded-lg">
                             <div className="p-6 text-gray-900">
                                 <h3 className="text-lg font-medium leading-6 text-gray-900">
                                     Total Tickets
@@ -45,7 +45,7 @@ export default function Dashboard({ users_count, events_count, tickets_count, tr
                                 </p>
                             </div>
                         </div>
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className="overflow-hidden bg-white shadow-sm rounded-lg">
                             <div className="p-6 text-gray-900">
                                 <h3 className="text-lg font-medium leading-6 text-gray-900">
                                     Total Transactions

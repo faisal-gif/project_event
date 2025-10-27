@@ -19,6 +19,15 @@ class IsUser
             return $next($request);
         }
 
-        return redirect('/admin/dashboard');
+        if (auth()->check() && auth()->user()->role === 'organizer') {
+            return redirect('/organizer/dashboard');
+        }
+
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return redirect('/admin/dashboard');
+        }
+
+
+        return redirect('/login');
     }
 }

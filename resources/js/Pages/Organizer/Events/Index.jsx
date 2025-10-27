@@ -53,7 +53,7 @@ function Index({ events }) {
                         <h2 className="card-title mb-2">Events</h2>
                         <div className="flex flex-wrap gap-4 justify-between items-center">
                             <p className="card-text">Here is the list of events</p>
-                            <Link href={route('events.create')} className='btn btn-primary mt-10'>Tambah Event</Link>
+                            <Link href={route('organizer.events.create')} className='btn btn-primary mt-10'>Tambah Event</Link>
                         </div>
 
                         <div className="overflow-x-auto">
@@ -63,7 +63,6 @@ function Index({ events }) {
                                     <tr>
                                         <th></th>
                                         <th>Nama Event</th>
-                                        <th>Creator</th>
                                         <th>Category</th>
                                         <th>Price Range</th>
                                         <th>Total Quota</th>
@@ -76,17 +75,20 @@ function Index({ events }) {
                                         <tr key={event.id}>
                                             <td>{index + 1}</td>
                                             <td>{event.title}</td>
-                                            <td>{event.creator.name}</td>
-                                            <td>{event.category.name}</td>
+                                            <td>
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    {event.category.name}
+                                                </span>
+                                            </td>
                                             <td>{formatPriceRange(event.price_range)}</td>
                                             <td>{event.total_quota}</td>
 
                                             <td> <div className='flex gap-2'>
-                                                <Link className='btn btn-sm btn-primary' href={route('events.show', event)}>
+                                                <Link className='btn btn-sm btn-primary' href={route('organizer.events.show', event)}>
                                                     Detail
                                                 </Link>
 
-                                                <Link className='btn btn-sm btn-warning' href={route('events.edit', event)}>
+                                                <Link className='btn btn-sm btn-warning' href={route('organizer.events.edit', event)}>
                                                     Edit
                                                 </Link>
                                             </div>

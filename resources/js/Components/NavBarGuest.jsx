@@ -34,6 +34,7 @@ function NavBarGuest() {
       <div className="navbar-end">
         {user ? (
           <Dropdown>
+
             <Dropdown.Trigger>
               <button className="btn btn-ghost flex items-center gap-2">
                 <User size={20} />
@@ -44,7 +45,16 @@ function NavBarGuest() {
               </button>
             </Dropdown.Trigger>
             <Dropdown.Content>
-            
+              {user.role === 'admin' && (
+                <Dropdown.Link href={route('admin.dashboard')}>
+                  Admin Dashboard
+                </Dropdown.Link>
+              )}
+              {user.role === 'organizer' && (
+                <Dropdown.Link href={route('organizer.dashboard')}>
+                  Organizer Dashboard
+                </Dropdown.Link>
+              )}
               <Dropdown.Link href={route('logout')} method="post" as="button">
                 Log Out
               </Dropdown.Link>

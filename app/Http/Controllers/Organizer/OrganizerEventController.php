@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Organizer;
 
+use App\Http\Controllers\Controller;
 use App\Models\CategoryEvents;
 use App\Models\Event;
 use Illuminate\Http\Request;
@@ -11,20 +12,18 @@ use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 
-class EventController extends Controller
+class OrganizerEventController extends Controller
 {
-
     public function index()
     {
         $events = Event::with('creator', 'category', 'ticketTypes')->latest()->get();
-     
-        return Inertia::render('Admin/Events/Index', ['events' => $events]);
+        return Inertia::render('Organizer/Events/Index', ['events' => $events]);
     }
 
     public function create()
     {
         $category = CategoryEvents::all();
-        return Inertia::render('Admin/Events/Create', [
+        return Inertia::render('Organizer/Events/Create', [
             'category' => $category
         ]);
     }
@@ -73,13 +72,21 @@ class EventController extends Controller
 
         $this->syncRelatedData($event, $data);
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully.');
+        return redirect()->route('organizer.events.index')->with('success', 'Event created successfully.');
     }
 
     public function show(Event $event)
     {
+
+        $user = auth()->user();
+
+        if (!$user || ($user->id !== $event->created_by && $user->role !== 'admin')) {
+            abort(403, 'Unauthorized access.');
+        }
+
+
         $event->load('tickets.user', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
-        return Inertia::render('Admin/Events/Show', ['event' => $event]);
+        return Inertia::render('Organizer/Events/Show', ['event' => $event]);
     }
 
     public function edit(Event $event)
@@ -87,7 +94,7 @@ class EventController extends Controller
         $category = CategoryEvents::all();
         $event->load('eventFields', 'eventSubmissionFields', 'ticketTypes');
 
-        return Inertia::render('Admin/Events/Edit', ['event' => $event, 'category' => $category]);
+        return Inertia::render('Organizer/Events/Edit', ['event' => $event, 'category' => $category]);
     }
 
     public function update(Request $request, Event $event)
@@ -137,7 +144,7 @@ class EventController extends Controller
 
         $this->syncRelatedData($event, $data);
 
-        return redirect()->route('events.index')->with('success', 'Event updated successfully.');
+        return redirect()->route('organizer.events.index')->with('success', 'Event updated successfully.');
     }
 
     private function validateEventData(Request $request, Event $event = null)
@@ -269,17 +276,6 @@ class EventController extends Controller
         }
     }
 
-  
-    public function userIndex()
-    {
-        $events = Event::with('creator')->latest()->get();
-        return Inertia::render('Users/Events/Index', ['events' => $events]);
-    }
-
-    public function userShow(Event $event)
-    {
-        return Inertia::render('Users/Events/Show', ['event' => $event]);
-    }
 
     public function validateStep(Request $request)
     {
