@@ -304,7 +304,7 @@ function Show({ event }) {
             </Modal>
 
             {/* --- PERUBAHAN 5: Tambahkan Modal untuk QR Scanner --- */}
-            <Modal show={isScannerModalOpen} onClose={closeScannerModal} maxWidth="xl">
+            <Modal show={isScannerModalOpen} onClose={closeScannerModal} maxWidth="2xl">
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>
                     <QrCode
