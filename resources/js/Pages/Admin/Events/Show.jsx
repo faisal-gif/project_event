@@ -5,6 +5,7 @@ import Card from '@/Components/ui/Card';
 import { QrCode as QrCodeIcon } from 'lucide-react';
 import Modal from '@/Components/Modal'; // Assuming you have a Modal component
 import QrCode from '@/Components/QrCode';
+import Swal from 'sweetalert2';
 
 // Helper functions
 const formatPrice = (price) => {
