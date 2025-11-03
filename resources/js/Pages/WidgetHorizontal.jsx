@@ -96,74 +96,69 @@ function WidgetHorizontal({ events }) {
                     </div>
                     <Carousel opts={{ align: "start", loop: true }} className="w-full" plugins={[Autoplay()]}>
                         <Carousel.Content className="-ml-4">
-                            {events.map((event) => (
-                                <Carousel.Item
-                                    key={event.id}
-                                    className=" min-w-0 shrink-0 grow-0 basis-10/12 lg:basis-1/3"
-                                >
-                                    <div className="h-full">
-                                        <div key={event.id} className="card w-full h-96 md:h-[500px] bg-base-100 transition-shadow">
-                                            <figure className="w-full bg-base-200 flex items-center justify-center overflow-hidden">
-                                                {event.image && event.image !== '' ? (
-                                                    <img
-                                                        src={`/storage/${event.image}`}
-                                                        alt={event.title}
-                                                        className="object-cover w-full h-full"
-                                                    />
-                                                ) : (
-                                                    <img
-                                                        src={'https://picsum.photos/400/200'}
-                                                        alt={event.title}
-                                                        className="object-cover w-full h-full"
-                                                    />
-                                                )
-                                                }
-                                            </figure>
-                                            <div className="card-body p-5 space-y-0 md:space-y-4">
+                            {events.map((event) => {
+                                // Tentukan URL gambar di sini
+                                const imageUrl = event.image && event.image !== ''
+                                    ? `/storage/${event.image}`
+                                    : 'https://picsum.photos/400/200';
 
-                                                <h3 className="text-base font-bold text-card-foreground line-clamp-2 min-h-[48px] group-hover:text-[#4d0c0c] transition-colors duration-300">
-                                                    {event.title}
-                                                </h3>
+                                return (
+                                    <Carousel.Item
+                                        key={event.id}
+                                        className=" min-w-0 shrink-0 grow-0 basis-10/12 lg:basis-4/12 px-4"
+                                    >
+                                        <div className="h-full">
+                                          
+                                            <div
+                                                key={event.id}
+                                                className="card w-full h-96 md:h-[500px] transition-shadow overflow-hidden"
+                                                style={{
+                                                    backgroundImage: `url(${imageUrl})`,
+                                                    backgroundSize: 'contain',
+                                                    backgroundPosition: 'center',
+                                                }}
+                                            >
+                                              
+                                                <div className="card-body h-full p-5 space-y-0 md:space-y-4 flex flex-col justify-end bg-black/40 text-base-100">
 
-                                                <div className="flex items-center gap-2 text-sm text-black/60 bg-secondary rounded-lg px-3 py-2 backdrop-blur-sm">
-                                                    <Calendar className="w-4 h-4 text-[#b41d1d]" />
-                                                    <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
-                                                </div>
+                                                    {/* MODIFIKASI 3: Ubah warna teks jadi putih */}
+                                                    <h3 className="text-base font-bold text-white line-clamp-2 min-h-[48px] group-hover:text-white/90 transition-colors duration-300">
+                                                        {event.title}
+                                                    </h3>
 
-                                                <div className="flex items-center justify-between">
-                                                    <div className="bg-gradient-to-t from-[#7b0f1f] to-[#3f154f] bg-clip-text text-transparent text-xl font-extrabold">
-                                                        {formatPriceRange(event.price_range)}
+                                                    {/* MODIFIKASI 4: Ubah style kotak tanggal */}
+                                                    <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                                                        <Calendar className="w-4 h-4 text-white" />
+                                                        <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
                                                     </div>
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-t from-[#b41d1d]/30 to-[#3f154f]/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                                        <div className="w-2 h-2 rounded-full bg-[#7b0f1f] animate-pulse" />
+
+                                                    <div className="flex items-center justify-between">
+                                                        {/* MODIFIKASI 5: Ubah text-gradient jadi text-white */}
+                                                        <div className="text-white text-xl font-extrabold">
+                                                            {formatPriceRange(event.price_range)}
+                                                        </div>
+                                                        {/* MODIFIKASI 6: Ubah style blinking dot */}
+                                                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                                                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <a
-                                                    href={route('events.guest.detail', { event: event.id, slug: event.slug })}
-                                                    target='_blank'
-                                                    rel='noopener noreferrer'
-                                                    className="w-full text-white btn  bg-gradient-to-r from-[#b41d1d] to-[#3f154f] btn-sm md:w-auto">
-                                                    Pesan Tiket
-                                                </a>
+                                                    {/* Tombol ini sudah OK karena punya background solid */}
+                                                    <a
+                                                        href={route('events.guest.detail', { event: event.id, slug: event.slug })}
+                                                        target='_blank'
+                                                        rel='noopener noreferrer'
+                                                        className="w-full text-white btn  bg-gradient-to-r from-[#b41d1d] to-[#3f154f] btn-sm md:w-auto">
+                                                        Pesan Tiket
+                                                    </a>
 
-                                                {/* <div className="card-actions flex flex-col md:flex-row  justify-between ">
-                                                <div className="text-xl font-bold text-primary">
-                                                    {formatPrice(event.price)}
+                                                    {/* Kode <div className="card-actions ..."> yang di-comment-out juga dihapus untuk kebersihan */}
                                                 </div>
-                                                <a
-                                                    target='_blank'
-                                                    href={route('events.guest.detail', { event: event.id, slug: event.slug })}
-                                                    className="btn btn-primary btn-sm w-full md:w-auto"
-                                                >
-                                                    Lihat Detail
-                                                </a>
-                                            </div> */}
                                             </div>
                                         </div>
-                                    </div>
-                                </Carousel.Item>
-                            ))}
+                                    </Carousel.Item>
+                                );
+                            })}
                         </Carousel.Content>
                     </Carousel>
 
