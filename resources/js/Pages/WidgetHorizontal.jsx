@@ -67,7 +67,13 @@ function WidgetHorizontal({ events }) {
                         <div className="flex-1 space-y-4 min-w-[300px]">
                             <div className="inline-block">
                                 <div className="text-2xl font-extrabold bg-gradient-to-r from-[#b41d1d] to-[#3f154f] bg-clip-text text-transparent mb-4 px-4 py-2 border-l-4 border-primary">
-                                    <ApplicationLogo className="w-full h-10" />
+                                    <a
+                                        href={'https://event.times.co.id/'}
+                                        target='_blank'
+                                        rel='noopener noreferrer'
+                                    >
+                                        <ApplicationLogo className="w-full h-10" />
+                                    </a>
                                 </div>
                             </div>
                             <h2 className="text-xl md:text-4xl font-extrabold text-[#b41d1d] leading-tight">
@@ -135,6 +141,8 @@ function WidgetHorizontal({ events }) {
 
                                                 <a
                                                     href={route('events.guest.detail', { event: event.id, slug: event.slug })}
+                                                    target='_blank'
+                                                    rel='noopener noreferrer'
                                                     className="w-full text-white btn  bg-gradient-to-r from-[#b41d1d] to-[#3f154f] btn-sm md:w-auto">
                                                     Pesan Tiket
                                                 </a>
