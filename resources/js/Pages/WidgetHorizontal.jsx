@@ -57,8 +57,8 @@ function WidgetHorizontal({ events }) {
     return (
         <>
             <Head title="Widget Event" />
-            <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12">
-                <div className='w-full relative bg-gradient-to-br from-base-100 via-base-200 to-base-300 rounded-3xl p-10 space-y-8 shadow-xl border border-border/50 overflow-hidden'>
+            <div className="max-w-7xl mx-auto py-8">
+                <div className='w-full relative bg-gradient-to-br from-[#b41d1d]/30 via-base-200 to-base-300 rounded-3xl p-10 space-y-8 shadow-xl border border-border/50 overflow-hidden'>
                     {/* Decorative background elements */}
                     <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-primary opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-accent opacity-5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
