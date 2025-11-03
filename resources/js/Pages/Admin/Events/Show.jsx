@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import React, { useState } from 'react';
 import Card from '@/Components/ui/Card';
 import { QrCode as QrCodeIcon } from 'lucide-react';
@@ -44,14 +44,31 @@ function Show({ event }) {
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
     const handleScanSuccess = (decodedText) => {
+        console.log(decodedText);
+        
         // --- PERUBAHAN 2: Tutup modal scanner ---
         setScannerModalOpen(false);
-        Swal.fire({
-            title: 'QR Code Scanned!',
-            text: decodedText,
-            icon: 'success',
-        });
+         router.get(route('ticket.validate'), { qr_data: decodedText }, {
+                onSuccess: (params) => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'QR berhasil divalidasi.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+                },
+                onError: (errors) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: errors.message || 'QR tidak valid atau sudah digunakan.',
+                    });
+                }
+            });
     };
+
+
 
     if (!event) {
         return (

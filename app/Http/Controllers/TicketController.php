@@ -120,7 +120,7 @@ class TicketController extends Controller
         $ticket = Ticket::where('ticket_code', $ticket)->first();
         $ticket->status = 'used';
         $ticket->save();
-        return redirect()->route('tickets.index');
+        return redirect()->back();
     }
 
     public function scan()
