@@ -2,7 +2,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import React, { useState } from 'react';
 import Card from '@/Components/ui/Card';
+import { QrCode as QrCodeIcon } from 'lucide-react';
 import Modal from '@/Components/Modal'; // Assuming you have a Modal component
+import QrCode from '@/Components/QrCode';
 
 // Helper functions
 const formatPrice = (price) => {
@@ -37,6 +39,18 @@ function Show({ event }) {
     const [isDetailModalOpen, setDetailModalOpen] = useState(false);
     const [isSubmissionModalOpen, setSubmissionModalOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
+    // --- PERUBAHAN 1: Ganti nama state ---
+    const [isScannerModalOpen, setScannerModalOpen] = useState(false);
+
+    const handleScanSuccess = (decodedText) => {
+        // --- PERUBAHAN 2: Tutup modal scanner ---
+        setScannerModalOpen(false);
+        Swal.fire({
+            title: 'QR Code Scanned!',
+            text: decodedText,
+            icon: 'success',
+        });
+    };
 
     if (!event) {
         return (
@@ -62,8 +76,14 @@ function Show({ event }) {
     };
 
     const closeSubmissionModal = () => {
-        setDetailModalOpen(false);
-        setSubmissionModalOpen(null);
+        // --- PERBAIKAN BUG: Seharusnya menutup submission modal, bukan detail ---
+        setSubmissionModalOpen(false);
+        setSelectedTicket(null);
+    };
+
+    // --- PERUBAHAN 3: Tambah fungsi untuk tutup modal scanner ---
+    const closeScannerModal = () => {
+        setScannerModalOpen(false);
     };
 
     return (
@@ -71,6 +91,7 @@ function Show({ event }) {
             <Head title={`View Event: ${event.title}`} />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+                    {/* ... (Event Details Card & Ticket Info Card - tidak ada perubahan) ... */}
                     <div className='grid md:grid-cols-5 gap-4'>
                         <Card className={'h-[50vw] md:col-span-2'}>
                             <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-contain rounded" />
@@ -108,7 +129,6 @@ function Show({ event }) {
                                                 )}
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </Card>
@@ -127,8 +147,6 @@ function Show({ event }) {
                                                         <div className="flex items-start">
                                                             <span className="flex-1 text-xs">{formatDate(ticketType.purchase_date)} - {formatDate(ticketType.end_purchase_date)}</span>
                                                         </div>
-                                                     
-                                                     
                                                     </div>
                                                     <div className="font-bold text-lg">{formatPrice(ticketType.price)}</div>
                                                 </li>
@@ -150,7 +168,12 @@ function Show({ event }) {
                     {/* Participants Card */}
                     <Card className="bg-base-100 shadow-xl">
                         <div className="card-body">
-                            <h2 className="card-title mb-4">Participants</h2>
+                            <div className='flex justify-between items-start'>
+                                <h2 className="card-title mb-4">Participants</h2>
+                                {/* --- PERUBAHAN 4: Update onClick button --- */}
+                                <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary"><QrCodeIcon size={16} className="mr-1" /> Scan QR</button>
+                            </div>
+
                             <div className="overflow-x-auto">
                                 <table className="table table-zebra">
                                     <thead>
@@ -235,6 +258,7 @@ function Show({ event }) {
                 </div>
             </Modal>
 
+            {/* Submission Modal */}
             <Modal show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
@@ -257,7 +281,7 @@ function Show({ event }) {
                                 </div>
                             )}
                             <h3 className="text-xl font-bold mb-2">Jawaban Pendaftar</h3>
-                            {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
+                            {selectedTicket.submission && selectedTicket.submission.submission_custom_fields && selectedTicket.submission.submission_custom_fields.length > 0 ? (
                                 <div className="space-y-3">
                                     {selectedTicket.submission.submission_custom_fields.map(response => (
                                         <div key={response.id} className="flex">
@@ -278,6 +302,20 @@ function Show({ event }) {
                     </div>
                 </div>
             </Modal>
+
+            {/* --- PERUBAHAN 5: Tambahkan Modal untuk QR Scanner --- */}
+            <Modal show={isScannerModalOpen} onClose={closeScannerModal} maxWidth="xl">
+                <div className="p-6">
+                    <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>
+                    <QrCode
+                        onScanSuccess={handleScanSuccess}
+                        startScan={isScannerModalOpen}
+                        onCancel={closeScannerModal}
+                    />
+                </div>
+            </Modal>
+
+
 
         </AuthenticatedLayout>
     );

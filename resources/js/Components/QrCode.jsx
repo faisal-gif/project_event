@@ -1,63 +1,40 @@
-import { Html5Qrcode } from 'html5-qrcode';
-import React, { useEffect } from 'react'
+import { useEffect, useRef } from "react";
 
-function QrCode({ onScanSuccess }) {
-    useEffect(() => {
+export default function QrCode({ startScan, onScanSuccess }) {
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
-        const scannerId = "qr-reader";
-        const qrCodeScanner = new Html5Qrcode(scannerId);
-        let isScanning = false;
+  useEffect(() => {
+    let isActive = true;
 
-        Html5Qrcode.getCameras().then(cameras => {
-            if (cameras && cameras.length) {
-                const cameraId = cameras[1].id;
-                qrCodeScanner.start(
-                    cameraId,
-                    {
-                        fps: 10,
-                        qrbox: 250,
-                    },
-                    (decodedText) => {
-                        if (!isScanning) return; // sudah dihentikan
-                        isScanning = false;
+    async function startCamera() {
+      if (!startScan) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current && isActive) {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+          await videoRef.current.play();
+        }
+      } catch (err) {
+        console.error("Camera error:", err);
+      }
+    }
 
-                        qrCodeScanner.stop()
-                            .then(() => {
-                                onScanSuccess(decodedText);
-                            })
-                            .catch((err) => {
-                                console.warn("Stop error:", err);
-                                onScanSuccess(decodedText); // tetap lanjut
-                            });
-                    },
-                    (errorMessage) => {
-                        // bisa di-log kalau perlu
-                    }
-                ).then(() => {
-                    isScanning = true;
-                }).catch(err => {
-                    console.error("Start camera failed:", err);
-                });
-            } else {
-                console.error("No cameras found.");
-            }
-        }).catch(err => {
-            console.error("Camera access error:", err);
-        });
+    startCamera();
 
-        return () => {
-            if (isScanning) {
-                qrCodeScanner.stop().catch(() => { });
-            }
-        };
+    return () => {
+      // Hentikan semua track kamera dengan aman
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      isActive = false;
+    };
+  }, [startScan]);
 
-    }, []);
-
-    return (
-        <div>
-            <div id="qr-reader" className="w-full max-w-md mx-auto border border-gray-300 rounded-md"></div>
-        </div>
-    )
+  return (
+    <div className="flex justify-center">
+      <video ref={videoRef} className="rounded-lg shadow-lg" />
+    </div>
+  );
 }
-
-export default QrCode

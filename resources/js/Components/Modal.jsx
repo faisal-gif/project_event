@@ -1,65 +1,91 @@
-import {
-    Dialog,
-    DialogPanel,
-    Transition,
-    TransitionChild,
-} from '@headlessui/react';
+import React, { useEffect, useRef } from 'react';
 
 export default function Modal({
     children,
     show = false,
     maxWidth = '2xl',
     closeable = true,
-    onClose = () => {},
+    onClose = () => { },
 }) {
-    const close = () => {
-        if (closeable) {
-            onClose();
-        }
-    };
+    // 1. Kita butuh 'ref' untuk mengakses elemen <dialog> secara imperatif
+    const modalRef = useRef(null);
 
+    // 2. Map 'maxWidth' prop ke class DaisyUI (tanpa prefix 'sm:')
     const maxWidthClass = {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
+        sm: 'max-w-sm',
+        md: 'max-w-md',
+        lg: 'max-w-lg',
+        xl: 'max-w-xl',
+        '2xl': 'max-w-2xl',
     }[maxWidth];
 
-    return (
-        <Transition show={show} leave="duration-200">
-            <Dialog
-                as="div"
-                id="modal"
-                className="fixed inset-0 z-50 flex transform items-center overflow-y-auto px-4 py-6 transition-all sm:px-0"
-                onClose={close}
-            >
-                <TransitionChild
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="absolute inset-0 bg-gray-500/75" />
-                </TransitionChild>
+    // 3. Gunakan useEffect untuk menyinkronkan prop 'show' dengan .showModal() / .close()
+    useEffect(() => {
+        const modal = modalRef.current;
+        if (!modal) {
+            return;
+        }
 
-                <TransitionChild
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    enterTo="opacity-100 translate-y-0 sm:scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                    leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                    <DialogPanel
-                        className={`mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full ${maxWidthClass}`}
-                    >
-                        {children}
-                    </DialogPanel>
-                </TransitionChild>
-            </Dialog>
-        </Transition>
+        // Tampilkan modal jika 'show' true dan modal sedang tidak terbuka
+        if (show && !modal.open) {
+            modal.showModal();
+        }
+        // Tutup modal jika 'show' false dan modal sedang terbuka
+        else if (!show && modal.open) {
+            modal.close();
+        }
+    }, [show]);
+
+    // 4. Gunakan useEffect untuk menangani event 'close' dan 'cancel' dari <dialog>
+    useEffect(() => {
+        const modal = modalRef.current;
+        if (!modal) {
+            return;
+        }
+
+        // Event 'close' dipicu saat dialog ditutup (baik via ESC, form, atau .close())
+        // Kita panggil 'onClose' prop untuk memberi tahu parent agar update state 'show'
+        const handleClose = () => {
+            if (closeable) {
+                onClose();
+            }
+        };
+
+        // Event 'cancel' dipicu saat tombol 'ESC' ditekan
+        const handleCancel = (event) => {
+            // Jika 'closeable' false, kita cegah 'ESC' menutup modal
+            if (!closeable) {
+                event.preventDefault();
+            }
+        };
+
+        modal.addEventListener('close', handleClose);
+        modal.addEventListener('cancel', handleCancel);
+
+        // Cleanup listener saat komponen unmount
+        return () => {
+            modal.removeEventListener('close', handleClose);
+            modal.removeEventListener('cancel', handleCancel);
+        };
+    }, [closeable, onClose]);
+
+    return (
+        // Gunakan ref untuk 'dialog'
+        <dialog ref={modalRef} className="modal  modal-bottom sm:modal-middle">
+            <div className={`modal-box ${maxWidthClass}`}>
+                {closeable && (
+                    <form method="dialog" className="modal-backdrop">
+                        <button className="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
+                    </form>
+                )}
+                {children}
+            </div>
+
+            {/* DaisyUI menggunakan <form method="dialog"> untuk backdrop
+              yang bisa diklik untuk menutup modal.
+              Kita render ini hanya jika 'closeable' true.
+            */}
+
+        </dialog>
     );
 }
