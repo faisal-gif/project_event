@@ -310,7 +310,6 @@ function Show({ event }) {
                     <QrCode
                         onScanSuccess={handleScanSuccess}
                         startScan={isScannerModalOpen}
-                        onCancel={closeScannerModal}
                     />
                 </div>
             </Modal>
