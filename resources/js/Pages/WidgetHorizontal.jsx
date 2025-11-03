@@ -9,7 +9,13 @@ import React from 'react';
 function WidgetHorizontal({ events }) {
     console.log(events);
 
-    const formatPrice = (price) => {
+  const formatPrice = (price) => {
+        // TAMBAHKAN INI: Cek jika harga adalah 0
+        if (price === 0) {
+            return "Gratis";
+        }
+        
+        // Kode asli Anda
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
