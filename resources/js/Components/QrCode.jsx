@@ -100,7 +100,7 @@ export default function QrCode({ startScan, onScanSuccess, onCancel }) {
       <div
         id={scannerId}
         className="relative w-full max-w-sm border border-gray-300 rounded-lg overflow-hidden bg-black"
-        style={{ height: 300 }}
+        style={{ height: 400 }}
       >
         {/* Loading Overlay */}
         {isLoading && (
