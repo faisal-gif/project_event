@@ -213,7 +213,8 @@ function Show({ event }) {
                                                     <td>{getStatusBadge(ticket.status)}</td>
                                                     <td className="space-x-2">
                                                         <button onClick={() => openDetailModal(ticket)} className="btn btn-sm btn-info">Detail</button>
-                                                        {event.needs_submission && (
+
+                                                        {event.needs_submission === 1 && (
                                                             <button onClick={() => openSubmissionModal(ticket)} className="btn btn-sm btn-accent">Submission</button>
                                                         )}
                                                     </td>
