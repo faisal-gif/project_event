@@ -7,7 +7,7 @@ import { ArrowRight, Calendar } from 'lucide-react';
 import React from 'react';
 
 function WidgetHorizontal({ events }) {
-    console.log(events);
+
 
     const formatPrice = (price) => {
         if (price == 0) {
@@ -125,49 +125,47 @@ function WidgetHorizontal({ events }) {
                                 return (
                                     <Carousel.Item
                                         key={event.id}
-                                        className=" min-w-0 shrink-0 grow-0 basis-10/12 lg:basis-1/3"
+                                        className=" min-w-0 shrink-0 grow-0 basis-10/12 lg:basis-1/5"
                                     >
-                                        <div className="h-full">
-                                            <div
-                                                key={event.id}
-                                                className="card w-full h-96 md:h-[500px] transition-shadow overflow-hidden"
-                                                style={{
-                                                    backgroundImage: `url(${imageUrl})`,
-                                                    backgroundSize: 'cover',
-                                                    backgroundPosition: 'center',
-                                                }}
-                                            >
-                                                <div className="card-body h-full p-5 space-y-0 md:space-y-4 flex flex-col justify-end bg-black/40 text-base-100">
+                                        <a
+                                            href={route('events.guest.detail', { event: event.id, slug: event.slug })}
+                                            target='_blank'
+                                            rel='noopener noreferrer'>
+                                            <div className="h-full">
+                                                <div
+                                                    key={event.id}
+                                                    className="card w-full h-96 md:h-[380px] transition-shadow overflow-hidden"
+                                                    style={{
+                                                        backgroundImage: `url(${imageUrl})`,
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                    }}
+                                                >
+                                                    <div className="card-body h-full p-5 space-y-0 md:space-y-4 flex flex-col justify-end bg-black/40 text-base-100">
 
-                                                    <h3 className="text-base font-bold text-white line-clamp-2 min-h-[48px] group-hover:text-white/90 transition-colors duration-300">
-                                                        {event.title}
-                                                    </h3>
+                                                        <h3 className="text-sm font-bold text-white line-clamp-2 min-h-[48px] group-hover:text-white/90 transition-colors duration-300">
+                                                            {event.title}
+                                                        </h3>
 
-                                                    <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
-                                                        <Calendar className="w-4 h-4 text-white" />
-                                                        {/* Tidak ada perubahan di baris ini, tapi fungsinya sudah diubah */}
-                                                        <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
-                                                    </div>
-
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-white text-xl font-extrabold">
-                                                            {formatPriceRange(event.price_range)}
+                                                        <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                                                            <Calendar className="w-4 h-4 text-white" />
+                                                            {/* Tidak ada perubahan di baris ini, tapi fungsinya sudah diubah */}
+                                                            <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
                                                         </div>
-                                                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                                                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                                                        </div>
-                                                    </div>
 
-                                                    <a
-                                                        href={route('events.guest.detail', { event: event.id, slug: event.slug })}
-                                                        target='_blank'
-                                                        rel='noopener noreferrer'
-                                                        className="w-full text-white btn  bg-gradient-to-r from-[#b41d1d] to-[#3f154f] btn-sm md:w-auto">
-                                                        Pesan Tiket
-                                                    </a>
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="text-white text-xl font-extrabold">
+                                                                {formatPriceRange(event.price_range)}
+                                                            </div>
+                                                            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                                                                <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </a>
                                     </Carousel.Item>
                                 );
                             })}
@@ -175,7 +173,7 @@ function WidgetHorizontal({ events }) {
                     </Carousel>
 
                 </div>
-            </div>
+            </div >
         </>
     )
 }
