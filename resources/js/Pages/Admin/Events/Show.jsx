@@ -111,7 +111,7 @@ function Show({ event }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
                     {/* ... (Event Details Card & Ticket Info Card - tidak ada perubahan) ... */}
                     <div className='grid md:grid-cols-5 gap-4'>
-                        <Card className={'h-[50vw] md:h-full md:col-span-2'}>
+                        <Card className={'h-full md:h-[50vw] md:col-span-2'}>
                             <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-contain rounded" />
                         </Card>
 
