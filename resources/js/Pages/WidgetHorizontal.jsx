@@ -7,12 +7,12 @@ import { ArrowRight, Calendar } from 'lucide-react';
 import React from 'react';
 
 function WidgetHorizontal({ events }) {
+    console.log(events);
 
-  const formatPrice = (price) => {
+    const formatPrice = (price) => {
         if (price == 0) {
             return "Gratis";
         }
-        
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -40,23 +40,40 @@ function WidgetHorizontal({ events }) {
         });
     }
 
+    // --- FUNGSI YANG DIPERBARUI ---
     const formatDateRange = (start, end) => {
         const startDate = new Date(start);
         const endDate = new Date(end);
 
+        // Ambil komponen tanggal, bulan, dan tahun
         const startDay = startDate.getDate();
-        const endDay = endDate.getDate();
-
         const startMonth = startDate.toLocaleDateString("id-ID", { month: "short" });
-        const endMonth = endDate.toLocaleDateString("id-ID", { month: "short" });
-        const year = startDate.getFullYear();
+        const startYear = startDate.getFullYear();
 
-        if (startMonth === endMonth) {
-            return `${startDay} ${startMonth} ${year} - ${endDay} ${endMonth} ${year}`;
+        const endDay = endDate.getDate();
+        const endMonth = endDate.toLocaleDateString("id-ID", { month: "short" });
+        const endYear = endDate.getFullYear();
+
+        // 1. Jika tanggal, bulan, dan tahunnya sama (acara satu hari)
+        if (startDay === endDay && startMonth === endMonth && startYear === endYear) {
+            return `${startDay} ${startMonth} ${startYear}`;
         }
 
-        return `${startDay} ${startMonth} ${year} - ${endDay} ${endMonth} ${year}`;
+        // 2. Jika bulan dan tahun sama (acara beberapa hari di bulan yg sama)
+        if (startMonth === endMonth && startYear === endYear) {
+            return `${startDay} - ${endDay} ${startMonth} ${startYear}`;
+        }
+
+        // 3. Jika tahun sama, tapi bulan beda
+        if (startYear === endYear) {
+            return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${startYear}`;
+        }
+
+        // 4. Default: Jika beda tahun
+        return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
     };
+    // --- AKHIR FUNGSI YANG DIPERBARUI ---
+
     return (
         <>
             <Head title="Widget Event" />
@@ -108,45 +125,39 @@ function WidgetHorizontal({ events }) {
                                 return (
                                     <Carousel.Item
                                         key={event.id}
-                                        className=" min-w-0 shrink-0 grow-0 basis-10/12 lg:basis-4/12 px-4"
+                                        className=" min-w-0 shrink-0 grow-0 basis-10/12 lg:basis-1/3"
                                     >
                                         <div className="h-full">
-                                          
                                             <div
                                                 key={event.id}
                                                 className="card w-full h-96 md:h-[500px] transition-shadow overflow-hidden"
                                                 style={{
                                                     backgroundImage: `url(${imageUrl})`,
-                                                    backgroundSize: 'contain',
+                                                    backgroundSize: 'cover',
                                                     backgroundPosition: 'center',
                                                 }}
                                             >
-                                              
                                                 <div className="card-body h-full p-5 space-y-0 md:space-y-4 flex flex-col justify-end bg-black/40 text-base-100">
 
-                                                    {/* MODIFIKASI 3: Ubah warna teks jadi putih */}
                                                     <h3 className="text-base font-bold text-white line-clamp-2 min-h-[48px] group-hover:text-white/90 transition-colors duration-300">
                                                         {event.title}
                                                     </h3>
 
-                                                    {/* MODIFIKASI 4: Ubah style kotak tanggal */}
                                                     <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                                                         <Calendar className="w-4 h-4 text-white" />
+                                                        {/* Tidak ada perubahan di baris ini, tapi fungsinya sudah diubah */}
                                                         <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
                                                     </div>
 
                                                     <div className="flex items-center justify-between">
-                                                        {/* MODIFIKASI 5: Ubah text-gradient jadi text-white */}
                                                         <div className="text-white text-xl font-extrabold">
                                                             {formatPriceRange(event.price_range)}
                                                         </div>
-                                                        {/* MODIFIKASI 6: Ubah style blinking dot */}
                                                         <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
                                                             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                                                         </div>
                                                     </div>
 
-                                                    {/* Tombol ini sudah OK karena punya background solid */}
                                                     <a
                                                         href={route('events.guest.detail', { event: event.id, slug: event.slug })}
                                                         target='_blank'
@@ -154,8 +165,6 @@ function WidgetHorizontal({ events }) {
                                                         className="w-full text-white btn  bg-gradient-to-r from-[#b41d1d] to-[#3f154f] btn-sm md:w-auto">
                                                         Pesan Tiket
                                                     </a>
-
-                                                    {/* Kode <div className="card-actions ..."> yang di-comment-out juga dihapus untuk kebersihan */}
                                                 </div>
                                             </div>
                                         </div>
