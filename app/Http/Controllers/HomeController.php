@@ -68,8 +68,7 @@ class HomeController extends Controller
 
     public function widget()
     {
-        $events = Event::where('status', 'valid')->with('creator', 'ticketTypes')->get();
-
+        $events = Event::with('creator', 'ticketTypes', 'category')->latest()->get();
         return Inertia::render('WidgetHorizontal', [
             'events' => $events,
         ]);
