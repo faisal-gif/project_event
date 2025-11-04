@@ -16,7 +16,13 @@ class OrganizerEventController extends Controller
 {
     public function index()
     {
-        $events = Event::with('creator', 'category', 'ticketTypes')->latest()->get();
+        $user = auth()->user();
+
+        if (!$user || $user->role !== 'organizer') {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $events = Event::with('creator', 'category', 'ticketTypes')->where('created_by', $user->id)->latest()->get();
         return Inertia::render('Organizer/Events/Index', ['events' => $events]);
     }
 
