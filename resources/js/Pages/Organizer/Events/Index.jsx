@@ -53,7 +53,7 @@ function Index({ events }) {
                         <h2 className="card-title mb-2">Events</h2>
                         <div className="flex flex-wrap gap-4 justify-between items-center">
                             <p className="card-text">Here is the list of events</p>
-                            <Link href={route('organizer.events.create')} className='btn btn-primary mt-10'>Tambah Event</Link>
+                            {/* <Link href={route('organizer.events.create')} className='btn btn-primary mt-10'>Tambah Event</Link> */}
                         </div>
 
                         <div className="overflow-x-auto">
