@@ -33,6 +33,11 @@ class Event extends Model
         return $this->belongsTo(CategoryEvents::class);
     }
 
+    public function transaction()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function eventFields()
     {
         return $this->hasMany(EventField::class);

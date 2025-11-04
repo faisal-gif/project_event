@@ -11,6 +11,7 @@ use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TripayCallbackController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -51,7 +52,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::resource('category', CategoryEventsController::class);
-    Route::resource('users', \App\Http\Controllers\UserController::class);
+    Route::resource('users', UserController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
     Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('transactions.index');
