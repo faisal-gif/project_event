@@ -53,7 +53,7 @@ function Index({ events }) {
                         <h2 className="card-title mb-2">Events</h2>
                         <div className="flex flex-wrap gap-4 justify-between items-center">
                             <p className="card-text">Here is the list of events</p>
-                            <Link href={route('events.create')} className='btn btn-primary mt-10'>Tambah Event</Link>
+                            <Link href={route('admin.events.create')} className='btn btn-primary mt-10'>Tambah Event</Link>
                         </div>
 
                         <div className="overflow-x-auto">
@@ -82,11 +82,11 @@ function Index({ events }) {
                                             <td>{event.total_quota}</td>
 
                                             <td> <div className='flex gap-2'>
-                                                <Link className='btn btn-sm btn-primary' href={route('events.show', event)}>
+                                                <Link className='btn btn-sm btn-primary' href={route('admin.events.show', event)}>
                                                     Detail
                                                 </Link>
 
-                                                <Link className='btn btn-sm btn-warning' href={route('events.edit', event)}>
+                                                <Link className='btn btn-sm btn-warning' href={route('admin.events.edit', event)}>
                                                     Edit
                                                 </Link>
                                             </div>

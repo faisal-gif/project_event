@@ -84,17 +84,18 @@ export default function AuthenticatedLayout({ children }) {
                             {user.role === 'admin' && (
                                 <>
                                     <li>
-                                        <Link href={route('category.index')}>
+                                        <Link href={route('admin.category.index')}>
                                             Category
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('events.index')}>
+                                        <Link href={route('admin.events.index')}>
                                             Event
                                         </Link>
                                     </li>
-                                    <li><Link href={route('ticket.scan')}>QR Scanner</Link></li>
+                                    <li><Link href={route('admin.ticket.scan')}>QR Scanner</Link></li>
                                     <li><Link href={route('admin.transactions.index')}>Transaction</Link></li>
+                                    <li><Link href={route('admin.users.index')}>Users</Link></li>
                                 </>
                             )}
 

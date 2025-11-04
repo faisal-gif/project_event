@@ -46,7 +46,7 @@ class CategoryEventsController extends Controller
             'icon' => $request->icon,
         ]);
 
-        return redirect()->route('category.index')->with('success', 'Category created');
+        return redirect()->route('admin.category.index')->with('success', 'Category created');
     }
 
     /**
@@ -85,7 +85,7 @@ class CategoryEventsController extends Controller
             'icon' => $request->icon,
         ]);
 
-        return redirect()->route('category.index')->with('success', 'Category updated');
+        return redirect()->route('admin.category.index')->with('success', 'Category updated');
     }
 
     /**

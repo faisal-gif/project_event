@@ -53,7 +53,7 @@ function Edit({ event, category }) {
     const handleSubmit = (e) => {
         e.preventDefault();
       
-      router.post(route('events.update', event.id), {
+      router.post(route('admin.events.update', event.id), {
             _method: 'patch',
             ...data,
         });
@@ -63,7 +63,7 @@ function Edit({ event, category }) {
         setValidating(true);
         clearErrors(...stepFields[step]);
 
-        const url = route('events.validateStep.edit', { event: event.id });
+        const url = route('admin.events.validateStep.edit', { event: event.id });
         console.log('Validating step...', { step, url, data });
 
         try {

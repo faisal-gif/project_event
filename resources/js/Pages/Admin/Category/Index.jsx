@@ -13,7 +13,7 @@ function Index({ categories }) {
                     <div className="card-body">
                         <h2 className="card-title">Category</h2>
                         <div className="flex flex-wrap gap-4 justify-end items-center">
-                            <Link href={route('category.create')} className='btn btn-primary btn-md mt-10'>
+                            <Link href={route('admin.category.create')} className='btn btn-primary btn-md mt-10'>
                                 Tambah Event
                             </Link>
                         </div>
@@ -44,7 +44,7 @@ function Index({ categories }) {
                                                 <div className="flex gap-2">
                                                     <Link
                                                         className="btn btn-sm btn-warning"
-                                                        href={route('category.edit', category)}
+                                                        href={route('admin.category.edit', category)}
                                                     >
                                                         <Edit size={16} />
                                                     </Link>

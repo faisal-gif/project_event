@@ -73,7 +73,7 @@ class EventController extends Controller
 
         $this->syncRelatedData($event, $data);
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully.');
+        return redirect()->route('admin.events.index')->with('success', 'Event created successfully.');
     }
 
     public function show(Event $event)
@@ -137,7 +137,7 @@ class EventController extends Controller
 
         $this->syncRelatedData($event, $data);
 
-        return redirect()->route('events.index')->with('success', 'Event updated successfully.');
+        return redirect()->route('admin.events.index')->with('success', 'Event updated successfully.');
     }
 
     private function validateEventData(Request $request, Event $event = null)

@@ -10,7 +10,7 @@ function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('category.store'), {
+        post(route('admin.category.store'), {
             data,
         });
     };

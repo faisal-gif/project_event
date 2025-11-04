@@ -41,19 +41,20 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
 });
 
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+    })->middleware(['auth', 'verified']);
 
-    Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
     Route::resource('events', EventController::class);
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::resource('category', CategoryEventsController::class);
+    Route::resource('users', \App\Http\Controllers\UserController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
-    Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('admin.transactions.index');
+    Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('transactions.index');
 });
 
 

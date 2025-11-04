@@ -11,7 +11,7 @@ function Edit({ category }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        router.put(route('category.update', category), {
+        router.put(route('admin.category.update', category), {
             ...editData,
         });
     };

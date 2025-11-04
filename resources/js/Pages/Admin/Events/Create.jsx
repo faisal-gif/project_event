@@ -56,7 +56,7 @@ function Create({ category }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('events.store'), {
+        post(route('admin.events.store'), {
             // Manually transform data for submission if needed
             transform: (data) => ({
                 ...data,
@@ -70,7 +70,7 @@ function Create({ category }) {
         setValidating(true);
         clearErrors(...stepFields[step]);
 
-        const url = route('events.validateStep');
+        const url = route('admin.events.validateStep');
         console.log('Validating step...', { step, url, data });
 
         try {
