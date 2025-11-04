@@ -20,7 +20,7 @@ export default function OrganizerDashboard({ auth, totalEvents, totalRevenue, ti
             <Head title="Organizer Dashboard" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-4 lg:px-8">
                     {/* Stat Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">

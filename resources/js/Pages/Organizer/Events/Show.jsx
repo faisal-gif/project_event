@@ -127,7 +127,7 @@ function Show({ event }) {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`px-8 py-3 font-semibold transition-all text-lg ${activeTab === tab
+                                    className={`px-4 py-2  md:px-8 md:py-3 font-semibold transition-all text-sm md:text-lg ${activeTab === tab
                                         ? 'bg-primary text-white'
                                         : 'hover:bg-base-300 text-base-content'
                                         }`}
@@ -140,7 +140,7 @@ function Show({ event }) {
 
                     {/* ===== Tab Content ===== */}
                     {activeTab === 'Detail' && (
-                        <div className="grid md:grid-cols-5 gap-4">
+                        <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 ">
                             <Card className="h-[50vw] md:col-span-2">
                                 <img
                                     src={`/storage/${event.image}`}
@@ -229,89 +229,93 @@ function Show({ event }) {
 
 
                     {activeTab === 'Participants' && (
-                        <Card className="bg-base-100 shadow-xl">
-                            <div className="card-body">
-                                <div className='flex justify-between items-start'>
-                                    <h2 className="card-title mb-4">Participants</h2>
-                                    {/* --- PERUBAHAN 4: Update onClick button --- */}
-                                    <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary"><QrCodeIcon size={16} className="mr-1" /> Scan QR</button>
-                                </div>
+                        <div className='px-2 md:px-0'>
+                            <Card className="bg-base-100 shadow-xl">
+                                <div className="card-body">
+                                    <div className='flex justify-between items-start'>
+                                        <h2 className="card-title mb-4">Participants</h2>
+                                        {/* --- PERUBAHAN 4: Update onClick button --- */}
+                                        <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary"><QrCodeIcon size={16} className="mr-1" /> Scan QR</button>
+                                    </div>
 
-                                <div className="overflow-x-auto">
-                                    <table className="table table-zebra">
-                                        <thead>
-                                            <tr>
-                                                <th>Ticket Code</th>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {event.tickets && event.tickets.length > 0 ? (
-                                                event.tickets.map((ticket) => (
-                                                    <tr key={ticket.id}>
-                                                        <td>{ticket.ticket_code}</td>
-                                                        <td>{ticket.user.name}</td>
-                                                        <td>{ticket.user.email}</td>
-                                                        <td>{getStatusBadge(ticket.status)}</td>
-                                                        <td className="space-x-2">
-                                                            <button onClick={() => openDetailModal(ticket)} className="btn btn-sm btn-info">Detail</button>
+                                    <div className="overflow-x-auto">
+                                        <table className="table table-zebra">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket Code</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {event.tickets && event.tickets.length > 0 ? (
+                                                    event.tickets.map((ticket) => (
+                                                        <tr key={ticket.id}>
+                                                            <td>{ticket.ticket_code}</td>
+                                                            <td>{ticket.user.name}</td>
+                                                            <td>{ticket.user.email}</td>
+                                                            <td>{getStatusBadge(ticket.status)}</td>
+                                                            <td className="space-x-2">
+                                                                <button onClick={() => openDetailModal(ticket)} className="btn btn-sm btn-info">Detail</button>
 
-                                                            {event.needs_submission === 1 && (
-                                                                <button onClick={() => openSubmissionModal(ticket)} className="btn btn-sm btn-accent">Submission</button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr><td colSpan="5" className="text-center">No participants yet.</td></tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                                                {event.needs_submission === 1 && (
+                                                                    <button onClick={() => openSubmissionModal(ticket)} className="btn btn-sm btn-accent">Submission</button>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr><td colSpan="5" className="text-center">No participants yet.</td></tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                        </Card>
+                            </Card>
+                        </div>
                     )}
 
                     {activeTab === 'Transaction' && (
-                        <Card className="bg-base-100 shadow-xl">
-                            <div className="card-body">
-                                <h2 className="card-title mb-4">Riwayat Transaksi</h2>
-                                <div className="overflow-x-auto">
-                                    <table className="table table-zebra">
-                                        <thead>
-                                            <tr>
-                                                <th>Kode Transaksi</th>
-                                                <th>Nama</th>
-                                                <th>Email</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {event.transaction?.length ? (
-                                                event.transaction.map((transaction) => (
-                                                    <tr key={transaction.id}>
-                                                        <td>{transaction.reference}</td>
-                                                        <td>{transaction.user.name}</td>
-                                                        <td>{transaction.user.email}</td>
-                                                        <td>{getStatusTransactionBadge(transaction.status)}</td>
-
-                                                    </tr>
-                                                ))
-                                            ) : (
+                        <div className='px-2 md:px-0'>
+                            <Card className="bg-base-100 shadow-xl">
+                                <div className="card-body">
+                                    <h2 className="card-title mb-4">Riwayat Transaksi</h2>
+                                    <div className="overflow-x-auto">
+                                        <table className="table table-zebra">
+                                            <thead>
                                                 <tr>
-                                                    <td colSpan="5" className="text-center">
-                                                        No participants yet.
-                                                    </td>
+                                                    <th>Kode Transaksi</th>
+                                                    <th>Nama</th>
+                                                    <th>Email</th>
+                                                    <th>Status</th>
                                                 </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {event.transaction?.length ? (
+                                                    event.transaction.map((transaction) => (
+                                                        <tr key={transaction.id}>
+                                                            <td>{transaction.reference}</td>
+                                                            <td>{transaction.user.name}</td>
+                                                            <td>{transaction.user.email}</td>
+                                                            <td>{getStatusTransactionBadge(transaction.status)}</td>
+
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="5" className="text-center">
+                                                            No participants yet.
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                        </Card>
+                            </Card>
+                        </div>
                     )}
                 </div>
             </div>
@@ -325,15 +329,15 @@ function Show({ event }) {
                             {selectedTicket.detail_pendaftar && (
                                 <div className="space-y-3 pb-4 border-b mb-4">
                                     <div className="flex">
-                                        <div className="font-semibold w-32">Name</div>
+                                        <div className="font-semibold md:w-32">Name</div>
                                         <div>: {selectedTicket.detail_pendaftar.nama}</div>
                                     </div>
                                     <div className="flex">
-                                        <div className="font-semibold w-32">Email</div>
+                                        <div className="font-semibold md:w-32">Email</div>
                                         <div>: {selectedTicket.detail_pendaftar.email}</div>
                                     </div>
                                     <div className="flex">
-                                        <div className="font-semibold w-32">Phone</div>
+                                        <div className="font-semibold md:w-32">Phone</div>
                                         <div>: {selectedTicket.detail_pendaftar.no_hp}</div>
                                     </div>
                                 </div>
@@ -344,7 +348,7 @@ function Show({ event }) {
                                 <div className="space-y-3">
                                     {selectedTicket.event_field_responses.map(response => (
                                         <div key={response.id} className="flex">
-                                            <div className="font-semibold w-32 capitalize">{response.field_name.replace(/_/g, ' ')}</div>
+                                            <div className="font-semibold md:w-32 capitalize">{response.field_name.replace(/_/g, ' ')}</div>
                                             <div>: {response.field_value}</div>
                                         </div>
                                     ))}
