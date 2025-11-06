@@ -293,8 +293,8 @@ class EventController extends Controller
                 'description' => 'required|string',
                 'category_id' => 'required|exists:category_events,id',
                 'location_type' => 'required|in:online,offline,hybrid',
-                'start_date' => 'required|date',
-                'end_date' => 'required|date|after_or_equal:start_date',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
             ];
         } elseif ($step === 2) {
             $rules = [
@@ -302,8 +302,8 @@ class EventController extends Controller
                 'ticket_types.*.name' => 'required|string|max:255',
                 'ticket_types.*.price' => 'required|numeric|min:0',
                 'ticket_types.*.quota' => 'required|integer|min:1',
-                'ticket_types.*.purchase_date' => 'required|date',
-                'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
+                'ticket_types.*.purchase_date' => 'nullable|date',
+                'ticket_types.*.end_purchase_date' => 'nullable|date|after_or_equal:purchase_date',
                 'ticket_types.*.description' => 'required|string',
                 'limit_ticket_user' => 'required|integer|min:1',
             ];
