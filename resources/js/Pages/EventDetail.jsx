@@ -149,7 +149,7 @@ function EventDetail({ event, seo }) {
                                     {event.location_details && (
                                         <div className="flex items-center gap-3 text-muted-foreground">
                                             <MapPin className="h-5 w-5 text-primary" />
-                                            <span className="text-sm md:text-lg">{event.location_details}</span>
+                                            <span className="text-lg">{event.location_details}</span>
                                         </div>
                                     )}
 
