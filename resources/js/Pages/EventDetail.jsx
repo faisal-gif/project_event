@@ -186,7 +186,7 @@ function EventDetail({ event, seo }) {
                         </div>
                         <div className='flex flex-col gap-4 w-full md:col-span-2'>
                             {/* Ticket Selection Section */}
-                            
+
                             <div className="md:col-span-3">
                                 <div className="space-y-4">
                                     {event.ticket_types && event.ticket_types.length > 0 ? (
@@ -221,13 +221,15 @@ function EventDetail({ event, seo }) {
                                                         <div>
                                                             <h3 className="card-title text-xl">{ticketType.name}</h3>
                                                             <p className='text-sm'>{ticketType.description}</p>
-                                                            <div className="flex items-start">
-                                                                <span className="flex-1 text-xs">
-                                                                    {hasStartDate ? formatDate(ticketType.purchase_date) : '-'} - 
-                                                                    <br />
-                                                                    {hasEndDate ? formatDate(ticketType.end_purchase_date) : '-'}
-                                                                </span>
-                                                            </div>
+                                                            {ticketType.purchase_date && ticketType.end_purchase_date && (
+                                                                <div className="flex items-start">
+                                                                    <span className="flex-1 text-xs">
+                                                                        {hasStartDate ? formatDate(ticketType.purchase_date) : '-'} -
+                                                                        <br />
+                                                                        {hasEndDate ? formatDate(ticketType.end_purchase_date) : '-'}
+                                                                    </span>
+                                                                </div>
+                                                            )}
                                                             <p className="text-xs text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
 
                                                             {/* --- TAMBAHKAN BADGE KONDISI --- */}
