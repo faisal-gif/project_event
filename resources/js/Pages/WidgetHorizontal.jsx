@@ -150,7 +150,11 @@ function WidgetHorizontal({ events }) {
                                                         <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                                                             <Calendar className="w-4 h-4 text-white" />
                                                             {/* Tidak ada perubahan di baris ini, tapi fungsinya sudah diubah */}
-                                                            <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
+                                                            {event.start_date && event.end_date && (
+                                                                <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
+                                                            )
+                                                            }
+
                                                         </div>
 
                                                         <div className="flex items-center justify-between">

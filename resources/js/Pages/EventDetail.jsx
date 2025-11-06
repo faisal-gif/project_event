@@ -11,6 +11,38 @@ function EventDetail({ event, seo }) {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
+    const formatDateRange = (start, end) => {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+
+        // Ambil komponen tanggal, bulan, dan tahun
+        const startDay = startDate.getDate();
+        const startMonth = startDate.toLocaleDateString("id-ID", { month: "short" });
+        const startYear = startDate.getFullYear();
+
+        const endDay = endDate.getDate();
+        const endMonth = endDate.toLocaleDateString("id-ID", { month: "short" });
+        const endYear = endDate.getFullYear();
+
+        // 1. Jika tanggal, bulan, dan tahunnya sama (acara satu hari)
+        if (startDay === endDay && startMonth === endMonth && startYear === endYear) {
+            return `${startDay} ${startMonth} ${startYear}`;
+        }
+
+        // 2. Jika bulan dan tahun sama (acara beberapa hari di bulan yg sama)
+        if (startMonth === endMonth && startYear === endYear) {
+            return `${startDay} - ${endDay} ${startMonth} ${startYear}`;
+        }
+
+        // 3. Jika tahun sama, tapi bulan beda
+        if (startYear === endYear) {
+            return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${startYear}`;
+        }
+
+        // 4. Default: Jika beda tahun
+        return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
+    };
+
     // Definisikan 'now' sekali di luar map untuk efisiensi
     const now = new Date();
 
@@ -89,7 +121,14 @@ function EventDetail({ event, seo }) {
                                     <div className="badge badge-outline">{event.category.name}</div>
                                     <h1 className="card-title text-3xl font-bold">{event.title}</h1>
                                     <div className="flex items-center space-x-4 text-sm text-gray-500 my-2">
-                                        <div className="flex items-center"><Calendar size={16} className="mr-1" /> {formatDate(event.start_date)}</div>
+                                        <div className="flex items-center"><Calendar size={16} className="mr-1" />
+                                            {event.start_date && event.end_date && (
+                                                <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
+                                            )
+                                            }
+                                            {formatDate(event.start_date)}
+
+                                        </div>
                                         <div className="flex items-center"><MapPin size={16} className="mr-1" /> {event.location_type}</div>
                                     </div>
                                     {event.location_details && (
@@ -136,12 +175,17 @@ function EventDetail({ event, seo }) {
                                         const isSelected = selectedTicket && selectedTicket.id === ticketType.id;
 
                                         // --- LOGIKA TANGGAL DIMULAI ---
-                                        const startDate = new Date(ticketType.purchase_date);
-                                        const endDate = new Date(ticketType.end_purchase_date);
-                                        
-                                        const isBeforePurchase = now < startDate;
-                                        const isAfterPurchase = now > endDate;
-                                        
+                                        const now = new Date();
+
+                                        const hasStartDate = !!ticketType.purchase_date;
+                                        const hasEndDate = !!ticketType.end_purchase_date;
+
+                                        const startDate = hasStartDate ? new Date(ticketType.purchase_date) : null;
+                                        const endDate = hasEndDate ? new Date(ticketType.end_purchase_date) : null;
+
+                                        const isBeforePurchase = hasStartDate ? now < startDate : false;
+                                        const isAfterPurchase = hasEndDate ? now > endDate : false;
+
                                         // Gabungkan semua kondisi disabled
                                         const isDisabled = isSoldOut || isBeforePurchase || isAfterPurchase;
                                         // --- LOGIKA TANGGAL SELESAI ---
@@ -149,7 +193,8 @@ function EventDetail({ event, seo }) {
                                         return (
                                             <div
                                                 key={ticketType.id}
-                                                className={`card bg-base-200 shadow-md transition-all ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'} ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                                                className={`card bg-base-200 shadow-md transition-all ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'
+                                                    } ${isSelected ? 'ring-2 ring-primary' : ''}`}
                                                 onClick={() => !isDisabled && handleTicketSelect(ticketType)}
                                             >
                                                 <div className="card-body flex-row justify-between items-center">
@@ -157,17 +202,19 @@ function EventDetail({ event, seo }) {
                                                         <h3 className="card-title text-xl">{ticketType.name}</h3>
                                                         <p className='text-sm'>{ticketType.description}</p>
                                                         <div className="flex items-start">
-                                                            <span className="flex-1 text-sm">{formatDate(ticketType.purchase_date)} - {formatDate(ticketType.end_purchase_date)}</span>
+                                                            <span className="flex-1 text-sm">
+                                                                {hasStartDate ? formatDate(ticketType.purchase_date) : '-'} - {hasEndDate ? formatDate(ticketType.end_purchase_date) : '-'}
+                                                            </span>
                                                         </div>
                                                         <p className="text-xs text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
-                                                        
+
                                                         {/* --- TAMBAHKAN BADGE KONDISI --- */}
                                                         {isSoldOut && <span className="badge badge-error badge-sm mt-2">Habis</span>}
                                                         {!isSoldOut && isBeforePurchase && <span className="badge badge-outline badge-warning badge-sm mt-2">Belum dibuka</span>}
                                                         {!isSoldOut && isAfterPurchase && <span className="badge badge-outline badge-error badge-sm mt-2">Sudah ditutup</span>}
                                                         {/* --- BADGE SELESAI --- */}
-
                                                     </div>
+
                                                     <div className='flex gap-2 items-center'>
                                                         <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
                                                         <input
@@ -176,17 +223,21 @@ function EventDetail({ event, seo }) {
                                                             className="radio radio-primary"
                                                             checked={isSelected}
                                                             onChange={() => !isDisabled && handleTicketSelect(ticketType)}
-                                                            disabled={isDisabled} // Gunakan isDisabled
+                                                            disabled={isDisabled}
                                                         />
                                                     </div>
-
                                                 </div>
                                             </div>
                                         );
                                     })
                                 ) : (
-                                    <div className="card bg-base-200"><div className="card-body"><p>Tiket untuk event ini belum tersedia.</p></div></div>
+                                    <div className="card bg-base-200">
+                                        <div className="card-body">
+                                            <p>Tiket untuk event ini belum tersedia.</p>
+                                        </div>
+                                    </div>
                                 )}
+
                             </div>
                         </div>
 
