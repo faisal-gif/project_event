@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { Ticket, Calendar, MapPin, Minus, Plus } from 'lucide-react';
+import { Ticket, Calendar, MapPin, Minus, Plus, Tag } from 'lucide-react';
 import Card from '@/Components/ui/Card';
 import Seo from '@/Components/Seo';
 
@@ -17,11 +17,11 @@ function EventDetail({ event, seo }) {
 
         // Ambil komponen tanggal, bulan, dan tahun
         const startDay = startDate.getDate();
-        const startMonth = startDate.toLocaleDateString("id-ID", { month: "short" });
+        const startMonth = startDate.toLocaleDateString("id-ID", { month: "long" });
         const startYear = startDate.getFullYear();
 
         const endDay = endDate.getDate();
-        const endMonth = endDate.toLocaleDateString("id-ID", { month: "short" });
+        const endMonth = endDate.toLocaleDateString("id-ID", { month: "long" });
         const endYear = endDate.getFullYear();
 
         // 1. Jika tanggal, bulan, dan tahunnya sama (acara satu hari)
@@ -110,37 +110,60 @@ function EventDetail({ event, seo }) {
                         </ul>
                     </div>
 
-                    <div className='grid md:grid-cols-5 gap-4'>
+                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-8 md:p-12 shadow-lg mb-4">
 
-                        <Card className={'bg-base-100 shadow-xl rounded-xl h-full lg:h-[50vw] md:col-span-2'}>
-                            <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-contain rounded-xl" />
-                        </Card>
-                        <div className='flex flex-col gap-4 w-full md:col-span-3'>
-                            <Card className="bg-base-100 shadow-xl  border border-base-300 ">
-                                <div className="card-body">
-                                    <div className="badge badge-outline">{event.category.name}</div>
-                                    <h1 className="card-title text-3xl font-bold">{event.title}</h1>
-                                    <div className="flex items-center space-x-4 text-sm text-gray-500 my-2">
-                                        <div className="flex items-center"><Calendar size={16} className="mr-1" />
-                                            {event.start_date && event.end_date && (
-                                                <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
-                                            )
-                                            }
-                                            {formatDate(event.start_date)}
+                        <div className="grid gap-8 lg:grid-cols-[400px_1fr] lg:gap-12">
+                            {/* Event Poster - Portrait */}
+                            <div className="order-2 lg:order-1">
+                                <div className="relative mx-auto max-w-sm overflow-hidden rounded-xl shadow-xl transition-transform duration-500 hover:scale-[1.02] lg:max-w-none">
+                                    <div className="aspect-[3/4]">
+                                        <img
+                                            src={`/storage/${event.image}`}
+                                            alt={event.title}
+                                            className="h-full w-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                                    </div>
+                                </div>
+                            </div>
 
-                                        </div>
-                                        <div className="flex items-center"><MapPin size={16} className="mr-1" /> {event.location_type}</div>
+                            {/* Event Details */}
+                            <div className="order-1 flex flex-col justify-center lg:order-2">
+                                <div className="badge badge-warning flex items-center p-3 text-white">
+                                    <Tag className="mr-2 h-3 w-3" />
+                                    {event.category.name}
+                                </div>
+
+                                <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+                                    {event.title}
+                                </h1>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 text-muted-foreground">
+                                        <Calendar className="h-5 w-5 text-primary" />
+                                        {event.start_date && event.end_date && (
+                                            <span className="font-bold text-lg">{formatDateRange(event.start_date, event.end_date)}</span>
+                                        )
+                                        }
                                     </div>
                                     {event.location_details && (
-                                        <div className='space-y-4'>
-                                            <div className="flex items-center gap-2"><MapPin size={16} className="my-2" /> Location Details </div>
-                                            <div className='text-sm'>
-                                                {event.location_details}
-                                            </div>
+                                        <div className="flex items-center gap-3 text-muted-foreground">
+                                            <MapPin className="h-5 w-5 text-primary" />
+                                            <span className="text-lg">{event.location_details}</span>
                                         </div>
                                     )}
+
+                                    <div className="badge badge-outline badge-accent flex items-center p-2 ">Event {event.location_type}</div>
                                 </div>
-                            </Card>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div className='grid md:grid-cols-5 gap-4'>
+                        <div className='flex flex-col gap-4 w-full md:col-span-3'>
+
                             {/* Deskrpsi */}
                             <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
                                 <input type="checkbox" defaultChecked />
@@ -161,141 +184,147 @@ function EventDetail({ event, seo }) {
 
 
                         </div>
+                        <div className='flex flex-col gap-4 w-full md:col-span-2'>
+                            {/* Ticket Selection Section */}
+                            
+                            <div className="md:col-span-3">
+                                <div className="space-y-4">
+                                    {event.ticket_types && event.ticket_types.length > 0 ? (
+                                        event.ticket_types.map(ticketType => {
+                                            const isSoldOut = ticketType.remaining_quota === 0;
+                                            const isSelected = selectedTicket && selectedTicket.id === ticketType.id;
+
+                                            // --- LOGIKA TANGGAL DIMULAI ---
+                                            const now = new Date();
+
+                                            const hasStartDate = !!ticketType.purchase_date;
+                                            const hasEndDate = !!ticketType.end_purchase_date;
+
+                                            const startDate = hasStartDate ? new Date(ticketType.purchase_date) : null;
+                                            const endDate = hasEndDate ? new Date(ticketType.end_purchase_date) : null;
+
+                                            const isBeforePurchase = hasStartDate ? now < startDate : false;
+                                            const isAfterPurchase = hasEndDate ? now > endDate : false;
+
+                                            // Gabungkan semua kondisi disabled
+                                            const isDisabled = isSoldOut || isBeforePurchase || isAfterPurchase;
+                                            // --- LOGIKA TANGGAL SELESAI ---
+
+                                            return (
+                                                <div
+                                                    key={ticketType.id}
+                                                    className={`card bg-base-200 shadow-md transition-all ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'
+                                                        } ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                                                    onClick={() => !isDisabled && handleTicketSelect(ticketType)}
+                                                >
+                                                    <div className="card-body flex-row justify-between items-center">
+                                                        <div>
+                                                            <h3 className="card-title text-xl">{ticketType.name}</h3>
+                                                            <p className='text-sm'>{ticketType.description}</p>
+                                                            <div className="flex items-start">
+                                                                <span className="flex-1 text-xs">
+                                                                    {hasStartDate ? formatDate(ticketType.purchase_date) : '-'} - 
+                                                                    <br />
+                                                                    {hasEndDate ? formatDate(ticketType.end_purchase_date) : '-'}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
+
+                                                            {/* --- TAMBAHKAN BADGE KONDISI --- */}
+                                                            {isSoldOut && <span className="badge badge-error badge-sm mt-2">Habis</span>}
+                                                            {!isSoldOut && isBeforePurchase && <span className="badge badge-outline badge-warning badge-sm mt-2">Belum dibuka</span>}
+                                                            {!isSoldOut && isAfterPurchase && <span className="badge badge-outline badge-error badge-sm mt-2">Sudah ditutup</span>}
+                                                            {/* --- BADGE SELESAI --- */}
+                                                        </div>
+
+                                                        <div className='flex gap-2 items-center'>
+                                                            <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
+                                                            <input
+                                                                type="radio"
+                                                                name="ticket-type"
+                                                                className="radio radio-primary"
+                                                                checked={isSelected}
+                                                                onChange={() => !isDisabled && handleTicketSelect(ticketType)}
+                                                                disabled={isDisabled}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className="card bg-base-200">
+                                            <div className="card-body">
+                                                <p>Tiket untuk event ini belum tersedia.</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                </div>
+                            </div>
+
+                            {/* Purchase Summary Section */}
+                            <div className="md:col-span-2 card bg-base-100 shadow-xl border border-base-300">
+                                <div className="card-body">
+                                    <h2 className="card-title text-2xl">Detail Pembelian</h2>
+                                    <div className='divider'></div>
+                                    {selectedTicket ? (
+                                        <>
+                                            <div className="flex justify-between items-center mb-4">
+                                                <div>
+                                                    <p className='font-semibold text-lg'>{selectedTicket.name}</p>
+                                                    <p className="font-bold text-primary text-xl">{formatPrice(selectedTicket.price)}</p>
+                                                </div>
+                                                <div className="join">
+                                                    <button onClick={() => handleQuantityChange(-1)} className="btn join-item" disabled={quantity <= 1}>-</button>
+                                                    <input type="text" readOnly value={quantity} className="input input-bordered join-item w-16 text-center" />
+                                                    <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button>
+                                                </div>
+                                            </div>
+                                            <div className="divider"></div>
+                                            <div className="flex justify-between items-center font-bold text-xl">
+                                                <span>Total Harga</span>
+                                                <span>{formatPrice(selectedTicket.price * quantity)}</span>
+                                            </div>
+                                            <div className="card-actions justify-end mt-4">
+                                                <Link
+                                                    href={route('transactions.checkout', { ticket_type: selectedTicket.id, quantity: quantity })}
+                                                    className={`btn btn-primary ${quantity === 0 ? 'btn-disabled' : ''}`}
+                                                    as="button"
+                                                    disabled={quantity === 0}
+                                                >
+                                                    Beli Tiket
+                                                </Link>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="text-center py-8">
+                                                <p className="text-gray-500">Pilih salah satu tiket untuk melanjutkan.</p>
+                                            </div>
+                                            <div className="divider"></div>
+                                            <div className="flex justify-between items-center font-bold text-xl">
+                                                <span>Total Harga</span>
+                                                <span>{formatPrice(0)}</span>
+                                            </div>
+                                            <div className="card-actions justify-end mt-4">
+                                                <button className="btn btn-primary" disabled>Beli Tiket</button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
 
                     <div className='grid md:grid-cols-5 gap-4'>
                         {/* Ticket Selection Section */}
-                        <div className="mt-8 md:col-span-3">
-                            <h2 className="text-2xl font-bold mb-4 flex items-center"><Ticket className="mr-2" /> Pilih Tiket Anda</h2>
-                            <div className="space-y-4">
-                                {event.ticket_types && event.ticket_types.length > 0 ? (
-                                    event.ticket_types.map(ticketType => {
-                                        const isSoldOut = ticketType.remaining_quota === 0;
-                                        const isSelected = selectedTicket && selectedTicket.id === ticketType.id;
 
-                                        // --- LOGIKA TANGGAL DIMULAI ---
-                                        const now = new Date();
-
-                                        const hasStartDate = !!ticketType.purchase_date;
-                                        const hasEndDate = !!ticketType.end_purchase_date;
-
-                                        const startDate = hasStartDate ? new Date(ticketType.purchase_date) : null;
-                                        const endDate = hasEndDate ? new Date(ticketType.end_purchase_date) : null;
-
-                                        const isBeforePurchase = hasStartDate ? now < startDate : false;
-                                        const isAfterPurchase = hasEndDate ? now > endDate : false;
-
-                                        // Gabungkan semua kondisi disabled
-                                        const isDisabled = isSoldOut || isBeforePurchase || isAfterPurchase;
-                                        // --- LOGIKA TANGGAL SELESAI ---
-
-                                        return (
-                                            <div
-                                                key={ticketType.id}
-                                                className={`card bg-base-200 shadow-md transition-all ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'
-                                                    } ${isSelected ? 'ring-2 ring-primary' : ''}`}
-                                                onClick={() => !isDisabled && handleTicketSelect(ticketType)}
-                                            >
-                                                <div className="card-body flex-row justify-between items-center">
-                                                    <div>
-                                                        <h3 className="card-title text-xl">{ticketType.name}</h3>
-                                                        <p className='text-sm'>{ticketType.description}</p>
-                                                        <div className="flex items-start">
-                                                            <span className="flex-1 text-sm">
-                                                                {hasStartDate ? formatDate(ticketType.purchase_date) : '-'} - {hasEndDate ? formatDate(ticketType.end_purchase_date) : '-'}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-xs text-gray-500">Sisa kuota: {ticketType.remaining_quota}</p>
-
-                                                        {/* --- TAMBAHKAN BADGE KONDISI --- */}
-                                                        {isSoldOut && <span className="badge badge-error badge-sm mt-2">Habis</span>}
-                                                        {!isSoldOut && isBeforePurchase && <span className="badge badge-outline badge-warning badge-sm mt-2">Belum dibuka</span>}
-                                                        {!isSoldOut && isAfterPurchase && <span className="badge badge-outline badge-error badge-sm mt-2">Sudah ditutup</span>}
-                                                        {/* --- BADGE SELESAI --- */}
-                                                    </div>
-
-                                                    <div className='flex gap-2 items-center'>
-                                                        <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
-                                                        <input
-                                                            type="radio"
-                                                            name="ticket-type"
-                                                            className="radio radio-primary"
-                                                            checked={isSelected}
-                                                            onChange={() => !isDisabled && handleTicketSelect(ticketType)}
-                                                            disabled={isDisabled}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <div className="card bg-base-200">
-                                        <div className="card-body">
-                                            <p>Tiket untuk event ini belum tersedia.</p>
-                                        </div>
-                                    </div>
-                                )}
-
-                            </div>
-                        </div>
-
-                        {/* Purchase Summary Section */}
-                        <div className=" md:col-span-2 mt-8 card bg-base-100 shadow-xl border border-base-300">
-                            <div className="card-body">
-                                <h2 className="card-title text-2xl">Detail Pembelian</h2>
-                                <div className='divider'></div>
-                                {selectedTicket ? (
-                                    <>
-                                        <div className="flex justify-between items-center mb-4">
-                                            <div>
-                                                <p className='font-semibold text-lg'>{selectedTicket.name}</p>
-                                                <p className="font-bold text-primary text-xl">{formatPrice(selectedTicket.price)}</p>
-                                            </div>
-                                            <div className="join">
-                                                <button onClick={() => handleQuantityChange(-1)} className="btn join-item" disabled={quantity <= 1}>-</button>
-                                                <input type="text" readOnly value={quantity} className="input input-bordered join-item w-16 text-center" />
-                                                <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button>
-                                            </div>
-                                        </div>
-                                        <div className="divider"></div>
-                                        <div className="flex justify-between items-center font-bold text-xl">
-                                            <span>Total Harga</span>
-                                            <span>{formatPrice(selectedTicket.price * quantity)}</span>
-                                        </div>
-                                        <div className="card-actions justify-end mt-4">
-                                            <Link
-                                                href={route('transactions.checkout', { ticket_type: selectedTicket.id, quantity: quantity })}
-                                                className={`btn btn-primary ${quantity === 0 ? 'btn-disabled' : ''}`}
-                                                as="button"
-                                                disabled={quantity === 0}
-                                            >
-                                                Beli Tiket
-                                            </Link>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="text-center py-8">
-                                            <p className="text-gray-500">Pilih salah satu tiket untuk melanjutkan.</p>
-                                        </div>
-                                        <div className="divider"></div>
-                                        <div className="flex justify-between items-center font-bold text-xl">
-                                            <span>Total Harga</span>
-                                            <span>{formatPrice(0)}</span>
-                                        </div>
-                                        <div className="card-actions justify-end mt-4">
-                                            <button className="btn btn-primary" disabled>Beli Tiket</button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
                     </div>
 
                 </div>
-            </GuestLayout>
+            </GuestLayout >
         </>
     )
 }
