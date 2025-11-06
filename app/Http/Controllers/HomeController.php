@@ -34,7 +34,7 @@ class HomeController extends Controller
 
     public function event()
     {
-        $events = Event::with('creator', 'ticketTypes', 'category')->latest()->get();
+        $events = Event::with('creator', 'ticketTypes', 'category')->where('status', 'valid')->latest()->get();
         return Inertia::render('EventList', [
             'events' => $events,
         ]);
