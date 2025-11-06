@@ -146,16 +146,13 @@ function WidgetHorizontal({ events }) {
                                                         <h3 className="text-sm font-bold text-white line-clamp-2 min-h-[48px] group-hover:text-white/90 transition-colors duration-300">
                                                             {event.title}
                                                         </h3>
-
-                                                        <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
-                                                            <Calendar className="w-4 h-4 text-white" />
-                                                            {/* Tidak ada perubahan di baris ini, tapi fungsinya sudah diubah */}
-                                                            {event.start_date && event.end_date && (
+                                                        {event.start_date && event.end_date && (
+                                                            <div className="flex items-center gap-2 text-sm text-white/90 bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                                                                <Calendar className="w-4 h-4 text-white" />
+                                                                {/* Tidak ada perubahan di baris ini, tapi fungsinya sudah diubah */}
                                                                 <span className="font-bold text-xs">{formatDateRange(event.start_date, event.end_date)}</span>
-                                                            )
-                                                            }
-
-                                                        </div>
+                                                            </div>
+                                                        )}
 
                                                         <div className="flex items-center justify-between">
                                                             <div className="text-white text-xl font-extrabold">
