@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class SocialiteController extends Controller
 {
@@ -26,9 +27,10 @@ class SocialiteController extends Controller
             ['email' => $socialUser->getEmail()],
             [
                 'name' => $socialUser->getName() ?? $socialUser->getNickname(),
+                'email' => $socialUser->getEmail(),
+                'role' => 'user',
                 'email_verified_at' => now(),
-                'password' => bcrypt(Str::random(16)), // password acak
-                'avatar' => $socialUser->getAvatar(),
+                'password' => Hash::make(Str::random(16)), // password acak
             ]
         );
 
