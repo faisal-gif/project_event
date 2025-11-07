@@ -92,7 +92,7 @@ function WidgetHorizontal({ events }) {
                                         target='_blank'
                                         rel='noopener noreferrer'
                                     >
-                                        <ApplicationLogo className="w-full h-10" />
+                                        <ApplicationLogo className="w-40 h-10" />
                                     </a>
                                 </div>
                             </div>
@@ -108,7 +108,7 @@ function WidgetHorizontal({ events }) {
                             href={'https://event.times.co.id/'}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className="hidden group md:inline-flex items-center gap-2 text-primary font-medium hover:underline transition"
+                            className="hidden group lg:inline-flex items-center gap-2 text-primary font-medium hover:underline transition"
                         >
                             Tiket Lainnya
                             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
