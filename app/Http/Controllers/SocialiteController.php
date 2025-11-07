@@ -20,17 +20,21 @@ class SocialiteController extends Controller
     public function callback($provider)
     {
         $socialUser = Socialite::driver($provider)->user();
-        // Cari user berdasarkan email
-        $user = User::where('email', $socialUser->getEmail())->first();
-        if ($user) {
-            Auth::login($user);
-            return redirect()->intended(route('welcome'));
-        }
 
+        // Buat user baru jika belum ada, berdasarkan email
+        $user = User::firstOrCreate(
+            ['email' => $socialUser->getEmail()],
+            [
+                'name' => $socialUser->getName() ?? $socialUser->getNickname(),
+                'email_verified_at' => now(),
+                'password' => bcrypt(Str::random(16)), // password acak
+                'avatar' => $socialUser->getAvatar(),
+            ]
+        );
 
-        session(['socialite_user' => $socialUser]);
+        Auth::login($user);
 
-        return Redirect::route('socialite.register.complete');
+        return redirect()->intended(route('welcome'));
     }
 
     public function showCompleteRegistrationForm()
