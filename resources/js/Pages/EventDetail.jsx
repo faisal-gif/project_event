@@ -133,7 +133,7 @@ function EventDetail({ event, seo }) {
                                     {event.category.name}
                                 </div>
 
-                                <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+                                <h1 className="mb-6 text-3xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
                                     {event.title}
                                 </h1>
 
