@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
 import React from 'react'
+import { toast } from "sonner";
 
 function Show({ ticket }) {
 
