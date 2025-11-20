@@ -162,7 +162,7 @@ function Show({ ticket }) {
                    DOWNLOAD
                 ============================ */
                 const link = document.createElement("a");
-                link.download = `e-ticket-${guestName.replace(/\s+/g, "-")}.png`;
+                link.download = `e-ticket-${ticket.user.name.replace(/\s+/g, "-")}.png`;
                 link.href = canvas.toDataURL("image/png");
                 link.click();
 
