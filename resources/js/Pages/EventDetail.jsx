@@ -140,13 +140,13 @@ function EventDetail({ event, seo }) {
                                 <div className="space-y-4">
                                     {event.start_date && event.end_date && (
                                         <div className="flex items-center gap-3 text-muted-foreground">
-                                            <Calendar className="h-5 w-5 text-primary" />
+                                            <Calendar className="h-5 w-5 text-primary shrink-0" />
                                             <span className="font-bold text-lg">{formatDateRange(event.start_date, event.end_date)}</span>
                                         </div>
                                     )}
                                     {event.location_details && (
                                         <div className="flex items-center gap-3 text-muted-foreground">
-                                            <MapPin className="h-10 w-10 text-primary" />
+                                            <MapPin className="h-5 w-5 text-primary shrink-0" />
                                             <span className="text-sm md:text-lg">{event.location_details}</span>
                                         </div>
                                     )}

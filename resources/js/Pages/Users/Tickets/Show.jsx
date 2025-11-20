@@ -51,6 +51,125 @@ function Show({ ticket }) {
         }
     };
 
+      const downloadQRCode = async () => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = `/storage/${ticket.qr_image}`;
+    
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = 420;
+                canvas.height = 900;
+    
+                const ctx = canvas.getContext("2d");
+    
+                /* ============================
+                   BACKGROUND
+                ============================ */
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, "#f8fafc");
+                gradient.addColorStop(1, "#e2e8f0");
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+                // Outer Card
+                ctx.fillStyle = "white";
+                ctx.roundRect(20, 20, 380, 860, 22);
+                ctx.fill();
+    
+                /* ============================
+                   LOGO
+                ============================ */
+                const logo = new Image();
+                logo.src = "/icon/logo-times-event.png"; // ganti sesuai logo Anda
+    
+                logo.onload = () => {
+                    ctx.drawImage(logo, 160, 40, 100, 100);
+    
+                    /* ============================
+                      TITLE SECTION
+                    ============================ */
+                    ctx.fillStyle = "#0f172a";
+                    ctx.font = "bold 24px Inter";
+                    ctx.textAlign = "center";
+                    ctx.fillText("E - TICKET", 210, 170);
+    
+                    ctx.fillStyle = "#475569";
+                    ctx.font = "16px Inter";
+                    ctx.fillText(ticket.event.title, 210, 195);
+    
+                    /* ============================
+                       QR CODE BOX
+                    ============================ */
+                    ctx.fillStyle = "#f1f5f9";
+                    ctx.roundRect(60, 230, 300, 300, 16);
+                    ctx.fill();
+    
+                    ctx.strokeStyle = "#cbd5e1";
+                    ctx.lineWidth = 3;
+                    ctx.roundRect(60, 230, 300, 300, 16);
+                    ctx.stroke();
+    
+                    ctx.drawImage(img, 85, 255, 250, 250);
+    
+    
+                    /* ============================
+                       TICKET DETAILS BOX
+                    ============================ */
+                    ctx.fillStyle = "#f8fafc";
+                    ctx.roundRect(40, 620, 340, 240, 16);
+                    ctx.fill();
+    
+                    ctx.strokeStyle = "#cbd5e1";
+                    ctx.lineWidth = 1.5;
+                    ctx.roundRect(40, 620, 340, 240, 16);
+                    ctx.stroke();
+    
+                    ctx.textAlign = "left";
+                    ctx.fillStyle = "#0f172a";
+                    ctx.font = "bold 16px Inter";
+                    ctx.fillText("Detail Tiket", 55, 650);
+    
+                    ctx.fillStyle = "#475569";
+                    ctx.font = "14px Inter";
+    
+                    let y = 680;
+                    const lineGap = 32;
+    
+                    const details = [
+                        ["Nama Pemegang", ticket.user.name],
+                        ["Email", ticket.user.email],
+                        ["Tanggal Pembelian", formatDate(ticket.transaction.paid_at)],
+                        ["Harga Satuan", formatPrice(ticket.transaction.ticket_type.price)],
+                        ["Quantity", ticket.quantity],
+                        ["Total", formatPrice(ticket.transaction.subtotal)],
+                    ];
+    
+                    details.forEach(([label, value]) => {
+                        ctx.fillStyle = "#64748b";
+                        ctx.font = "13px Inter";
+                        ctx.fillText(label, 55, y);
+    
+                        ctx.fillStyle = "#0f172a";
+                        ctx.font = "14px Inter";
+                        ctx.fillText(value, 200, y);
+    
+                        y += lineGap;
+                    });
+    
+                    /* ============================
+                       DOWNLOAD
+                    ============================ */
+                    const link = document.createElement("a");
+                    link.download = `e-ticket-${guestName.replace(/\s+/g, "-")}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+    
+                    toast.success("E-Ticket berhasil diunduh!");
+                };
+            };
+        };
+
 
     return (
         <GuestLayout>
