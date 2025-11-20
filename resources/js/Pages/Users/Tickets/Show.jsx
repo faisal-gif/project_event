@@ -67,7 +67,7 @@ function Show({ ticket }) {
 
             // Load QR + Logo bersamaan
             const qrImg = await loadImage(qrUrl);
-            const logoImg = await loadImage("/icon/logo-times-event.png");
+            const logoImg = await loadImage("/logo-times-event.png");
 
             // Buat canvas
             const canvas = document.createElement("canvas");
