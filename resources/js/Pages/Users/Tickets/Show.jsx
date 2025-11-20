@@ -52,18 +52,27 @@ function Show({ ticket }) {
         }
     };
 
-     const qrUrl = `/storage/${ticket.qr_image}`;
+    const qrUrl = `/storage/${ticket.qr_image}`;
 
     const downloadQRCode = async () => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = qrUrl;
+        try {
+            const loadImage = (src) =>
+                new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject("Gagal load gambar: " + src);
+                    img.src = src;
+                });
 
-        img.onload = () => {
+            // Load QR + Logo bersamaan
+            const qrImg = await loadImage(qrUrl);
+            const logoImg = await loadImage("/icon/logo-times-event.png");
+
+            // Buat canvas
             const canvas = document.createElement("canvas");
             canvas.width = 420;
             canvas.height = 900;
-
             const ctx = canvas.getContext("2d");
 
             /* ============================
@@ -83,95 +92,105 @@ function Show({ ticket }) {
             /* ============================
                LOGO
             ============================ */
-            const logo = new Image();
-            logo.src = "/icon/logo-times-event.png"; // ganti sesuai logo Anda
+            ctx.drawImage(logoImg, 160, 40, 100, 100);
 
-            logo.onload = () => {
-                ctx.drawImage(logo, 160, 40, 100, 100);
+            /* ============================
+              TITLE SECTION
+            ============================ */
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 24px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText("E - TICKET", 210, 170);
 
-                /* ============================
-                  TITLE SECTION
-                ============================ */
+            ctx.fillStyle = "#475569";
+            ctx.font = "16px Inter";
+            ctx.fillText(ticket.event.title, 210, 195);
+
+            /* ============================
+               QR CODE BOX
+            ============================ */
+            ctx.fillStyle = "#f1f5f9";
+            ctx.roundRect(60, 230, 300, 300, 16);
+            ctx.fill();
+
+            ctx.strokeStyle = "#cbd5e1";
+            ctx.lineWidth = 3;
+            ctx.roundRect(60, 230, 300, 300, 16);
+            ctx.stroke();
+
+            ctx.drawImage(qrImg, 85, 255, 250, 250);
+
+            /* ============================
+               PERFORATION LINE (sobekan)
+            ============================ */
+            ctx.setLineDash([10, 10]);
+            ctx.strokeStyle = "#cbd5e1";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(40, 580);
+            ctx.lineTo(380, 580);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            /* ============================
+               TICKET DETAILS BOX
+            ============================ */
+            ctx.fillStyle = "#f8fafc";
+            ctx.roundRect(40, 620, 340, 240, 16);
+            ctx.fill();
+
+            ctx.strokeStyle = "#cbd5e1";
+            ctx.lineWidth = 1.5;
+            ctx.roundRect(40, 620, 340, 240, 16);
+            ctx.stroke();
+
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 16px Inter";
+            ctx.fillText("Detail Tiket", 55, 650);
+
+            ctx.fillStyle = "#475569";
+            ctx.font = "14px Inter";
+
+            let y = 680;
+            const lineGap = 32;
+
+            const details = [
+                ["Nama Pemegang", ticket.user.name],
+                ["Email", ticket.user.email],
+                ["Tanggal Pembelian", formatDate(ticket.transaction.paid_at)],
+                ["Harga Satuan", formatPrice(ticket.transaction.ticket_type.price)],
+                ["Quantity", ticket.quantity],
+                ["Total", formatPrice(ticket.transaction.subtotal)],
+            ];
+
+            details.forEach(([label, value]) => {
+                ctx.fillStyle = "#64748b";
+                ctx.font = "13px Inter";
+                ctx.fillText(label, 55, y);
+
                 ctx.fillStyle = "#0f172a";
-                ctx.font = "bold 24px Inter";
-                ctx.textAlign = "center";
-                ctx.fillText("E - TICKET", 210, 170);
-
-                ctx.fillStyle = "#475569";
-                ctx.font = "16px Inter";
-                ctx.fillText(ticket.event.title, 210, 195);
-
-                /* ============================
-                   QR CODE BOX
-                ============================ */
-                ctx.fillStyle = "#f1f5f9";
-                ctx.roundRect(60, 230, 300, 300, 16);
-                ctx.fill();
-
-                ctx.strokeStyle = "#cbd5e1";
-                ctx.lineWidth = 3;
-                ctx.roundRect(60, 230, 300, 300, 16);
-                ctx.stroke();
-
-                ctx.drawImage(img, 85, 255, 250, 250);
-
-
-                /* ============================
-                   TICKET DETAILS BOX
-                ============================ */
-                ctx.fillStyle = "#f8fafc";
-                ctx.roundRect(40, 620, 340, 240, 16);
-                ctx.fill();
-
-                ctx.strokeStyle = "#cbd5e1";
-                ctx.lineWidth = 1.5;
-                ctx.roundRect(40, 620, 340, 240, 16);
-                ctx.stroke();
-
-                ctx.textAlign = "left";
-                ctx.fillStyle = "#0f172a";
-                ctx.font = "bold 16px Inter";
-                ctx.fillText("Detail Tiket", 55, 650);
-
-                ctx.fillStyle = "#475569";
                 ctx.font = "14px Inter";
+                ctx.fillText(value, 200, y);
 
-                let y = 680;
-                const lineGap = 32;
+                y += lineGap;
+            });
 
-                const details = [
-                    ["Nama Pemegang", ticket.user.name],
-                    ["Email", ticket.user.email],
-                    ["Tanggal Pembelian", formatDate(ticket.transaction.paid_at)],
-                    ["Harga Satuan", formatPrice(ticket.transaction.ticket_type.price)],
-                    ["Quantity", ticket.quantity],
-                    ["Total", formatPrice(ticket.transaction.subtotal)],
-                ];
+            /* ============================
+               DOWNLOAD
+            ============================ */
+            const link = document.createElement("a");
+            link.download = `e-ticket-${ticket.user.name.replace(/\s+/g, "-")}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
 
-                details.forEach(([label, value]) => {
-                    ctx.fillStyle = "#64748b";
-                    ctx.font = "13px Inter";
-                    ctx.fillText(label, 55, y);
-
-                    ctx.fillStyle = "#0f172a";
-                    ctx.font = "14px Inter";
-                    ctx.fillText(value, 200, y);
-
-                    y += lineGap;
-                });
-
-                /* ============================
-                   DOWNLOAD
-                ============================ */
-                const link = document.createElement("a");
-                link.download = `e-ticket-${ticket.user.name.replace(/\s+/g, "-")}.png`;
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-
-                toast.success("E-Ticket berhasil diunduh!");
-            };
-        };
+            toast.success("E-Ticket berhasil diunduh!");
+        } catch (err) {
+            console.error(err);
+            toast.error("Gagal memuat gambar QR atau Logo!");
+        }
     };
+
 
 
     return (
