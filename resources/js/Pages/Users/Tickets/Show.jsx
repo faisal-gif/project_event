@@ -53,6 +53,7 @@ function Show({ ticket }) {
     };
 
     const qrUrl = `/storage/${ticket.qr_image}`;
+    const logoUrl = "/logo-times-event.png";
 
     const downloadQRCode = async () => {
         try {
@@ -67,7 +68,7 @@ function Show({ ticket }) {
 
             // Load QR + Logo bersamaan
             const qrImg = await loadImage(qrUrl);
-            const logoImg = await loadImage("/logo-times-event.png");
+            const logoImg = await loadImage(logoUrl);
 
             // Buat canvas
             const canvas = document.createElement("canvas");
