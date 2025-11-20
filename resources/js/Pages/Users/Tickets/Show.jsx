@@ -52,10 +52,12 @@ function Show({ ticket }) {
         }
     };
 
+     const qrUrl = `/storage/${ticket.qr_image}`;
+
     const downloadQRCode = async () => {
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = `/storage/${ticket.qr_image}`;
+        img.src = qrUrl;
 
         img.onload = () => {
             const canvas = document.createElement("canvas");
