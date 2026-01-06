@@ -42,6 +42,11 @@ class HomeController extends Controller
 
     public function eventShow(Event $event)
     {
+
+        if ($event->status == 'tunda') {
+            return redirect('/');
+        }
+
         $event->load('ticketTypes', 'category');
 
         $plainTextBody = strip_tags($event->description);
