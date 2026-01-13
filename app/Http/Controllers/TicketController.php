@@ -45,7 +45,7 @@ class TicketController extends Controller
     public function show(Ticket $ticket)
     {
         $ticket->load(['event.eventSubmissionFields', 'transaction.ticketType', 'user']);
-        dd($ticket);
+  
 
         return Inertia::render('Users/Tickets/Show', [
             'ticket' => $ticket

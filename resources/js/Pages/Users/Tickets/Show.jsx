@@ -236,7 +236,7 @@ function Show({ ticket }) {
 
                                         <div>
                                             <label className="text-sm font-medium text-base-content/70">Jenis Tiket</label>
-                                            {/* <p className="font-medium">{ticket.transaction.ticket_type.name}</p> */}
+                                            <p className="font-medium">{ticket.transaction.ticket_type.name}</p>
                                         </div>
                                         <div>
                                             <label className="text-sm font-medium text-base-content/70">Harga Satuan</label>
