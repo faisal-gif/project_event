@@ -146,7 +146,6 @@ class EventController extends Controller
 
         // 1. Definisikan semua rules Anda
         $rules = [
-            'id' => 'nullable',
             'image' => $imageRule,
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -159,6 +158,7 @@ class EventController extends Controller
             'limit_ticket_user' => 'required|integer|min:1',
             'is_headline' => 'required|boolean',
             'ticket_types' => 'required|array|min:1',
+            'ticket_types.*.id' => 'nullable',
             'ticket_types.*.name' => 'required|string|max:255',
             'ticket_types.*.price' => 'required|numeric|min:0',
             'ticket_types.*.quota' => 'required|integer|min:1',
