@@ -105,7 +105,7 @@ class EventController extends Controller
             // Gabungkan kembali data yang sudah diubah ke dalam request
             $request->merge(['event_fields' => $eventFields]);
         }
-        dd($request->all());
+        
         $data = $this->validateEventData($request, $event);
 
         $updateData = [
