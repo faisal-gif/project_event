@@ -105,7 +105,7 @@ class EventController extends Controller
             // Gabungkan kembali data yang sudah diubah ke dalam request
             $request->merge(['event_fields' => $eventFields]);
         }
-        
+
         $data = $this->validateEventData($request, $event);
 
         $updateData = [
@@ -146,6 +146,7 @@ class EventController extends Controller
 
         // 1. Definisikan semua rules Anda
         $rules = [
+            'id' => 'nullable',
             'image' => $imageRule,
             'title' => 'required|string|max:255',
             'description' => 'required|string',
