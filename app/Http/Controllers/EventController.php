@@ -229,14 +229,13 @@ class EventController extends Controller
 
             foreach ($data['ticket_types'] as $ticketData) {
                 // Jika ada ID, berarti update data lama
-                if (isset($ticketData['id']) && !empty($ticketData['id'])) {
+                if (!empty($ticketData['id'])) {
                     $ticket = $event->ticketTypes()->find($ticketData['id']);
                     if ($ticket) {
                         $ticket->update([
                             'name' => $ticketData['name'],
                             'price' => $ticketData['price'],
                             'quota' => $ticketData['quota'],
-                            // Note: hati-hati mengupdate remaining_quota di sini jika sudah ada transaksi
                             'description' => $ticketData['description'],
                             'purchase_date' => $ticketData['purchase_date'],
                             'end_purchase_date' => $ticketData['end_purchase_date'],
