@@ -17,7 +17,7 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::with('creator', 'category', 'ticketTypes')->latest()->get();
-     
+
         return Inertia::render('Admin/Events/Index', ['events' => $events]);
     }
 
@@ -223,53 +223,87 @@ class EventController extends Controller
 
     private function syncRelatedData(Event $event, array $data)
     {
-        // Sync Ticket Types
-        $event->ticketTypes()->delete();
+        // 1. Sync Ticket Types (Logika Upsert)
         if (!empty($data['ticket_types'])) {
-            foreach ($data['ticket_types'] as $ticketType) {
-                $event->ticketTypes()->create([
-                    'name' => $ticketType['name'],
-                    'price' => $ticketType['price'],
-                    'quota' => $ticketType['quota'],
-                    'remaining_quota' => $ticketType['quota'],
-                    'description' => $ticketType['description'],
-                    'purchase_date' => $ticketType['purchase_date'],
-                    'end_purchase_date' => $ticketType['end_purchase_date'],
-                ]);
+            $keepTicketIds = [];
+
+            foreach ($data['ticket_types'] as $ticketData) {
+                // Jika ada ID, berarti update data lama
+                if (isset($ticketData['id']) && !empty($ticketData['id'])) {
+                    $ticket = $event->ticketTypes()->find($ticketData['id']);
+                    if ($ticket) {
+                        $ticket->update([
+                            'name' => $ticketData['name'],
+                            'price' => $ticketData['price'],
+                            'quota' => $ticketData['quota'],
+                            // Note: hati-hati mengupdate remaining_quota di sini jika sudah ada transaksi
+                            'description' => $ticketData['description'],
+                            'purchase_date' => $ticketData['purchase_date'],
+                            'end_purchase_date' => $ticketData['end_purchase_date'],
+                        ]);
+                        $keepTicketIds[] = $ticket->id;
+                    }
+                } else {
+                    // Jika tidak ada ID, berarti buat baru
+                    $newTicket = $event->ticketTypes()->create([
+                        'name' => $ticketData['name'],
+                        'price' => $ticketData['price'],
+                        'quota' => $ticketData['quota'],
+                        'remaining_quota' => $ticketData['quota'],
+                        'description' => $ticketData['description'],
+                        'purchase_date' => $ticketData['purchase_date'],
+                        'end_purchase_date' => $ticketData['end_purchase_date'],
+                    ]);
+                    $keepTicketIds[] = $newTicket->id;
+                }
             }
+
+            // Hapus tiket yang TIDAK ada di dalam input (berhati-hatilah jika sudah ada transaksi)
+            // Jika tiket yang dihapus sudah punya transaksi, sebaiknya gunakan Soft Deletes atau cegah penghapusan.
+            $event->ticketTypes()->whereNotIn('id', $keepTicketIds)->delete();
         }
 
+        // --- Lakukan logika yang sama untuk Event Fields agar ID tetap terjaga ---
 
-        // Sync Event Fields
-        $event->eventFields()->delete();
+        $keepFieldIds = [];
         if ($data['need_additional_questions'] && !empty($data['event_fields'])) {
             foreach ($data['event_fields'] as $field) {
-                $event->eventFields()->create([
-                    'label' => $field['label'],
-                    'name' => Str::snake($field['label']),
-                    'type' => $field['type'],
-                    'is_required' => $field['is_required'] ?? false,
-                    'options' => $field['options'],
-                ]);
+                $f = $event->eventFields()->updateOrCreate(
+                    ['id' => $field['id'] ?? null], // Cari berdasarkan ID jika ada
+                    [
+                        'label' => $field['label'],
+                        'name' => Str::snake($field['label']),
+                        'type' => $field['type'],
+                        'is_required' => $field['is_required'] ?? false,
+                        'options' => $field['options'],
+                    ]
+                );
+                $keepFieldIds[] = $f->id;
             }
         }
+        $event->eventFields()->whereNotIn('id', $keepFieldIds)->delete();
 
-        // Sync Submission Fields
-        $event->eventSubmissionFields()->delete();
+        // --- Lakukan hal yang sama untuk Submission Fields ---
+        $keepSubIds = [];
         if ($data['needs_submission'] && !empty($data['submission_fields'])) {
             foreach ($data['submission_fields'] as $field) {
-                $event->eventSubmissionFields()->create([
-                    'label' => $field['label'],
-                    'name' => Str::snake($field['label']),
-                    'type' => $field['type'],
-                    'is_required' => $field['is_required'] ?? false,
-                    'options' => $field['options'] ?? null,
-                ]);
+                $s = $event->eventSubmissionFields()->updateOrCreate(
+                    ['id' => $field['id'] ?? null],
+                    [
+                        'label' => $field['label'],
+                        'name' => Str::snake($field['label']),
+                        'type' => $field['type'],
+                        'is_required' => $field['is_required'] ?? false,
+                        'options' => $field['options'] ?? null,
+                    ]
+                );
+                $keepSubIds[] = $s->id;
             }
         }
+        $event->eventSubmissionFields()->whereNotIn('id', $keepSubIds)->delete();
     }
 
-  
+
     public function userIndex()
     {
         $events = Event::with('creator')->latest()->get();
