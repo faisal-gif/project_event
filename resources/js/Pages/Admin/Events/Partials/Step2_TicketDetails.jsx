@@ -15,10 +15,10 @@ function Step2_TicketDetails({ data, setData, errors }) {
         updatedTicketTypes[index][name] = value;
         setData('ticket_types', updatedTicketTypes);
     };
-    
+
 
     const addTicketType = () => {
-        setData('ticket_types', [...data.ticket_types, { name: '', price: '', quota: '', purchase_date: '', end_purchase_date: '', description: '' }]);
+        setData('ticket_types', [...data.ticket_types, { id: null, name: '', price: '', quota: '', purchase_date: '', end_purchase_date: '', description: '' }]);
     };
 
     const removeTicketType = (index) => {
@@ -30,6 +30,7 @@ function Step2_TicketDetails({ data, setData, errors }) {
         <div className="space-y-6">
             {data.ticket_types.map((ticket, index) => (
                 <Card key={index} className="bg-base-100 p-6 shadow-medium relative">
+                    <input type="hidden" name={`ticket_types[${index}][id]`} value={ticket.id || ''} />
                     <div className="flex items-center gap-2 mb-4">
                         <Ticket className="w-5 h-5 text-primary" />
                         <label className="text-lg font-semibold">Ticket Type #{index + 1}</label>
