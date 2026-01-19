@@ -27,10 +27,8 @@ export default function Welcome({ listEvents, headlines, populars, categories })
             </Head>
             <div className="bg-gray-50 text-gray-800 ">
                 <GuestLayout>
-                    <div className='flex flex-col lg:flex-row '>
-                        <SideBarLeft setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} categories={categories} />
+                    <div className='flex flex-col lg:flex-row max-w-7xl mx-auto'>
                         <HeroSection events={filteredEvents} headline={headlines} />
-                        <SideBarRight />
                     </div>
                 </GuestLayout>
             </div>

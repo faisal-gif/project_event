@@ -168,7 +168,7 @@ class EventController extends Controller
             'need_additional_questions' => 'boolean',
             'event_fields' => ['nullable', 'array'],
             'event_fields.*.label' => ['required_with:event_fields', 'string'],
-            'event_fields.*.type' => ['required_with:event_fields', 'string', 'in:text,textarea,select,radio,checkbox,date,file,url'],
+            'event_fields.*.type' => ['required_with:event_fields', 'string', 'in:text,textarea,select,radio,checkbox,date,file,image,url'],
             'event_fields.*.is_required' => ['boolean'],
             'event_fields.*.options' => [
                 'required_if:event_fields.*.type,select',

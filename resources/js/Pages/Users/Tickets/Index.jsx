@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react'
 import { data } from 'autoprefixer';
-import { Calendar, Clock, Eye, MapPin, Ticket } from 'lucide-react';
+import { Calendar, Clock, Eye, MapPin, QrCode, Ticket } from 'lucide-react';
 import React from 'react'
 
 function Index({ tickets }) {
@@ -29,11 +29,11 @@ function Index({ tickets }) {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'unused':
-                return <div className="badge badge-success">VALID</div>;
+                return <div className="badge badge-success badge-outline">Valid</div>;
             case 'used':
-                return <div className="badge badge-warning">DIGUNAKAN</div>;
+                return <div className="badge badge-warning badge-outline">Digunakan</div>;
             case 'expired':
-                return <div className="badge badge-error">KADALUARSA</div>;
+                return <div className="badge badge-error badge-outline">Kadaluarsa</div>;
             default:
                 return <div className="badge badge-ghost">UNKNOWN</div>;
         }
@@ -43,8 +43,11 @@ function Index({ tickets }) {
     return (
         <GuestLayout>
             <Head title="Tickets" />
-            <div className="mx-auto px-4 py-8">
-
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <h1 className="text-2xl font-bold mb-2">Tiket Saya</h1>
+                <p className="text-secondary mb-8">
+                    Kelola semua tiket event Anda di sini
+                </p>
                 {/* Tickets Grid */}
                 {tickets.length === 0 ? (
                     <Card className="shadow-medium">
@@ -57,76 +60,81 @@ function Index({ tickets }) {
                         </Card.Body>
                     </Card>
                 ) : (
-                    <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid gap-6 grid-cols-1">
                         {tickets.map((ticket) => (
-                            <Card key={ticket.id} className="shadow-md hover:shadow-glow transition-all duration-300 group">
+                            <Link href={route('tickets.show', ticket)} >
+                                <Card key={ticket.id} className="shadow-md hover:shadow-glow transition-all duration-300 group rounded-lg border border-2 border-primary">
+                                    <div className="flex flex-col sm:flex-row">
+                                        <div className="sm:w-36 h-36 sm:h-auto relative">
+                                            <img
+                                                src={'/storage/' + ticket.event.image}
+                                                alt={ticket.event.title}
+                                                className="w-full h-full object-cover rounded-l-lg"
+                                            />
 
-                                <div className="p-6 flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <Card.Title className="text-lg leading-tight mb-2">
-                                            {ticket.event.title}
-                                        </Card.Title>
-                                        <div className="flex items-center gap-2">
-                                            {getStatusBadge(ticket.status)}
-                                            <div
-                                                className={'badge '}
-                                            >
-                                                {ticket.locationType}
+                                        </div>
+                                        <div className="flex-1 p-4">
+                                            <div className="pb-4 flex items-start justify-between">
+                                                <div className="flex flex-col gap-4">
+                                                    <div className="flex items-center gap-2 ">
+                                                        {getStatusBadge(ticket.status)}
+                                                        <div
+                                                            className={'badge badge-primary badge-outline capitalize'}
+                                                        >
+                                                            {ticket.event.location_type}
+                                                        </div>
+                                                    </div>
+                                                    <Card.Title className="text-lg leading-tight">
+                                                        {ticket.event.title}
+                                                    </Card.Title>
+
+                                                </div>
+                                                <QrCode className={`h-5 w-5 text-primary`} />
+                                            </div>
+
+                                            <div className="pb-4 space-y-2">
+                                                {/* Event Details */}
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2 text-sm text-secondary">
+                                                        <Calendar className="h-4 w-4 " />
+                                                        <span>{new Date(ticket.event.start_date).toLocaleDateString('id-ID', {
+                                                            weekday: 'long',
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                            day: 'numeric'
+                                                        })}</span>
+                                                    </div>
+
+                                                    {ticket.event.location_details ? (
+                                                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                                                            <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                                            <span className="break-words">{ticket.event.location_type}</span>
+                                                        </div>
+                                                    ) : ""
+                                                    }
+
+                                                </div>
+
+                                                {/* Ticket Info */}
+
+
+                                                {/* Actions */}
+
+                                            </div>
+
+                                            <div className="flex items-center justify-between mt-4 pt-3 border-t border-base-300">
+                                                <div className="flex items-center gap-1 text-sm">
+                                                    <Ticket className="h-4 w-4" />
+                                                    <span>{ticket.quantity} tiket</span>
+                                                </div>
+                                                <span className={`font-semibold text-primary`}>
+                                                    {formatPrice(ticket.transaction.subtotal)}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="px-6 pb-4 space-y-4">
-                                    {/* Event Details */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            <Calendar className="h-4 w-4" />
-                                            <span>{new Date(ticket.event.start_date).toLocaleDateString('id-ID', {
-                                                weekday: 'long',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}</span>
-                                        </div>
-
-                                        {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            <Clock className="h-4 w-4" />
-                                            <span>{ticket.event.start_date} WIB</span>
-                                        </div> */}
-
-                                        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                                            <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                            <span className="break-words">{ticket.event.location_type}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Ticket Info */}
-                                    <div className="bg-secondary/30 rounded-lg p-3 space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Ticket Code:</span>
-                                            <span className="font-mono font-medium">{ticket.ticket_code}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Quantity:</span>
-                                            <span className="font-medium">{ticket.quantity}x</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">Total Price:</span>
-                                            <span className="font-medium">{formatPrice(ticket.event.price)}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex gap-2 pt-2">
-                                        <Link href={route('tickets.show',ticket)} className="btn btn-primary flex-1 gap-2">
-                                            <Eye className="h-4 w-4" />
-                                            View Details
-                                        </Link>
-
-                                    </div>
-                                </div>
-                            </Card>
+                                </Card>
+                            </Link>
                         ))}
                     </div>
                 )}

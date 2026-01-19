@@ -21,22 +21,22 @@ const BottomNav = () => {
 
 
     return (
-        <div className="btm-nav md:hidden  text-xs">
+        <div className="dock md:hidden  text-xs">
             <Link href="/" className={getLinkClass('/')}>
                 <Home size={24} />
-                <span className="btm-nav-label">Beranda</span>
+                <span className="dock-label">Beranda</span>
             </Link>
             <Link href="/event" className={getLinkClass('/event')}>
                 <Calendar size={24} />
-                <span className="btm-nav-label">Event</span>
+                <span className="dock-label">Event</span>
             </Link>
             <Link href={route('tickets.index')} className={getLinkClass(route('tickets.index'))}>
                 <Ticket size={24} />
-                <span className="btm-nav-label">Tiket</span>
+                <span className="dock-label">Tiket</span>
             </Link>
             <Link href={route('transactions.index')} className={getLinkClass(route('transactions.index'))}>
                 <Receipt size={24} />
-                <span className="btm-nav-label">Transaksi</span>
+                <span className="dock-label">Transaksi</span>
             </Link>
             {/* <Link href={handleUserClick()} className={getLinkClass('/login')}>
                 <User size={24} />

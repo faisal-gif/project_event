@@ -46,6 +46,7 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
                                     <option value="text">Text</option>
                                     <option value="textarea">Textarea</option>
                                     <option value="file">File</option>
+                                    <option value="image">Image</option>
                                     <option value="select">Select</option>
                                     <option value="checkbox">Checkbox</option>
                                     <option value="url">URL</option>
