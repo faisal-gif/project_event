@@ -13,7 +13,8 @@ function TicketForm({ data }) {
                     <div className="text-center p-6 bg-base-200 rounded-lg flex flex-col items-center justify-center h-full">
                         <h3 className="text-xl font-semibold mb-4">Submission Selesai</h3>
                         <p className="text-base-content/70">
-                            Anda telah menyelesaikan submission untuk event ini. Terima kasih.
+                            Anda telah menyelesaikan submission untuk event ini. Terima kasih. <br />
+                            Tunggu pemberitahuan lebih lanjut untuk Informasi selanjutnya.
                         </p>
                     </div>
                 )
