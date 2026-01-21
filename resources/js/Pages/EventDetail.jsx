@@ -101,7 +101,7 @@ function EventDetail({ event, seo }) {
             />
 
             <GuestLayout>
-                <div className="container max-w-7xl mx-auto px-4 py-8">
+                <div className="container max-w-7xl mx-auto px-2 py-8">
                     <div className="text-sm breadcrumbs mb-6">
                         <ul>
                             <li><Link href="/">Home</Link></li>
@@ -110,7 +110,7 @@ function EventDetail({ event, seo }) {
                         </ul>
                     </div>
 
-                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-4 md:p-12 shadow-lg mb-4">
+                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-2 md:p-12 shadow-lg mb-4">
 
                         <div className="grid gap-8 lg:grid-cols-[400px_1fr] lg:gap-12">
                             {/* Event Poster - Portrait */}
