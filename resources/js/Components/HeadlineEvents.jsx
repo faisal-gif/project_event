@@ -82,7 +82,8 @@ function HeadlineEvents({ listHeadline = [] }) {
                                                 className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                                             />
                                             {/* Overlay Gradasi */}
-                                           
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
+
                                             {/* Content di Atas Image */}
                                             <div className="absolute inset-0 p-6 flex flex-col justify-between text-white">
                                                 <div className="flex justify-between items-start">
