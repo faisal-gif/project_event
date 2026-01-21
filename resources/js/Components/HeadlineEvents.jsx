@@ -67,7 +67,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                             return (
                                 <Carousel.Item
                                     key={event.id || index}
-                                    className="basis-[85%] md:basis-[500px] transition-all duration-500 ease-in-out"
+                                    className="basis-[100%] md:basis-[500px] transition-all duration-500 ease-in-out"
                                     style={{
                                         // Efek scaling: slide aktif 100%, slide samping 90%
                                         transform: isActive ? 'scale(1)' : 'scale(0.9)',
