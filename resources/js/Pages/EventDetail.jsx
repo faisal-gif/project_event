@@ -122,7 +122,6 @@ function EventDetail({ event, seo }) {
                                         className="h-auto w-full object-contain"
                                         style={{ maxHeight: '800px' }}
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                                 </div>
                             </div>
 
