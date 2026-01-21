@@ -110,17 +110,17 @@ function EventDetail({ event, seo }) {
                         </ul>
                     </div>
 
-                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-8 md:p-12 shadow-lg mb-4">
+                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-8 md:p-4 shadow-lg mb-4">
 
                         <div className="grid gap-8 lg:grid-cols-[400px_1fr] lg:gap-12">
                             {/* Event Poster - Portrait */}
                             <div className="order-2 lg:order-1">
-                                <div className="relative mx-auto max-w-md overflow-hidden rounded-xl shadow-xl transition-transform duration-500 hover:scale-[1.02] lg:mx-0 lg:max-w-[600px]">
+                                <div className="relative mx-auto max-w-md overflow-hidden rounded-xl shadow-xl transition-transform duration-500 hover:scale-[1.02] lg:mx-0 lg:max-w-[400px]">
                                     <img
                                         src={`/storage/${event.image}`}
                                         alt={event.title}
                                         className="h-auto w-full object-contain"
-                                        style={{ maxHeight: '600px' }}
+                                        style={{ maxHeight: '800px' }}
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                                 </div>
