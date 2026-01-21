@@ -115,7 +115,7 @@ function EventDetail({ event, seo }) {
                         <div className="grid gap-8 lg:grid-cols-[400px_1fr] lg:gap-12">
                             {/* Event Poster - Portrait */}
                             <div className="order-2 lg:order-1">
-                                <div className="relative mx-auto max-w-md overflow-hidden rounded-xl shadow-xl transition-transform duration-500 hover:scale-[1.02] lg:mx-0 lg:max-w-[400px]">
+                                <div className="relative mx-auto max-w-md overflow-hidden rounded-xl shadow-xl transition-transform duration-500 hover:scale-[1.02] lg:mx-0 lg:max-w-[600px]">
                                     <img
                                         src={`/storage/${event.image}`}
                                         alt={event.title}
