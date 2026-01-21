@@ -110,7 +110,7 @@ function EventDetail({ event, seo }) {
                         </ul>
                     </div>
 
-                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-8 md:p-4 shadow-lg mb-4">
+                    <div className="card rounded-2xl bg-gradient-to-br from-primary/5 via-background to-[#b41d1d]/20 p-4 md:p-12 shadow-lg mb-4">
 
                         <div className="grid gap-8 lg:grid-cols-[400px_1fr] lg:gap-12">
                             {/* Event Poster - Portrait */}
