@@ -82,8 +82,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                                                 className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                                             />
                                             {/* Overlay Gradasi */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-
+                                           
                                             {/* Content di Atas Image */}
                                             <div className="absolute inset-0 p-6 flex flex-col justify-between text-white">
                                                 <div className="flex justify-between items-start">
@@ -107,7 +106,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                                                         )} */}
                                                     </div>
 
-                                                    <div className="flex items-center justify-between bg-white/10 p-4 rounded-2xl border border-white/20">
+                                                    <div className="flex items-center justify-between p-4 rounded-2xl border border-white/20">
                                                         {event.start_date && event.end_date && (
                                                             <div className="flex items-center gap-2 text-sm opacity-90">
                                                                 <Calendar className="h-4 w-4 text-blue-400" />
