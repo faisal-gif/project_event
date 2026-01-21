@@ -67,7 +67,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                             return (
                                 <Carousel.Item
                                     key={event.id || index}
-                                    className="basis-[85%] md:basis-[400px] transition-all duration-500 ease-in-out"
+                                    className="basis-[85%] md:basis-[500px] transition-all duration-500 ease-in-out"
                                     style={{
                                         // Efek scaling: slide aktif 100%, slide samping 90%
                                         transform: isActive ? 'scale(1)' : 'scale(0.9)',
@@ -112,14 +112,11 @@ function HeadlineEvents({ listHeadline = [] }) {
                                                         )}
                                                     </div>
 
-                                                    <div className="flex items-center justify-between bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                                                    <div className="flex items-center justify-end bg-white/10 p-4 rounded-2xl border border-white/20">
                                                         <div>
                                                             <p className="text-[10px] uppercase opacity-60">Mulai</p>
                                                             <p className="font-bold text-lg text-yellow-400">{formatIDR(price)}</p>
                                                         </div>
-                                                        <button className="btn btn-primary ">
-                                                            <Ticket className="w-4 h-4 mr-2" /> Beli
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
