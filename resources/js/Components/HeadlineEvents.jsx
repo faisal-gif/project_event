@@ -13,8 +13,8 @@ const formatIDR = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', cur
 const formatDate = (d) => new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
 function HeadlineEvents({ listHeadline = [] }) {
-  
-    
+
+
     const [api, setApi] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -98,21 +98,22 @@ function HeadlineEvents({ listHeadline = [] }) {
                                                     </h3>
 
                                                     <div className="space-y-2 mb-6">
+                                                        {/*                                                       
+                                                        {event.location && (
+                                                            <div className="flex items-center gap-2 text-sm opacity-90">
+                                                                <MapPin className="h-4 w-4 text-red-400" />
+                                                                <span className="line-clamp-1">{event.location}</span>
+                                                            </div>
+                                                        )} */}
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between bg-white/10 p-4 rounded-2xl border border-white/20">
                                                         {event.start_date && event.end_date && (
                                                             <div className="flex items-center gap-2 text-sm opacity-90">
                                                                 <Calendar className="h-4 w-4 text-blue-400" />
                                                                 <span>{formatDate(event.start_date)}</span>
                                                             </div>
                                                         )}
-                                                        {event.location && (
-                                                            <div className="flex items-center gap-2 text-sm opacity-90">
-                                                                <MapPin className="h-4 w-4 text-red-400" />
-                                                                <span className="line-clamp-1">{event.location}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="flex items-center justify-end bg-white/10 p-4 rounded-2xl border border-white/20">
                                                         <div>
                                                             <p className="text-[10px] uppercase opacity-60">Mulai</p>
                                                             <p className="font-bold text-lg text-yellow-400">{formatIDR(price)}</p>
