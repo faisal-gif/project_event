@@ -79,7 +79,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                                             <img
                                                 src={'storage/' + event.image}
                                                 alt={event.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                                             />
                                             {/* Overlay Gradasi */}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
