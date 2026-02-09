@@ -78,7 +78,7 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('tickets.user', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+        $event->load('transaction.user', 'tickets.user', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
 
@@ -268,6 +268,11 @@ class EventController extends Controller
         $keepFieldIds = [];
         if ($data['need_additional_questions'] && !empty($data['event_fields'])) {
             foreach ($data['event_fields'] as $field) {
+                $options = $field['options'] ?? null;
+                if (is_string($options) && !empty($options)) {
+                    // Mengubah "Free,Paid" menjadi ["Free", "Paid"]
+                    $options = array_map('trim', explode(',', $options));
+                }
                 $f = $event->eventFields()->updateOrCreate(
                     ['id' => $field['id'] ?? null], // Cari berdasarkan ID jika ada
                     [
@@ -275,7 +280,7 @@ class EventController extends Controller
                         'name' => Str::snake($field['label']),
                         'type' => $field['type'],
                         'is_required' => $field['is_required'] ?? false,
-                        'options' => $field['options'],
+                        'options' =>$options,
                     ]
                 );
                 $keepFieldIds[] = $f->id;
@@ -287,6 +292,11 @@ class EventController extends Controller
         $keepSubIds = [];
         if ($data['needs_submission'] && !empty($data['submission_fields'])) {
             foreach ($data['submission_fields'] as $field) {
+                $options = $field['options'] ?? null;
+                if (is_string($options) && !empty($options)) {
+                    // Mengubah "Free,Paid" menjadi ["Free", "Paid"]
+                    $options = array_map('trim', explode(',', $options));
+                }
                 $s = $event->eventSubmissionFields()->updateOrCreate(
                     ['id' => $field['id'] ?? null],
                     [
@@ -294,7 +304,7 @@ class EventController extends Controller
                         'name' => Str::snake($field['label']),
                         'type' => $field['type'],
                         'is_required' => $field['is_required'] ?? false,
-                        'options' => $field['options'] ?? null,
+                        'options' => $options,
                     ]
                 );
                 $keepSubIds[] = $s->id;

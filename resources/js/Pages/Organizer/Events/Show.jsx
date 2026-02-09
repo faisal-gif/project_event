@@ -366,7 +366,7 @@ function Show({ event }) {
                 </div>
             </Modal>
 
-            <Modal show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
+            <Modal maxWidth='2xl' show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
                     {selectedTicket ? (
