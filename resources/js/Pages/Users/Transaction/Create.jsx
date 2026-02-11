@@ -4,98 +4,98 @@ import GuestLayout from "@/Layouts/GuestLayout";
 import MySwal from "sweetalert2";
 import InputError from "@/Components/InputError";
 
- const RenderField = ({ field, value, onChange, error }) => {
-        // Gunakan props yang tidak menyertakan 'value' untuk tipe file/image
-        const commonProps = {
-            id: field.name,
-            name: field.name,
-            required: !!field.is_required,
-        };
-
-        const label = (
-            <label htmlFor={field.name} className="label-text font-medium">
-                {field.label}
-                {field.is_required ? <span className="text-red-500 ml-1">*</span> : ''}
-            </label>
-        );
-
-        let inputElement;
-
-        switch (field.type) {
-            case 'image':
-            case 'file':
-                inputElement = (
-                    <div className="flex flex-col gap-2">
-                        <input
-                            type="file"
-                            accept={field.type === 'image' ? "image/*" : undefined}
-                            id={field.name}
-                            name={field.name}
-                            className="file-input file-input-bordered w-full"
-                            onChange={(e) => onChange(field, e)} // Gunakan onChange langsung
-                            required={field.is_required}
-                        // PENTING: Jangan berikan prop 'value' di sini
-                        />
-                        {/* Tampilkan nama file jika sudah ada di state */}
-                        {value && value instanceof File && (
-                            <p className="text-xs text-blue-600 font-medium mt-1 italic">
-                                File terpilih: {value.name}
-                            </p>
-                        )}
-                    </div>
-                );
-                break;
-
-            case 'time':
-                inputElement = (
-                    <input
-                        type="time"
-                        {...commonProps}
-                        value={value || ''}
-                        onChange={(e) => onChange(field, e)}
-                        className="input input-bordered w-full"
-                    />
-                );
-                break;
-
-            case 'select':
-                const options = field.options ? (Array.isArray(field.options) ? field.options : field.options.split(',')) : [];
-                inputElement = (
-                    <select
-                        {...commonProps}
-                        value={value || ''}
-                        onChange={(e) => onChange(field, e)}
-                        className="select select-bordered w-full"
-                    >
-                        <option value="" disabled>Pilih {field.label}</option>
-                        {options.map(opt => <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>)}
-                    </select>
-                );
-                break;
-
-            // ... case lainnya (textarea, checkbox, dll) pastikan menggunakan onChange bukan onBlur untuk file
-            default:
-                inputElement = (
-                    <input
-                        type={field.type}
-                        {...commonProps}
-                        value={value || ''}
-                        onChange={(e) => onChange(field, e)}
-                        placeholder={field.label}
-                        className="input input-bordered w-full"
-                    />
-                );
-                break;
-        }
-
-        return (
-            <div className="flex flex-col gap-2 w-full">
-                {label}
-                {inputElement}
-                {error && <p className="text-xs text-error mt-1">{error}</p>}
-            </div>
-        );
+const RenderField = ({ field, value, onChange, error }) => {
+    // Gunakan props yang tidak menyertakan 'value' untuk tipe file/image
+    const commonProps = {
+        id: field.name,
+        name: field.name,
+        required: !!field.is_required,
     };
+
+    const label = (
+        <label htmlFor={field.name} className="label-text font-medium">
+            {field.label}
+            {field.is_required ? <span className="text-red-500 ml-1">*</span> : ''}
+        </label>
+    );
+
+    let inputElement;
+
+    switch (field.type) {
+        case 'image':
+        case 'file':
+            inputElement = (
+                <div className="flex flex-col gap-2">
+                    <input
+                        type="file"
+                        accept={field.type === 'image' ? "image/*" : undefined}
+                        id={field.name}
+                        name={field.name}
+                        className="file-input file-input-bordered w-full"
+                        onChange={(e) => onChange(field, e)} // Gunakan onChange langsung
+                        required={field.is_required}
+                    // PENTING: Jangan berikan prop 'value' di sini
+                    />
+                    {/* Tampilkan nama file jika sudah ada di state */}
+                    {value && value instanceof File && (
+                        <p className="text-xs text-blue-600 font-medium mt-1 italic">
+                            File terpilih: {value.name}
+                        </p>
+                    )}
+                </div>
+            );
+            break;
+
+        case 'time':
+            inputElement = (
+                <input
+                    type="time"
+                    {...commonProps}
+                    value={value || ''}
+                    onChange={(e) => onChange(field, e)}
+                    className="input input-bordered w-full"
+                />
+            );
+            break;
+
+        case 'select':
+            const options = field.options ? (Array.isArray(field.options) ? field.options : field.options.split(',')) : [];
+            inputElement = (
+                <select
+                    {...commonProps}
+                    value={value || ''}
+                    onChange={(e) => onChange(field, e)}
+                    className="select select-bordered w-full"
+                >
+                    <option value="" disabled>Pilih {field.label}</option>
+                    {options.map(opt => <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>)}
+                </select>
+            );
+            break;
+
+        // ... case lainnya (textarea, checkbox, dll) pastikan menggunakan onChange bukan onBlur untuk file
+        default:
+            inputElement = (
+                <input
+                    type={field.type}
+                    {...commonProps}
+                    value={value || ''}
+                    onChange={(e) => onChange(field, e)}
+                    placeholder={field.label}
+                    className="input input-bordered w-full"
+                />
+            );
+            break;
+    }
+
+    return (
+        <div className="flex flex-col gap-2 w-full">
+            {label}
+            {inputElement}
+            {error && <p className="text-xs text-error mt-1">{error}</p>}
+        </div>
+    );
+};
 
 const Create = ({ ticketType, event, channel, quantity }) => {
 
@@ -149,11 +149,13 @@ const Create = ({ ticketType, event, channel, quantity }) => {
         setData('field_responses', { ...data.field_responses, [name]: value });
     };
 
-   
+
 
     const totalPrice = ticketType.price * data.quantity;
     const selectedChannel = channel.find((ch) => ch.code == data.paymentMethod);
-    const adminFee = selectedChannel?.fee_customer?.flat ?? 0;
+    const adminFee =
+        (selectedChannel?.fee_customer?.flat ?? 0) +
+        ((amount * (selectedChannel?.fee_customer?.percent ?? 0)) / 100);
     const finalPrice = totalPrice + adminFee;
 
     const handlePayment = (e) => {
