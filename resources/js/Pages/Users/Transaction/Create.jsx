@@ -155,7 +155,7 @@ const Create = ({ ticketType, event, channel, quantity }) => {
     const selectedChannel = channel.find((ch) => ch.code == data.paymentMethod);
     const adminFee =
         (selectedChannel?.fee_customer?.flat ?? 0) +
-        ((amount * (selectedChannel?.fee_customer?.percent ?? 0)) / 100);
+        ((totalPrice * (selectedChannel?.fee_customer?.percent ?? 0)) / 100);
     const finalPrice = totalPrice + adminFee;
 
     const handlePayment = (e) => {
