@@ -290,7 +290,7 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                         <span>{formatPrice(totalPrice)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm text-base-content/70">
-                                        <span>Biaya Admin</span>
+                                        <span>Biaya Layanan</span>
                                         <span>{formatPrice(adminFee)}</span>
                                     </div>
                                     <div className="divider my-2"></div>

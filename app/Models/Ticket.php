@@ -12,6 +12,11 @@ class Ticket extends Model
         'ticket_additional_questions' => 'array', // atau 'object'
     ];
 
+    public function ticket_type()
+    {
+        return $this->belongsTo(TicketType::class);
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class);

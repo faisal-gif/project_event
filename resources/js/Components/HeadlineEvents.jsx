@@ -6,6 +6,7 @@ import Autoplay from 'embla-carousel-autoplay'
 // Import Base Carousel Component kamu
 import Carousel from './ui/Carousel'
 import { Link } from '@inertiajs/react';
+import { formatCompact } from '@/Utils/formatter';
 
 
 // Helper Formatter
@@ -116,7 +117,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                                                         )}
                                                         <div>
                                                             <p className="text-[10px] uppercase opacity-60">Mulai</p>
-                                                            <p className="font-bold text-lg text-yellow-400">{formatIDR(price)}</p>
+                                                            <p className="font-bold text-lg text-yellow-400">Rp. {formatCompact(price)}</p>
                                                         </div>
                                                     </div>
                                                 </div>

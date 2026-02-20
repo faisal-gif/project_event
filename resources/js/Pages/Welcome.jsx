@@ -1,10 +1,7 @@
-import EventList from '@/Components/EventList';
 import HeroSection from '@/Components/HeroSection';
-import SideBarLeft from '@/Components/SideBarLeft';
-import SideBarRight from '@/Components/SideBarRight';
+
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Ticket, Shield, Award, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Welcome({ listEvents, headlines, populars, categories }) {

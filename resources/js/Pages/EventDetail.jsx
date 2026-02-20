@@ -6,6 +6,7 @@ import withReactContent from 'sweetalert2-react-content';
 import { Ticket, Calendar, MapPin, Minus, Plus, Tag } from 'lucide-react';
 import Card from '@/Components/ui/Card';
 import Seo from '@/Components/Seo';
+import { formatCompact } from '@/Utils/formatter';
 
 function EventDetail({ event, seo }) {
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -237,7 +238,7 @@ function EventDetail({ event, seo }) {
                                                         </div>
 
                                                         <div className='flex gap-2 items-center'>
-                                                            <p className="font-bold text-primary text-lg">{formatPrice(ticketType.price)}</p>
+                                                            <p className="font-bold text-primary text-lg">Rp. {formatCompact(ticketType.price)}</p>
                                                             <input
                                                                 type="radio"
                                                                 name="ticket-type"

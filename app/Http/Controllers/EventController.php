@@ -78,7 +78,8 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('transaction.user', 'tickets.user', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+        $event->load('transaction.user', 'tickets.user','tickets.ticket_type', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+       
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
 

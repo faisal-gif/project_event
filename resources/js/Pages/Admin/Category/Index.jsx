@@ -2,7 +2,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Edit } from 'lucide-react';
 import React from 'react';
-import DynamicIcon from '@/Components/DynamicIcon';
 
 function Index({ categories }) {
     return (
@@ -24,7 +23,6 @@ function Index({ categories }) {
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Icon</th>
                                         <th>Name</th>
                                         <th>Slug</th>
                                         <th></th>
@@ -35,9 +33,7 @@ function Index({ categories }) {
                                     {categories.map((category, index) => (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
-                                            <td>
-                                                <DynamicIcon name={category.icon} />
-                                            </td>
+                                            
                                             <td>{category.name}</td>
                                             <td>{category.slug}</td>
                                             <td>

@@ -20,15 +20,28 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
+
+
+
     @routes
     @viteReactRefresh
     @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
     @inertiaHead
 </head>
 
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YJY95LNFYX"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YJY95LNFYX', { 'debug_mode': true });
+</script>
+
 <body class="font-sans antialiased">
     @inertia
+
+  
 </body>
 
 </html>

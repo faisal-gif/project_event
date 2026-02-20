@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid3X3 } from "lucide-react";
 import Card from './ui/Card';
-import DynamicIcon from './DynamicIcon';
+
 
 function SideBarLeft({ setSelectedCategory, selectedCategory, categories }) {
 
@@ -25,7 +25,6 @@ function SideBarLeft({ setSelectedCategory, selectedCategory, categories }) {
                                     className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left hover:bg-base-200 transition-colors group ${isActive ? 'bg-secondary' : ''}`}
                                     onClick={() => setSelectedCategory(category.id)}
                                 >
-                                    <DynamicIcon name={category.icon} className="w-4 h-4 text-primary" />
                                     <span className={`text-sm font-medium group-hover:text-primary ${isActive ? 'text-primary' : 'text-base-content'}`}>
                                         {category.name}
                                     </span>

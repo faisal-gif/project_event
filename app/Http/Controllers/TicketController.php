@@ -68,84 +68,96 @@ class TicketController extends Controller
         //
     }
 
-public function additonal(Request $request, Ticket $ticket)
-{
-    $event = $ticket->event->load('eventSubmissionFields');
-    $user = auth()->user();
+    public function additonal(Request $request, Ticket $ticket)
+    {
+        // Pastikan relation ter-load
+        $event = $ticket->event->load('eventSubmissionFields');
+        $user = auth()->user();
 
-    $fieldRules = [];
-    $customMessages = [];
+        $fieldRules = [];
+        $customMessages = [];
 
-    // 1. Bangun Rules dan Messages secara dinamis
-    if ($event->needs_submission) {
-        foreach ($event->eventSubmissionFields as $field) {
-            $rules = $field->is_required ? ['required'] : ['nullable'];
-            
-            // Tambahkan validasi spesifik tipe
-            if ($field->type === 'image') {
-                $rules[] = 'image';
-                $rules[] = 'max:2048'; // 2MB
-            } elseif ($field->type === 'file') {
-                $rules[] = 'file';
-                $rules[] = 'max:5120'; // 5MB
+        // 1. Bangun Rules dan Messages
+        if ($event->needs_submission) {
+            foreach ($event->eventSubmissionFields as $field) {
+                $rules = $field->is_required ? ['required'] : ['nullable'];
+
+                if ($field->type === 'image') {
+                    $rules[] = 'image';
+                    $rules[] = 'max:2048';
+                } elseif ($field->type === 'file') {
+                    $rules[] = 'file';
+                    $rules[] = 'max:5120';
+                }
+
+                $fieldRules[$field->name] = $rules;
+
+                if ($field->is_required) {
+                    $customMessages["{$field->name}.required"] = "Bagian {$field->label} wajib diisi.";
+                }
+                $customMessages["{$field->name}.image"] = "{$field->label} harus berupa gambar.";
+                $customMessages["{$field->name}.max"] = "Ukuran {$field->label} terlalu besar.";
             }
+        }
 
-            $fieldRules[$field->name] = $rules;
-            
-            // Custom Messages
-            if ($field->is_required) {
-                $customMessages["{$field->name}.required"] = "Bagian {$field->label} wajib diisi.";
-            }
-            $customMessages["{$field->name}.image"] = "{$field->label} harus berupa gambar.";
-            $customMessages["{$field->name}.max"] = "Ukuran {$field->label} terlalu besar.";
+        // 2. Validasi
+        $validated = $request->validate($fieldRules, $customMessages);
+
+        try {
+            $trx = DB::transaction(function () use ($event, $ticket, $user, $validated, $request) {
+                // 3. Buat Parent Submission
+                $submission = Submission::create([
+                    'event_id' => $event->id,
+                    'ticket_id' => $ticket->id,
+                    'user_id' => $user->id,
+                    'status' => 'reviewed',
+                ]);
+
+                // --- [MODIFIKASI] ---
+                // Buat Map agar mudah mengambil ID berdasarkan nama field
+                // Hasilnya array/collection dengan key 'nama_field' dan value object field itu sendiri
+                $fieldMap = $event->eventSubmissionFields->keyBy('name');
+
+                // 4. Proses Simpan Data
+                foreach ($validated as $fieldName => $fieldValue) {
+                    $finalValue = $fieldValue;
+
+                    // Cek file
+                    if ($request->hasFile($fieldName)) {
+                        $file = $request->file($fieldName);
+                        // Simpan file
+                        $path = $file->store("uploads/submissions/{$event->slug}/{$fieldName}", 'public');
+                        // Simpan full path agar mudah diakses frontend
+                        $finalValue = $path;
+                    }
+
+                    // Ambil ID dari map yang sudah dibuat di atas
+                    $fieldId = $fieldMap[$fieldName]->id ?? null;
+                    // Opsional: Ambil tipe juga jika perlu disimpan di tabel custom fields
+                    $fieldType = $fieldMap[$fieldName]->type ?? 'text';
+
+                    // Simpan ke tabel relasional
+                    SubmissionCustomFields::create([
+                        'submission_id' => $submission->id,
+                        'submission_field_id' => $fieldId, 
+                        'field_name' => $fieldName,
+                        'field_type' => $fieldType, // (Opsional) Disarankan simpan tipe juga agar Frontend mudah render
+                        'field_value' => $finalValue,
+                    ]);
+                }
+
+                // 5. Update Status Tiket
+                $ticket->update(['status' => 'used']);
+
+                return $submission;
+            });
+
+            return redirect()->back()->with('success', 'Data karya berhasil dikirim.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    // 2. Validasi
-    $validated = $request->validate($fieldRules, $customMessages);
-
-    try {
-        $trx = DB::transaction(function () use ($event, $ticket, $user, $validated, $request) {
-            // 3. Buat Parent Submission
-            $submission = Submission::create([
-                'event_id' => $event->id,
-                'ticket_id' => $ticket->id,
-                'user_id' => $user->id,
-                'status' => 'reviewed',
-            ]);
-
-            // 4. Proses Simpan Data (Termasuk File)
-            foreach ($validated as $fieldName => $fieldValue) {
-                $finalValue = $fieldValue;
-
-                // Jika input adalah file, simpan ke storage
-                if ($request->hasFile($fieldName)) {
-                    $file = $request->file($fieldName);
-                    // Simpan di folder: public/submissions/{event_id}/{field_name}
-                    $path = $file->store("uploads/submissions/{$event->slug}/{$fieldName}", 'public');
-                    $finalValue = $path;
-                }
-
-                // Simpan ke tabel relasional
-                SubmissionCustomFields::create([
-                    'submission_id' => $submission->id,
-                    'field_name' => $fieldName,
-                    'field_value' => $finalValue, // Berisi teks atau path file
-                ]);
-            }
-
-            // 5. Update Status Tiket
-            $ticket->update(['status' => 'used']);
-
-            return $submission;
-        });
-
-        return redirect()->back()->with('success', 'Data karya berhasil dikirim.');
-
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-    }
-}
     /**
      * Remove the specified resource from storage.
      */

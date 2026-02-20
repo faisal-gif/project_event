@@ -78,6 +78,10 @@ function FormAditionalQuestion({ ticket, fields }) {
                             className={`file-input file-input-bordered w-full`}
                             required={field.is_required && !ticket?.ticket_additional_questions?.[field.name]}
                         />
+
+                        <p className="text-xs text-gray-500">
+                            Hanya bisa mengirim max {field.type === 'file' ? '5MB' : '2MB'}
+                        </p>
                         {/* Menampilkan indikator jika sudah ada file lama atau file baru terpilih */}
                         {value instanceof File ? (
                             <p className="text-xs text-blue-600 font-medium italic">File baru terpilih: {value.name}</p>
@@ -186,9 +190,9 @@ function FormAditionalQuestion({ ticket, fields }) {
             </div>
 
             <div className="pt-6 flex justify-end">
-                <button 
-                    type='submit' 
-                    className='btn btn-primary px-8' 
+                <button
+                    type='submit'
+                    className='btn btn-primary px-8'
                     disabled={processing}
                 >
                     {processing ? (

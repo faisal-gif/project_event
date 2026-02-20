@@ -5,6 +5,7 @@ import Carousel from './ui/Carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import Fade from 'embla-carousel-fade';
 import HeadlineEvents from './HeadlineEvents';
+import { formatCompact } from '@/Utils/formatter';
 
 function HeroSection({ events, headline }) {
 
@@ -22,9 +23,9 @@ function HeroSection({ events, headline }) {
         const [min, max] = range;
 
         if (min === max) {
-            return formatPrice(min);
+            return formatCompact(min);
         }
-        return <>{formatPrice(min)}</>;
+        return <>{formatCompact(min)}</>;
     };
 
     const formatDate = (dateString) => {
