@@ -55,6 +55,11 @@ function NavBarGuest() {
                   Organizer Dashboard
                 </Dropdown.Link>
               )}
+               {user.role === 'judge' && (
+                <Dropdown.Link href={route('judge.dashboard')}>
+                  Judge Dashboard
+                </Dropdown.Link>
+              )}
               <Dropdown.Link href={route('logout')} method="post" as="button">
                 Log Out
               </Dropdown.Link>

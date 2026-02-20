@@ -14,21 +14,19 @@ export default function UserManagement({ users }) {
             <Head title="User Management" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl px-4 lg:px-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="mb-2 font-semibold text-2xl">List Users</h2>
+                        <Link
+                            className="btn btn-primary"
+                            href={route("admin.users.create")}
+                        >
+                            Create User
+                        </Link>
+                    </div>
                     <div className="card bg-base-200 shadow-sm mb-8">
-                   <div className="card-body">
-
-                        <div className="flex items-center justify-between mb-6">
-                            <Link
-                                className="px-6 py-2 text-white bg-green-500 rounded-md focus:outline-none"
-                                href={route("admin.users.create")}
-                            >
-                                Create User
-                            </Link>
-                        </div>
-
-                        <div className="p-6 text-gray-900 overflow-x-auto">
-                            <table className="table-auto w-full">
+                        <div className=" overflow-x-auto">
+                            <table className="table w-full">
                                 <thead>
                                     <tr className="text-left font-bold">
                                         <th className="px-6 pt-6 pb-4">Name</th>
@@ -40,39 +38,41 @@ export default function UserManagement({ users }) {
                                 <tbody>
                                     {users.map((user) => (
                                         <tr key={user.id} className="hover:bg-gray-100 focus-within:bg-gray-100">
-                                            <td className="border-t px-6 py-4">
+                                            <td>
                                                 {user.name}
                                             </td>
-                                            <td className="border-t px-6 py-4">
+                                            <td>
                                                 {user.email}
                                             </td>
-                                            <td className="border-t px-6 py-4">
-                                                {user.role}
+                                            <td>
+                                                <span className='badge badge-outline badge-primary capitalize'>
+                                                    {user.role}
+                                                </span>
                                             </td>
-                                            <td className="border-t px-6 py-4">
+                                            <td className="flex flex-row gap-2">
                                                 <Link
-                                                    className="px-4 py-1 text-sm text-white bg-blue-500 rounded"
+                                                    className="btn btn-warning btn-outline btn-sm"
                                                     href={route("admin.users.edit", user.id)}
                                                 >
                                                     Edit
                                                 </Link>
-                                                <button
+                                                {/* <button
                                                     onClick={() => {
                                                         if (window.confirm("Are you sure you want to delete this user?")) {
                                                             Inertia.delete(route("admin.users.destroy", user.id));
                                                         }
                                                     }}
-                                                    className="px-4 py-1 text-sm text-white bg-red-500 rounded ml-2"
+                                                    className="btn btn-error btn-outline btn-sm"
                                                 >
                                                     Delete
-                                                </button>
+                                                </button> */}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                   </div>
+
                     </div>
                 </div>
             </div>

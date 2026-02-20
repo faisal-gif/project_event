@@ -4,6 +4,8 @@ use App\Http\Controllers\CategoryEventsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Judge\JudgeDashboardController;
+use App\Http\Controllers\Judge\JudgeEventController;
 use App\Http\Controllers\Organizer\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\OrganizerEventController;
 use App\Http\Controllers\ProfileController;
@@ -98,6 +100,12 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
+});
+
+Route::middleware(['auth', 'judge'])->prefix('judge')->name('judge.')->group(function () {
+    Route::get('/', [JudgeDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/events', [JudgeEventController::class, 'index'])->name('events.index');
+    Route::get('/events/penjurian/{id}',[JudgeEventController::class,'penjurian'])->name('event.penjurian');
 });
 
 require __DIR__ . '/auth.php';

@@ -35,20 +35,30 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-     public function tickets() {
+    public function tickets()
+    {
         return $this->hasMany(Ticket::class);
     }
 
-    public function eventsCreated() {
+    public function eventsCreated()
+    {
         return $this->hasMany(Event::class, 'created_by');
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class);
     }
 
-    public function notifications() {
+    public function notifications()
+    {
         return $this->hasMany(Notification::class);
+    }
+
+    public function judgedEvents()
+    {
+        // Parameter: Model Tujuan, Nama Tabel Pivot, Foreign Key di Pivot, Related Key di Pivot
+        return $this->belongsToMany(Event::class, 'event_judges', 'user_id', 'event_id');
     }
 
     /**

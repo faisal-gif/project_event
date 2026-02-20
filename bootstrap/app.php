@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'user' => \App\Http\Middleware\IsUser::class,
             'organizer' => \App\Http\Middleware\IsOrganizer::class,
+            'judge' => \App\Http\Middleware\IsJudge::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'users/tripay/callback', 
