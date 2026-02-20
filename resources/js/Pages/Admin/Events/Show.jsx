@@ -139,7 +139,7 @@ function Show({ event }) {
 
                     {/* ===== Tab Content ===== */}
                     {activeTab === 'Detail' && (
-                        <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 ">
+                        <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 items-start">
                             <Card className="h-[50vw] md:col-span-2">
                                 <img
                                     src={`/storage/${event.image}`}
