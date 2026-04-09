@@ -182,7 +182,7 @@ const Create = ({ ticketType, event, channel, quantity }) => {
     return (
         <GuestLayout>
             <Head title="Checkout" />
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Payment Form */}
                     <div className="lg:col-span-2 flex flex-col gap-4">
@@ -236,11 +236,18 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                     </>
                                 )}
 
-
                                 <div className="flex flex-col gap-2 w-full mt-4">
-                                    <label className="label cursor-pointer">
-                                        <input type="checkbox" checked={data.terms} onChange={(e) => setData('terms', e.target.checked)} className="checkbox checkbox-sm mr-2" required />
-                                        I agree with TIMESEvent Terms &amp; Conditions, and TIMESEvent Privacy Policy. Accept agreement and click continue to process your order.
+                                    <label className="flex items-start gap-3 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={data.terms}
+                                            onChange={(e) => setData('terms', e.target.checked)}
+                                            className="checkbox checkbox-sm shrink-0 mt-0.5"
+                                            required
+                                        />
+                                        <span className="text-sm leading-snug break-words">
+                                            I agree with TIMESEvent Terms &amp; Conditions, and TIMESEvent Privacy Policy. Accept agreement and click continue to process your order.
+                                        </span>
                                     </label>
                                     <InputError className={errors.terms ? 'invalid' : ''} message={errors.terms} />
                                 </div>
