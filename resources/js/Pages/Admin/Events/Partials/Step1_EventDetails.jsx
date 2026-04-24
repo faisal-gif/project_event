@@ -42,6 +42,19 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
                         <InputError message={errors.title} />
                     </div>
                     <div className="space-y-2">
+                        <InputLabel htmlFor="status" value="Event Status" />
+                        <select
+                            id="status"
+                            className="select select-bordered w-full"
+                            value={data.status}
+                            onChange={(e) => setData("status", e.target.value)}
+                        >
+                            <option value="valid">Valid (Active & Visible)</option>
+                            <option value="expired">Expired (Draft / Hidden)</option>
+                        </select>
+                        <InputError message={errors.status} />
+                    </div>
+                    <div className="space-y-2">
                         <InputLabel value="Headline" />
                         <div className="flex items-center space-x-2">
                             <input type="checkbox" id="headline" onChange={(e) => setData("is_headline", e.target.checked)} className="checkbox checkbox-sm" checked={data.is_headline} />

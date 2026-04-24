@@ -17,7 +17,12 @@ class TicketType extends Model
         'remaining_quota',
         'description',
         'purchase_date',
-        'end_purchase_date'
+        'end_purchase_date',
+        'submission_rules'
+    ];
+
+    protected $casts = [
+        'submission_rules' => 'array',
     ];
 
     public function event()

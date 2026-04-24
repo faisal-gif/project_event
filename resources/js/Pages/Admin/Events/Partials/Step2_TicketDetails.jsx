@@ -16,7 +16,6 @@ function Step2_TicketDetails({ data, setData, errors }) {
         setData('ticket_types', updatedTicketTypes);
     };
 
-
     const addTicketType = () => {
         setData('ticket_types', [...data.ticket_types, { id: null, name: '', price: '', quota: '', purchase_date: '', end_purchase_date: '', description: '' }]);
     };
@@ -29,27 +28,31 @@ function Step2_TicketDetails({ data, setData, errors }) {
     return (
         <div className="space-y-6">
             {data.ticket_types.map((ticket, index) => (
-                <Card key={index} className="bg-base-100 p-6 shadow-medium relative">
+                <Card key={index} className="bg-base-100 p-4 sm:p-6 shadow-medium">
                     <input type="hidden" name={`ticket_types[${index}][id]`} value={ticket.id || ''} />
-                    <div className="flex items-center gap-2 mb-4">
-                        <Ticket className="w-5 h-5 text-primary" />
-                        <label className="text-lg font-semibold">Ticket Type #{index + 1}</label>
-                    </div>
+                    
+                    {/* Header Card: Flex untuk menyesuaikan tombol hapus agar tidak tumpang tindih di mobile */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div className="flex items-center gap-2">
+                            <Ticket className="w-5 h-5 text-primary" />
+                            <label className="text-lg font-semibold">Ticket Type #{index + 1}</label>
+                        </div>
 
-                    {data.ticket_types.length > 1 && (
-                        <div className="absolute top-4 right-4">
+                        {data.ticket_types.length > 1 && (
                             <DangerButton
                                 type="button"
                                 onClick={() => removeTicketType(index)}
+                                className="w-full sm:w-auto justify-center"
                             >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Remove
                             </DangerButton>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="flex flex-col gap-2 col-span-2">
+                        {/* Tambahkan md: di depan col-span agar di mobile tetap 1 kolom penuh */}
+                        <div className="flex flex-col gap-2 md:col-span-2">
                             <InputLabel htmlFor={`ticket_name_${index}`} value="Ticket Name" />
                             <TextInput
                                 id={`ticket_name_${index}`}
@@ -90,35 +93,40 @@ function Step2_TicketDetails({ data, setData, errors }) {
                             <InputError message={errors[`ticket_types.${index}.quota`]} className="mt-2" />
                         </div>
 
-                        <div className="flex flex-col gap-2 col-span-2">
+                        <div className="flex flex-col gap-2 md:col-span-2">
                             <InputLabel htmlFor={`purchase_date_${index}`} value="Purchase Date" />
                             <TextInput
                                 id={`purchase_date_${index}`}
                                 name="purchase_date"
                                 type="datetime-local"
                                 value={ticket.purchase_date}
-                                onChange={(e) => handleTicketChange(index, e)} />
+                                onChange={(e) => handleTicketChange(index, e)} 
+                            />
                             <InputError message={errors[`ticket_types.${index}.purchase_date`]} />
                         </div>
-                        <div className="flex flex-col gap-2 col-span-2">
+                        
+                        <div className="flex flex-col gap-2 md:col-span-2">
                             <InputLabel htmlFor={`end_purchase_date_${index}`} value="Purchase End Date" />
                             <TextInput
                                 id={`end_purchase_date_${index}`}
                                 name="end_purchase_date"
                                 type="datetime-local"
                                 value={ticket.end_purchase_date}
-                                onChange={(e) => handleTicketChange(index, e)} />
+                                onChange={(e) => handleTicketChange(index, e)} 
+                            />
                             <InputError message={errors[`ticket_types.${index}.end_purchase_date`]} />
                         </div>
 
-                        <div className="flex flex-col gap-2 col-span-4">
+                        <div className="flex flex-col gap-2 md:col-span-4">
                             <InputLabel htmlFor={`description_${index}`} value="Description" />
                             <textarea
                                 id={`description_${index}`}
                                 name="description"
                                 placeholder="Isi deskripsi dari tiket"
                                 className="textarea textarea-bordered min-h-[80px] w-full"
-                                value={ticket.description} onChange={(e) => handleTicketChange(index, e)} />
+                                value={ticket.description} 
+                                onChange={(e) => handleTicketChange(index, e)} 
+                            />
                             <InputError message={errors[`ticket_types.${index}.description`]} />
                         </div>
                     </div>
@@ -126,13 +134,13 @@ function Step2_TicketDetails({ data, setData, errors }) {
             ))}
 
             <div>
-                <PrimaryButton type="button" onClick={addTicketType}>
+                <PrimaryButton type="button" onClick={addTicketType} className="w-full sm:w-auto justify-center">
                     <Plus className="mr-2 h-4 w-4" /> Add Another Ticket Type
                 </PrimaryButton>
             </div>
 
-            <Card className="bg-base-100 p-6 shadow-medium">
-                <div className="max-w-xs">
+            <Card className="bg-base-100 p-4 sm:p-6 shadow-medium">
+                <div className="max-w-full md:max-w-xs">
                     <InputLabel htmlFor="limit_ticket_user">Max Tickets Per User</InputLabel>
                     <TextInput
                         id="limit_ticket_user"

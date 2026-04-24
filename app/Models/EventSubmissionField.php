@@ -11,7 +11,7 @@ class EventSubmissionField extends Model
 
 
     protected $casts = [
-        'options' => 'array',        // Ini kuncinya!
+        'options' => 'array',
         'is_required' => 'boolean',
     ];
 }

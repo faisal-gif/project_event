@@ -28,8 +28,9 @@ function Create({ category }) {
         description: '',
         requirements: '',
         is_headline: false,
+        status: 'valid',
         // Step 2
-        ticket_types: [{ name: 'Regular', price: '0', quota: '100', purchase_date: '', end_purchase_date: '', description: '' }],
+        ticket_types: [{ name: 'Regular', price: '0', quota: '100', purchase_date: '', end_purchase_date: '', description: '', submission_rules: [] }],
         limit_ticket_user: 1,
         // Step 3
         need_additional_questions: false,
@@ -37,6 +38,7 @@ function Create({ category }) {
         // Step 4
         needs_submission: false,
         submission_fields: [], // For submission questions
+
     });
 
     const stepFields = {
@@ -110,7 +112,7 @@ function Create({ category }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Stepper steps={steps} currentStep={step} />
 
-                    <form onSubmit={handleSubmit} className="p-6" noValidate>
+                    <form onSubmit={handleSubmit} className="p-4" noValidate>
                         {step === 1 && <Step1_EventDetails data={data} setData={setData} errors={errors} category={category} />}
                         {step === 2 && <Step2_TicketDetails data={data} setData={setData} errors={errors} />}
                         {step === 3 && <Step3_RegistrationQuestions data={data} setData={setData} errors={errors} />}

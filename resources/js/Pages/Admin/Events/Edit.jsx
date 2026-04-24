@@ -28,6 +28,7 @@ function Edit({ event, category }) {
         description: event.description || '',
         requirements: event.requirements || '',
         is_headline: event.is_headline || false,
+        status: event.status || 'valid',
         // Step 2
         ticket_types: event.ticket_types || [],
         limit_ticket_user: event.limit_ticket_user || 1,
@@ -64,14 +65,11 @@ function Edit({ event, category }) {
         clearErrors(...stepFields[step]);
 
         const url = route('admin.events.validateStep.edit', { event: event.id });
-        console.log('Validating step...', { step, url, data });
 
         try {
             const response = await axios.post(url, { step, ...data });
-            console.log('Validation successful:', response.data);
             setStep(prev => prev + 1);
         } catch (error) {
-            console.error('Validation failed:', error.response || error);
             if (error.response && error.response.status === 422) {
                 const validationErrors = error.response.data.errors;
                 Object.keys(validationErrors).forEach(key => {
@@ -103,7 +101,7 @@ function Edit({ event, category }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Stepper steps={steps} currentStep={step} />
 
-                    <form onSubmit={handleSubmit} className="p-6" noValidate>
+                    <form onSubmit={handleSubmit} className="p-4" noValidate>
                         {step === 1 && <Step1_EventDetails data={data} setData={setData} errors={errors} category={category} />}
                         {step === 2 && <Step2_TicketDetails data={data} setData={setData} errors={errors} />}
                         {step === 3 && <Step3_RegistrationQuestions data={data} setData={setData} errors={errors} />}

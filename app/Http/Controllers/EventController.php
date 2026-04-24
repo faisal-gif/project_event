@@ -63,7 +63,7 @@ class EventController extends Controller
             'start_date' => $data['start_date'],
             'end_date' => $data['end_date'],
             'created_by' => auth()->id(),
-            'status' => 'valid',
+            'status' => $data['status'],
             'is_headline' => $data['is_headline'],
             'limit_ticket_user' => $data['limit_ticket_user'],
             'need_additional_questions' => $data['need_additional_questions'] ?? false,
@@ -78,8 +78,8 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('transaction.user', 'tickets.user','tickets.ticket_type', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
-       
+        $event->load('transaction.user', 'tickets.user', 'tickets.ticket_type', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+
         return Inertia::render('Admin/Events/Show', ['event' => $event]);
     }
 
@@ -122,6 +122,7 @@ class EventController extends Controller
             'limit_ticket_user' => $data['limit_ticket_user'],
             'need_additional_questions' => $data['need_additional_questions'] ?? false,
             'needs_submission' => $data['needs_submission'] ?? false,
+            'status' => $data['status'],
         ];
 
         if ($request->title !== $event->title) {
@@ -153,6 +154,7 @@ class EventController extends Controller
             'requirements' => 'nullable|string',
             'category_id' => 'required|exists:category_events,id',
             'location_type' => 'required|in:online,offline,hybrid',
+            'status' => 'required|in:valid,expired',
             'location_details' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -182,7 +184,13 @@ class EventController extends Controller
             'submission_fields' => ['nullable', 'array'],
             'submission_fields.*.label' => ['required_with:submission_fields', 'string'],
             'submission_fields.*.type' => ['required_with:submission_fields', 'string'],
-            'submission_fields.*.options' => ['nullable', 'string'],
+            'submission_fields.*.options' => [
+                'required_if:submission_fields.*.type,select',
+                'required_if:submission_fields.*.type,checkbox',
+                'nullable',
+                'array'
+            ],
+            'ticket_types.*.submission_rules' => 'nullable|array',
             'submission_fields.*.is_required' => ['boolean'],
         ];
 
@@ -190,6 +198,8 @@ class EventController extends Controller
         $messages = [
             'title.required' => 'Judul event tidak boleh kosong.',
             'title.max' => 'Judul event terlalu panjang, maksimal 255 karakter.',
+            'status.required' => 'Status event harus dipilih.',
+            'status.in' => 'Pilihan status tidak valid.',
             'description.required' => 'Deskripsi event wajib diisi.',
             'category_id.required' => 'Silakan pilih kategori event.',
             'category_id.exists' => 'Kategori yang dipilih tidak valid.',
@@ -225,11 +235,16 @@ class EventController extends Controller
 
     private function syncRelatedData(Event $event, array $data)
     {
+       
         // 1. Sync Ticket Types (Logika Upsert)
         if (!empty($data['ticket_types'])) {
             $keepTicketIds = [];
 
             foreach ($data['ticket_types'] as $ticketData) {
+                $submissionRules = !empty($ticketData['submission_rules'])
+                    ? $ticketData['submission_rules']
+                    : null;
+                
                 // Jika ada ID, berarti update data lama
                 if (!empty($ticketData['id'])) {
                     $ticket = $event->ticketTypes()->find($ticketData['id']);
@@ -241,6 +256,7 @@ class EventController extends Controller
                             'description' => $ticketData['description'],
                             'purchase_date' => $ticketData['purchase_date'],
                             'end_purchase_date' => $ticketData['end_purchase_date'],
+                            'submission_rules' => $submissionRules,
                         ]);
                         $keepTicketIds[] = $ticket->id;
                     }
@@ -254,6 +270,7 @@ class EventController extends Controller
                         'description' => $ticketData['description'],
                         'purchase_date' => $ticketData['purchase_date'],
                         'end_purchase_date' => $ticketData['end_purchase_date'],
+                        'submission_rules' => $submissionRules,
                     ]);
                     $keepTicketIds[] = $newTicket->id;
                 }
@@ -281,7 +298,7 @@ class EventController extends Controller
                         'name' => Str::snake($field['label']),
                         'type' => $field['type'],
                         'is_required' => $field['is_required'] ?? false,
-                        'options' =>$options,
+                        'options' => $options,
                     ]
                 );
                 $keepFieldIds[] = $f->id;
@@ -340,6 +357,7 @@ class EventController extends Controller
                 'location_type' => 'required|in:online,offline,hybrid',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date|after_or_equal:start_date',
+                'status' => 'required|in:valid,expired',
             ];
         } elseif ($step === 2) {
             $rules = [
@@ -360,6 +378,8 @@ class EventController extends Controller
             'title.required' => 'Judul event tidak boleh kosong.',
             'description.required' => 'Deskripsi event wajib diisi.',
             'category_id.required' => 'Silakan pilih kategori.',
+            'status.required' => 'Silakan pilih status event.',
+            'status.in' => 'Pilihan status tidak valid.',
             'start_date.required' => 'Tanggal mulai event wajib diisi',
             'end_date.required' => 'Tanggal berakhir event wajib diisi',
             'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh kurang dari tanggal mulai.',
@@ -399,6 +419,7 @@ class EventController extends Controller
                 'location_type' => 'required|in:online,offline,hybrid',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date|after_or_equal:start_date',
+                'status' => 'required|in:valid,expired',
             ];
         } elseif ($step === 2) {
             $rules = [
@@ -419,6 +440,8 @@ class EventController extends Controller
             'title.required' => 'Judul event tidak boleh kosong.',
             'description.required' => 'Deskripsi event wajib diisi.',
             'category_id.required' => 'Silakan pilih kategori.',
+            'status.required' => 'Silakan pilih status event.',
+            'status.in' => 'Pilihan status tidak valid.',
             'start_date.required' => 'Tanggal mulai event wajib diisi',
             'end_date.required' => 'Tanggal berakhir event wajib diisi',
             'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh kurang dari tanggal mulai.',
