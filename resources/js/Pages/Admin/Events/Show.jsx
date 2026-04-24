@@ -359,9 +359,9 @@ function Show({ event }) {
                             {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
                                 <div className="space-y-3">
                                     {selectedTicket.event_field_responses.map(response => (
-                                        <div key={response.id} className="flex items-start">
+                                          <div key={response.id} className="flex items-start">
                                             {/* Kolom Label / Pertanyaan */}
-                                            <div className="font-semibold md:w-32 capitalize shrink-0">
+                                            <div className="font-semibold capitalize w-1/3">
                                                 {response.field_name.replace(/_/g, ' ')}
                                             </div>
 
@@ -370,15 +370,16 @@ function Show({ event }) {
                                                 <span className="mr-2">:</span>
 
                                                 {/* Logika Tampilan Berdasarkan Tipe Field */}
-                                                {response.field_type === 'image' ? (
-                                                    <div className="mt-1">
+                                                {response.field_type == 'image' ? (
+                                                    <div className="mt-2">
                                                         <img
                                                             src={'/storage/' + response.field_value}
                                                             alt={response.field_name}
                                                             className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
                                                         />
                                                     </div>
-                                                ) : response.field_type === 'file' ? (
+                                                ) : response.field_type == 'file' ? (
+                                                    /* --- BAGIAN BARU UNTUK FILE --- */
                                                     <div className="flex items-center gap-3">
                                                         <a
                                                             href={'/storage/' + response.field_value}
@@ -387,6 +388,7 @@ function Show({ event }) {
                                                             download
                                                             className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
                                                         >
+                                                            {/* Ikon Download Opsional */}
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                                             </svg>
@@ -394,10 +396,12 @@ function Show({ event }) {
                                                         </a>
                                                     </div>
                                                 ) : (
+                                                    /* --- BAGIAN TEXT BIASA --- */
                                                     <span>{response.field_value}</span>
                                                 )}
                                             </div>
                                         </div>
+                                        
                                     ))}
                                 </div>
                             ) : (
