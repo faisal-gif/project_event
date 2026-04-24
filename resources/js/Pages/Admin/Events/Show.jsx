@@ -333,7 +333,7 @@ function Show({ event }) {
             </div>
 
             {/* Detail Modal */}
-            <Modal show={isDetailModalOpen} onClose={closeDetailModal}>
+            <Modal maxWidth='5xl' show={isDetailModalOpen} onClose={closeDetailModal}>
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
                     {selectedTicket ? (
@@ -359,9 +359,44 @@ function Show({ event }) {
                             {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
                                 <div className="space-y-3">
                                     {selectedTicket.event_field_responses.map(response => (
-                                        <div key={response.id} className="flex">
-                                            <div className="font-semibold md:w-32 capitalize">{response.field_name.replace(/_/g, ' ')}</div>
-                                            <div>: {response.field_value}</div>
+                                        <div key={response.id} className="flex items-start">
+                                            {/* Kolom Label / Pertanyaan */}
+                                            <div className="font-semibold md:w-32 capitalize shrink-0">
+                                                {response.field_name.replace(/_/g, ' ')}
+                                            </div>
+
+                                            {/* Kolom Jawaban */}
+                                            <div className="flex-1 flex items-start">
+                                                <span className="mr-2">:</span>
+
+                                                {/* Logika Tampilan Berdasarkan Tipe Field */}
+                                                {response.field_type === 'image' ? (
+                                                    <div className="mt-1">
+                                                        <img
+                                                            src={'/storage/' + response.field_value}
+                                                            alt={response.field_name}
+                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
+                                                        />
+                                                    </div>
+                                                ) : response.field_type === 'file' ? (
+                                                    <div className="flex items-center gap-3">
+                                                        <a
+                                                            href={'/storage/' + response.field_value}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            download
+                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                            </svg>
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    <span>{response.field_value}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
