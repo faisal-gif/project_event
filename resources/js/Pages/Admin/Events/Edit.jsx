@@ -34,7 +34,13 @@ function Edit({ event, category }) {
         limit_ticket_user: event.limit_ticket_user || 1,
         // Step 3
         need_additional_questions: event.need_additional_questions || false,
-        event_fields: event.event_fields || [], // Assumes 'event_fields' is passed in event prop
+        event_fields: event.event_fields.map(field => ({
+            id: field.id,
+            label: field.label,
+            type: field.type,
+            is_required: field.is_required,
+            options: field.options || []
+        })),
         // Step 4
         needs_submission: event.needs_submission || false,
         submission_fields: event.event_submission_fields || [], // Assumes 'submission_fields' is passed
@@ -53,8 +59,8 @@ function Edit({ event, category }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-      
-      router.post(route('admin.events.update', event.id), {
+
+        router.post(route('admin.events.update', event.id), {
             _method: 'patch',
             ...data,
         });

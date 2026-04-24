@@ -235,64 +235,64 @@ class EventController extends Controller
 
     private function syncRelatedData(Event $event, array $data)
     {
-       
-        // 1. Sync Ticket Types (Logika Upsert)
+        // 1. Sync Ticket Types
         if (!empty($data['ticket_types'])) {
             $keepTicketIds = [];
 
             foreach ($data['ticket_types'] as $ticketData) {
-                $submissionRules = !empty($ticketData['submission_rules'])
-                    ? $ticketData['submission_rules']
-                    : null;
-                
-                // Jika ada ID, berarti update data lama
+                $submissionRules = !empty($ticketData['submission_rules']) ? $ticketData['submission_rules'] : null;
+
+                // MENCARI TIKET: Berdasarkan ID, atau jika tidak ada, cari berdasarkan Nama Tiket
+                $match = [];
                 if (!empty($ticketData['id'])) {
-                    $ticket = $event->ticketTypes()->find($ticketData['id']);
-                    if ($ticket) {
-                        $ticket->update([
-                            'name' => $ticketData['name'],
-                            'price' => $ticketData['price'],
-                            'quota' => $ticketData['quota'],
-                            'description' => $ticketData['description'],
-                            'purchase_date' => $ticketData['purchase_date'],
-                            'end_purchase_date' => $ticketData['end_purchase_date'],
-                            'submission_rules' => $submissionRules,
-                        ]);
-                        $keepTicketIds[] = $ticket->id;
-                    }
+                    $match['id'] = $ticketData['id'];
                 } else {
-                    // Jika tidak ada ID, berarti buat baru
-                    $newTicket = $event->ticketTypes()->create([
+                    $match['name'] = $ticketData['name']; // Fallback
+                }
+
+                $ticket = $event->ticketTypes()->updateOrCreate(
+                    $match,
+                    [
                         'name' => $ticketData['name'],
                         'price' => $ticketData['price'],
                         'quota' => $ticketData['quota'],
-                        'remaining_quota' => $ticketData['quota'],
+                        'remaining_quota' => $ticketData['quota'], // Jika update, pertimbangkan logika sisa kuota ini agar tidak mereset
                         'description' => $ticketData['description'],
                         'purchase_date' => $ticketData['purchase_date'],
                         'end_purchase_date' => $ticketData['end_purchase_date'],
                         'submission_rules' => $submissionRules,
-                    ]);
-                    $keepTicketIds[] = $newTicket->id;
-                }
+                    ]
+                );
+                $keepTicketIds[] = $ticket->id;
             }
 
-            // Hapus tiket yang TIDAK ada di dalam input (berhati-hatilah jika sudah ada transaksi)
-            // Jika tiket yang dihapus sudah punya transaksi, sebaiknya gunakan Soft Deletes atau cegah penghapusan.
-            $event->ticketTypes()->whereNotIn('id', $keepTicketIds)->delete();
+            // AMAN DARI PENGHAPUSAN: Jangan hapus tiket sembarangan jika sudah ada transaksi
+            $event->ticketTypes()->whereNotIn('id', $keepTicketIds)->each(function ($ticket) {
+                // Opsional: Cek apakah tiket sudah dibeli, jika belum baru hapus
+                // if ($ticket->transactions()->count() == 0) { $ticket->delete(); }
+                $ticket->delete();
+            });
         }
 
-        // --- Lakukan logika yang sama untuk Event Fields agar ID tetap terjaga ---
-
+        // 2. Sync Event Fields (Registration)
         $keepFieldIds = [];
-        if ($data['need_additional_questions'] && !empty($data['event_fields'])) {
+        if (!empty($data['need_additional_questions']) && !empty($data['event_fields'])) {
             foreach ($data['event_fields'] as $field) {
                 $options = $field['options'] ?? null;
                 if (is_string($options) && !empty($options)) {
-                    // Mengubah "Free,Paid" menjadi ["Free", "Paid"]
                     $options = array_map('trim', explode(',', $options));
                 }
+
+                // MENCARI FIELD: Berdasarkan ID, atau berdasarkan Name
+                $match = [];
+                if (!empty($field['id'])) {
+                    $match['id'] = $field['id'];
+                } else {
+                    $match['name'] = Str::snake($field['label']); // Fallback
+                }
+
                 $f = $event->eventFields()->updateOrCreate(
-                    ['id' => $field['id'] ?? null], // Cari berdasarkan ID jika ada
+                    $match,
                     [
                         'label' => $field['label'],
                         'name' => Str::snake($field['label']),
@@ -304,19 +304,27 @@ class EventController extends Controller
                 $keepFieldIds[] = $f->id;
             }
         }
+        // Jangan hapus paksa jika tidak ingin jawaban user hilang (Sebaiknya gunakan SoftDeletes di database)
         $event->eventFields()->whereNotIn('id', $keepFieldIds)->delete();
 
-        // --- Lakukan hal yang sama untuk Submission Fields ---
+        // 3. Sync Submission Fields
         $keepSubIds = [];
-        if ($data['needs_submission'] && !empty($data['submission_fields'])) {
+        if (!empty($data['needs_submission']) && !empty($data['submission_fields'])) {
             foreach ($data['submission_fields'] as $field) {
                 $options = $field['options'] ?? null;
                 if (is_string($options) && !empty($options)) {
-                    // Mengubah "Free,Paid" menjadi ["Free", "Paid"]
                     $options = array_map('trim', explode(',', $options));
                 }
+
+                $match = [];
+                if (!empty($field['id'])) {
+                    $match['id'] = $field['id'];
+                } else {
+                    $match['name'] = Str::snake($field['label']); // Fallback
+                }
+
                 $s = $event->eventSubmissionFields()->updateOrCreate(
-                    ['id' => $field['id'] ?? null],
+                    $match,
                     [
                         'label' => $field['label'],
                         'name' => Str::snake($field['label']),

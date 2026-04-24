@@ -62,6 +62,7 @@ class TicketService
                             'event_field_id' => $eventFields[$fieldName]->id,
                             'ticket_id' => $ticket->id,
                             'field_name' => $fieldName,
+                            'field_type' => $eventFields[$fieldName]->type,
                             'field_value' => $fieldValue,
                         ]);
                     }

@@ -70,8 +70,10 @@ class TicketController extends Controller
 
     public function additonal(Request $request, Ticket $ticket)
     {
+
         // Pastikan relation ter-load
         $event = $ticket->event->load('eventSubmissionFields');
+
         $user = auth()->user();
 
         $fieldRules = [];
@@ -103,6 +105,7 @@ class TicketController extends Controller
         // 2. Validasi
         $validated = $request->validate($fieldRules, $customMessages);
 
+
         try {
             $trx = DB::transaction(function () use ($event, $ticket, $user, $validated, $request) {
                 // 3. Buat Parent Submission
@@ -113,14 +116,17 @@ class TicketController extends Controller
                     'status' => 'reviewed',
                 ]);
 
+
                 // --- [MODIFIKASI] ---
                 // Buat Map agar mudah mengambil ID berdasarkan nama field
                 // Hasilnya array/collection dengan key 'nama_field' dan value object field itu sendiri
                 $fieldMap = $event->eventSubmissionFields->keyBy('name');
 
+
                 // 4. Proses Simpan Data
                 foreach ($validated as $fieldName => $fieldValue) {
                     $finalValue = $fieldValue;
+
 
                     // Cek file
                     if ($request->hasFile($fieldName)) {
@@ -135,17 +141,16 @@ class TicketController extends Controller
                     $fieldId = $fieldMap[$fieldName]->id ?? null;
                     // Opsional: Ambil tipe juga jika perlu disimpan di tabel custom fields
                     $fieldType = $fieldMap[$fieldName]->type ?? 'text';
+        
 
                     // Simpan ke tabel relasional
-                    SubmissionCustomFields::create([
+                    $submissionCustom = SubmissionCustomFields::create([
                         'submission_id' => $submission->id,
-                        'submission_field_id' => $fieldId, 
                         'field_name' => $fieldName,
-                        'field_type' => $fieldType, // (Opsional) Disarankan simpan tipe juga agar Frontend mudah render
+                        'field_type' => $fieldType,
                         'field_value' => $finalValue,
                     ]);
                 }
-
                 // 5. Update Status Tiket
                 $ticket->update(['status' => 'used']);
 

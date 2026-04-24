@@ -333,7 +333,7 @@ function Show({ event }) {
             </div>
 
             {/* Detail Modal */}
-           <Modal  maxWidth='5xl' show={isDetailModalOpen} onClose={closeDetailModal}>
+            <Modal maxWidth='5xl' show={isDetailModalOpen} onClose={closeDetailModal}>
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
                     {selectedTicket ? (
@@ -364,11 +364,11 @@ function Show({ event }) {
                                             <div className="font-semibold md:w-32 capitalize shrink-0">
                                                 {response.field_name.replace(/_/g, ' ')}
                                             </div>
-                                            
+
                                             {/* Kolom Jawaban */}
                                             <div className="flex-1 flex items-start">
                                                 <span className="mr-2">:</span>
-                                                
+
                                                 {/* Logika Tampilan Berdasarkan Tipe Field */}
                                                 {response.field_type === 'image' ? (
                                                     <div className="mt-1">
