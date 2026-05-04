@@ -23,7 +23,7 @@ return new class extends Migration
             // ID user yang mempromosikan (yang punya link referral)
             $table->foreignId('promoter_id')->nullable()->constrained('users')->nullOnDelete()->after('user_id');
             // Jumlah komisi yang didapat dari transaksi ini
-            $table->decimal('commission_earned', 10, 2)->default(0)->after('total_price');
+            $table->decimal('commission_earned', 10, 2)->default(0)->after('subtotal');
         });
     }
 
