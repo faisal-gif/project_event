@@ -25,7 +25,7 @@ class TripayService
 
     public function getPaymentChannel()
     {
-       
+
         /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
@@ -39,7 +39,7 @@ class TripayService
     {
         $event = $ticketType->event;
 
-        $ref = 'INV-' . time();
+        $ref = 'INV-' . $event->id . '-' . time();
         $amount = (int) number_format($ticketType->price, 0, '', '');
         $total = $amount * $validated['quantity'];
         $payload = [
