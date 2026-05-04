@@ -12,7 +12,7 @@ function EventDetail({ event, seo }) {
 
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    
+
     // State untuk melacak status copy link
     const [copiedStandard, setCopiedStandard] = useState(false);
     const [copiedAffiliate, setCopiedAffiliate] = useState(false);
@@ -93,7 +93,7 @@ function EventDetail({ event, seo }) {
 
     const handleCopy = (link, type) => {
         navigator.clipboard.writeText(link);
-        
+
         // Ubah state berdasarkan tombol mana yang diklik
         if (type === 'standard') {
             setCopiedStandard(true);
@@ -145,9 +145,9 @@ function EventDetail({ event, seo }) {
                                         <Tag className="mr-2 h-3 w-3" />
                                         {event.category.name}
                                     </div>
-                                    
-                                    <button 
-                                        onClick={() => document.getElementById('share_modal').showModal()} 
+
+                                    <button
+                                        onClick={() => document.getElementById('share_modal').showModal()}
                                         className="btn btn-outline btn-sm shadow-sm"
                                     >
                                         <Share2 className="h-4 w-4 mr-1" /> Bagikan
@@ -329,21 +329,21 @@ function EventDetail({ event, seo }) {
             <dialog id="share_modal" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
                     <h3 className="font-bold text-xl mb-4">Bagikan Event Ini</h3>
-                    
+
                     {/* Input Link Reguler */}
                     <div className="form-control w-full mb-4">
                         <label className="label">
                             <span className="label-text font-semibold">Link Event</span>
                         </label>
                         <div className="join w-full">
-                            <input 
-                                type="text" 
-                                readOnly 
-                                value={standardLink} 
-                                className="input input-bordered join-item w-full bg-base-200 text-sm md:text-base" 
+                            <input
+                                type="text"
+                                readOnly
+                                value={standardLink}
+                                className="input input-bordered join-item w-full bg-base-200 text-sm md:text-base"
                             />
-                            <button 
-                                onClick={() => handleCopy(standardLink, 'standard')} 
+                            <button
+                                onClick={() => handleCopy(standardLink, 'standard')}
                                 className={`btn join-item w-24 ${copiedStandard ? 'btn-success text-white' : 'btn-primary'}`}
                                 title={copiedStandard ? "Tersalin!" : "Salin Link"}
                             >
@@ -353,21 +353,21 @@ function EventDetail({ event, seo }) {
                     </div>
 
                     {/* Input Link Afiliasi (Hanya Muncul Jika Fitur Aktif & User Login) */}
-                    {event.is_affiliate_enabled && auth?.user && (
+                    {!!event.is_affiliate_enabled && auth?.user && (
                         <div className="form-control w-full mb-2">
                             <label className="label">
                                 <span className="label-text font-semibold">Link Afiliasi Anda</span>
                                 <span className="label-text-alt text-success font-bold">Dapatkan Komisi!</span>
                             </label>
                             <div className="join w-full">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={affiliateLink} 
-                                    className="input input-bordered input-success join-item w-full bg-base-200 text-sm md:text-base" 
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={affiliateLink}
+                                    className="input input-bordered input-success join-item w-full bg-base-200 text-sm md:text-base"
                                 />
-                                <button 
-                                    onClick={() => handleCopy(affiliateLink, 'affiliate')} 
+                                <button
+                                    onClick={() => handleCopy(affiliateLink, 'affiliate')}
                                     className={`btn join-item w-24 text-white ${copiedAffiliate ? 'bg-green-700 hover:bg-green-800' : 'btn-success'}`}
                                     title={copiedAffiliate ? "Tersalin!" : "Salin Link Afiliasi"}
                                 >
