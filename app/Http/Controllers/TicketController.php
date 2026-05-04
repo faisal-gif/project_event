@@ -71,14 +71,13 @@ class TicketController extends Controller
     public function additonal(Request $request, Ticket $ticket)
     {
         // Pastikan relation ter-load
-        $event = $ticket->event->load('eventSubmissionFields', 'ticketType');
+        $event = $ticket->event->load('eventSubmissionFields');
         $user = auth()->user();
 
         // =====================================================================
         // 1. CEK LIMIT DARI SUBMISSION RULES TIKET
         // =====================================================================
-        $ticketType = $ticket->ticketType;
-        dd($ticketType);
+        $ticketType = $ticket->load('ticketType')->ticketType;
         $submissionRules = $ticketType->submission_rules ?? [];
 
         // Pastikan formatnya array (jika tersimpan sebagai JSON string di DB)
