@@ -71,7 +71,7 @@ class TicketController extends Controller
     public function additonal(Request $request, Ticket $ticket)
     {
         // Pastikan relation ter-load
-        $event = $ticket->event->load('eventSubmissionFields');
+        $event = $ticket->event->load('eventSubmissionFields', 'ticketType');
         $user = auth()->user();
 
         // =====================================================================
