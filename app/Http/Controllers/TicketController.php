@@ -70,16 +70,51 @@ class TicketController extends Controller
 
     public function additonal(Request $request, Ticket $ticket)
     {
-
         // Pastikan relation ter-load
         $event = $ticket->event->load('eventSubmissionFields');
-
         $user = auth()->user();
+
+        // =====================================================================
+        // 1. CEK LIMIT DARI SUBMISSION RULES TIKET
+        // =====================================================================
+        $ticketType = $ticket->ticketType;
+        $submissionRules = $ticketType->submission_rules ?? [];
+
+        // Pastikan formatnya array (jika tersimpan sebagai JSON string di DB)
+        if (is_string($submissionRules)) {
+            $submissionRules = json_decode($submissionRules, true);
+        }
+
+        if (is_array($submissionRules)) {
+            foreach ($submissionRules as $ruleField => $limit) {
+                // Pastikan limit berupa angka dan request memiliki input untuk field tersebut
+                if (is_numeric($limit) && $limit > 0 && $request->has($ruleField)) {
+                    $inputValue = $request->input($ruleField);
+
+                    // Hitung jumlah pilihan yang dikirim user
+                    $count = 0;
+                    if (is_array($inputValue)) {
+                        $count = count($inputValue); // Jika checkbox (array)
+                    } elseif (is_string($inputValue) && trim($inputValue) !== '') {
+                        $count = 1; // Jika select biasa / string
+                    }
+
+                    // Jika melebihi limit, langsung kembalikan pesan error ke halaman form
+                    if ($count > $limit) {
+                        return redirect()->back()->withErrors([
+                            $ruleField => "Berdasarkan tipe tiket Anda, maksimal pilihan untuk bagian ini adalah {$limit} opsi."
+                        ])->withInput();
+                    }
+                }
+            }
+        }
+        // =====================================================================
+
 
         $fieldRules = [];
         $customMessages = [];
 
-        // 1. Bangun Rules dan Messages
+        // 2. Bangun Rules dan Messages Default
         if ($event->needs_submission) {
             foreach ($event->eventSubmissionFields as $field) {
                 $rules = $field->is_required ? ['required'] : ['nullable'];
@@ -102,67 +137,82 @@ class TicketController extends Controller
             }
         }
 
-        // 2. Validasi
+        // 3. Validasi
         $validated = $request->validate($fieldRules, $customMessages);
-
 
         try {
             $trx = DB::transaction(function () use ($event, $ticket, $user, $validated, $request) {
-                // 3. Buat Parent Submission
-                $submission = Submission::create([
-                    'event_id' => $event->id,
-                    'ticket_id' => $ticket->id,
-                    'user_id' => $user->id,
-                    'status' => 'reviewed',
-                ]);
 
+                // --- [MODIFIKASI PENTING]: Gunakan updateOrCreate ---
+                // Agar jika user mengedit/memperbarui data, tabel submissions tidak dobel.
+                $submission = Submission::updateOrCreate(
+                    ['ticket_id' => $ticket->id], // Kunci pencarian
+                    [
+                        'event_id' => $event->id,
+                        'user_id' => $user->id,
+                        'status' => 'reviewed',
+                    ]
+                );
 
-                // --- [MODIFIKASI] ---
-                // Buat Map agar mudah mengambil ID berdasarkan nama field
-                // Hasilnya array/collection dengan key 'nama_field' dan value object field itu sendiri
                 $fieldMap = $event->eventSubmissionFields->keyBy('name');
-
 
                 // 4. Proses Simpan Data
                 foreach ($validated as $fieldName => $fieldValue) {
                     $finalValue = $fieldValue;
 
-
                     // Cek file
                     if ($request->hasFile($fieldName)) {
                         $file = $request->file($fieldName);
-                        // Simpan file
                         $path = $file->store("uploads/submissions/{$event->slug}/{$fieldName}", 'public');
-                        // Simpan full path agar mudah diakses frontend
                         $finalValue = $path;
                     }
+                    // --- [MODIFIKASI PENTING]: Handle Checkbox Array ---
+                    // Jika data berupa array (dari checkbox ganda), jadikan string dengan koma
+                    elseif (is_array($fieldValue)) {
+                        $finalValue = implode(', ', $fieldValue);
+                    }
 
-                    // Ambil ID dari map yang sudah dibuat di atas
                     $fieldId = $fieldMap[$fieldName]->id ?? null;
-                    // Opsional: Ambil tipe juga jika perlu disimpan di tabel custom fields
                     $fieldType = $fieldMap[$fieldName]->type ?? 'text';
-        
 
-                    // Simpan ke tabel relasional
-                    $submissionCustom = SubmissionCustomFields::create([
-                        'submission_id' => $submission->id,
-                        'field_name' => $fieldName,
-                        'field_type' => $fieldType,
-                        'field_value' => $finalValue,
-                    ]);
+                    // Jika tipe adalah file/image TAPI user tidak mengunggah file baru saat edit,
+                    // Kita cari data lamanya dan pertahankan (agar file tidak hilang)
+                    if (($fieldType === 'image' || $fieldType === 'file') && empty($finalValue)) {
+                        $existingData = SubmissionCustomFields::where('submission_id', $submission->id)
+                            ->where('field_name', $fieldName)
+                            ->first();
+                        if ($existingData) {
+                            $finalValue = $existingData->field_value;
+                        }
+                    }
+
+                    // Simpan ke tabel relasional menggunakan updateOrCreate (agar tidak menumpuk saat update)
+                    if ($finalValue !== null) {
+                        SubmissionCustomFields::updateOrCreate(
+                            [
+                                'submission_id' => $submission->id,
+                                'field_name' => $fieldName,
+                            ],
+                            [
+                                'submission_field_id' => $fieldId,
+                                'field_type' => $fieldType,
+                                'field_value' => $finalValue,
+                            ]
+                        );
+                    }
                 }
+
                 // 5. Update Status Tiket
                 $ticket->update(['status' => 'used']);
 
                 return $submission;
             });
 
-            return redirect()->back()->with('success', 'Data karya berhasil dikirim.');
+            return redirect()->back()->with('success', 'Data karya berhasil dikirim/diperbarui.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
     /**
      * Remove the specified resource from storage.
      */
