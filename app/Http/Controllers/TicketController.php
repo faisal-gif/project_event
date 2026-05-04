@@ -78,7 +78,6 @@ class TicketController extends Controller
         // 1. CEK LIMIT DARI SUBMISSION RULES TIKET
         // =====================================================================
         $ticketType = $ticket->load('ticket_type')->ticket_type;
-        dd($ticketType);
         $submissionRules = $ticketType->submission_rules ?? [];
 
         // Pastikan formatnya array (jika tersimpan sebagai JSON string di DB)
