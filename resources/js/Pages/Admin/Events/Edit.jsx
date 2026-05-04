@@ -11,6 +11,7 @@ import Step1_EventDetails from './Partials/Step1_EventDetails';
 import Step2_TicketDetails from './Partials/Step2_TicketDetails';
 import Step3_RegistrationQuestions from './Partials/Step3_RegistrationQuestions';
 import Step4_SubmissionQuestions from './Partials/Step4_SubmissionQuestions';
+import Step5_Affiliate from './Partials/Step5_Affiliate';
 
 function Edit({ event, category }) {
     const [step, setStep] = useState(1);
@@ -44,13 +45,18 @@ function Edit({ event, category }) {
         // Step 4
         needs_submission: event.needs_submission || false,
         submission_fields: event.event_submission_fields || [], // Assumes 'submission_fields' is passed
+
+        is_affiliate_enabled: event.is_affiliate_enabled || false,
+        affiliate_type: event.affiliate_type || 'percentage',
+        affiliate_reward: event.affiliate_reward || '',
     });
 
     const stepFields = {
         1: ['image', 'title', 'category_id', 'start_date', 'end_date', 'location_type', 'location_details', 'description', 'requirements'],
         2: ['ticket_types', 'limit_ticket_user'],
         3: ['need_additional_questions', 'event_fields'],
-        4: ['needs_submission', 'submission_fields']
+        4: ['needs_submission', 'submission_fields'],
+        5: ['is_affiliate_enabled', 'affiliate_type', 'affiliate_reward']
     };
 
     useEffect(() => {
@@ -96,7 +102,8 @@ function Edit({ event, category }) {
         "Event Details",
         "Ticket Details",
         "Registration Questions",
-        "Submission Questions"
+        "Submission Questions",
+         "Affiliate Program"
     ];
 
     return (
@@ -112,6 +119,7 @@ function Edit({ event, category }) {
                         {step === 2 && <Step2_TicketDetails data={data} setData={setData} errors={errors} />}
                         {step === 3 && <Step3_RegistrationQuestions data={data} setData={setData} errors={errors} />}
                         {step === 4 && <Step4_SubmissionQuestions data={data} setData={setData} errors={errors} />}
+                        {step === 5 && <Step5_Affiliate data={data} setData={setData} errors={errors} />}
 
                         <div className="flex justify-between mt-8">
                             <div>
@@ -120,12 +128,12 @@ function Edit({ event, category }) {
                                 )}
                             </div>
                             <div>
-                                {step < 4 && (
+                                {step < 5 && (
                                     <PrimaryButton type="button" onClick={nextStep} disabled={validating || processing}>
                                         {validating ? <><Loader className="animate-spin mr-2" /> Validating...</> : <>Next <ChevronsRight className="ml-2" /></>}
                                     </PrimaryButton>
                                 )}
-                                {step === 4 && (
+                                {step === 5 && (
                                     <PrimaryButton type="submit" disabled={validating || processing}>
                                         {processing ? 'Updating...' : 'Update Event'}
                                     </PrimaryButton>

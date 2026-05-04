@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryEvents;
 use App\Models\Event;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -40,11 +41,15 @@ class HomeController extends Controller
         ]);
     }
 
-    public function eventShow(Event $event)
+    public function eventShow(Request $request, Event $event)
     {
 
         if ($event->status == 'tunda') {
             return redirect('/');
+        }
+
+        if ($request->has('ref')) {
+            session(['referral_id' => $request->query('ref')]);
         }
 
         $event->load('ticketTypes', 'category');

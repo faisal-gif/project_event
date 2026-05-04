@@ -68,6 +68,9 @@ class EventController extends Controller
             'limit_ticket_user' => $data['limit_ticket_user'],
             'need_additional_questions' => $data['need_additional_questions'] ?? false,
             'needs_submission' => $data['needs_submission'] ?? false,
+            'is_affiliate_enabled' => $data['is_affiliate_enabled'] ?? false,
+            'affiliate_type' => $data['is_affiliate_enabled'] ? $data['affiliate_type'] : null,
+            'affiliate_reward' => $data['is_affiliate_enabled'] ? $data['affiliate_reward'] : null,
         ]);
 
 
@@ -122,6 +125,9 @@ class EventController extends Controller
             'limit_ticket_user' => $data['limit_ticket_user'],
             'need_additional_questions' => $data['need_additional_questions'] ?? false,
             'needs_submission' => $data['needs_submission'] ?? false,
+            'is_affiliate_enabled' => $data['is_affiliate_enabled'] ?? false,
+            'affiliate_type' => $data['is_affiliate_enabled'] ? $data['affiliate_type'] : null,
+            'affiliate_reward' => $data['is_affiliate_enabled'] ? $data['affiliate_reward'] : null,
             'status' => $data['status'],
         ];
 
@@ -192,6 +198,11 @@ class EventController extends Controller
             ],
             'ticket_types.*.submission_rules' => 'nullable|array',
             'submission_fields.*.is_required' => ['boolean'],
+
+            // Affilate
+            'is_affiliate_enabled' => 'boolean',
+            'affiliate_type' => 'required_if:is_affiliate_enabled,true|in:percentage,fixed|nullable',
+            'affiliate_reward' => 'required_if:is_affiliate_enabled,true|numeric|min:0|nullable',
         ];
 
         // 2. Definisikan pesan kustom Anda
@@ -216,6 +227,14 @@ class EventController extends Controller
             'event_fields.*.label.required_with' => 'Label pertanyaan tambahan wajib diisi.',
             'event_fields.*.type.in' => 'Tipe pertanyaan tambahan tidak valid.',
             'event_fields.*.options.required_if' => 'Opsi jawaban wajib diisi untuk tipe select, radio, atau checkbox.',
+
+            // Affilate
+            'is_affiliate_enabled.boolean' => 'Pilihan program afiliasi harus berupa boolean.',
+            'affiliate_type.required_if' => 'Tipe komisi wajib diisi jika program afiliasi diaktifkan.',
+            'affiliate_type.in' => 'Tipe komisi tidak valid.',
+            'affiliate_reward.required_if' => 'Besaran komisi wajib diisi jika program afiliasi diaktifkan.',
+            'affiliate_reward.numeric' => 'Besaran komisi harus berupa angka.',
+            'affiliate_reward.min' => 'Besaran komisi minimal adalah 0.',
         ];
 
         // 3. Masukkan $rules dan $messages ke method validate()

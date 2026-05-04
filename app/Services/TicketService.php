@@ -54,16 +54,21 @@ class TicketService
                     ->whereIn('name', array_keys($responses))
                     ->get()
                     ->keyBy('name');
+                // --- [MODIFIKASI] ---
+                // Lakukan looping pada array of objects yang baru
+                foreach ($responses as $responseObj) {
+                    // Ambil data langsung dari setiap object JSON
+                    $fieldName = $responseObj['field_name'] ?? null;
+                    $fieldValue = $responseObj['field_value'] ?? null;
+                    $fieldType = $responseObj['field_type'] ?? 'text';
 
-                // 3. Lakukan looping pada array yang sudah di-decode
-                foreach ($responses as $fieldName => $fieldValue) {
-                    if (isset($eventFields[$fieldName])) {
+                    if ($fieldName && isset($eventFields[$fieldName])) {
                         EventFieldResponse::create([
                             'event_field_id' => $eventFields[$fieldName]->id,
-                            'ticket_id' => $ticket->id,
-                            'field_name' => $fieldName,
-                            'field_type' => $eventFields[$fieldName]->type,
-                            'field_value' => $fieldValue,
+                            'ticket_id'      => $ticket->id,
+                            'field_name'     => $fieldName,
+                            'field_type'     => $fieldType, // Data tipe field otomatis terisi dari JSON
+                            'field_value'    => $fieldValue,
                         ]);
                     }
                 }
