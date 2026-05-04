@@ -51,7 +51,7 @@ class HomeController extends Controller
         if ($request->has('ref')) {
             session(['referral_id' => $request->query('ref')]);
         }
-
+        
         $event->load('ticketTypes', 'category');
 
         $plainTextBody = strip_tags($event->description);
