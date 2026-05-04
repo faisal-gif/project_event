@@ -5,6 +5,7 @@ import Card from '@/Components/ui/Card';
 import Modal from '@/Components/Modal'; // Assuming you have a Modal component
 import QrCode from '@/Components/QrCode';
 import { QrCodeIcon } from 'lucide-react';
+import { formatRupiah } from '@/Utils/formatter';
 
 // Helper functions
 const formatPrice = (price) => {
@@ -40,23 +41,27 @@ const getStatusTransactionBadge = (status) => {
         case 'PAID':
             return <div className="badge badge-success">PAID</div>;
         case 'UNPAID':
-            return <div className="badge badge-error">UNPAID</div>;
+            return <div className="badge badge-warning">UNPAID</div>;
+        case 'EXPIRED':
+            return <div className="badge badge-error">EXPIRED</div>;
         default:
             return <div className="badge badge-ghost">UNKNOWN</div>;
     }
 };
 
 function Show({ event }) {
+
     const [activeTab, setActiveTab] = useState('Detail');
     const [isDetailModalOpen, setDetailModalOpen] = useState(false);
     const [isSubmissionModalOpen, setSubmissionModalOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
+    console.log(selectedTicket);
+
 
     // --- PERUBAHAN 1: Ganti nama state ---
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
     const handleScanSuccess = (decodedText) => {
-        console.log(decodedText);
 
         // --- PERUBAHAN 2: Tutup modal scanner ---
         setScannerModalOpen(false);
@@ -79,7 +84,6 @@ function Show({ event }) {
             }
         });
     };
-
 
     if (!event) {
         return (
@@ -121,47 +125,40 @@ function Show({ event }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
                     {/* ===== Manual Tab Navigation ===== */}
-                    <div className="flex justify-center mb-8">
-                        <div className="flex bg-base-200 rounded-xl overflow-hidden shadow">
-                            {['Detail', 'Participants', 'Transaction'].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`px-4 py-2  md:px-8 md:py-3 font-semibold transition-all text-sm md:text-lg ${activeTab === tab
-                                        ? 'bg-primary text-white'
-                                        : 'hover:bg-base-300 text-base-content'
-                                        }`}
-                                >
-                                    {tab}
-                                </button>
-                            ))}
-                        </div>
+
+                    <div className="tabs tabs-border">
+                        {['Detail', 'Participants', 'Transaction'].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`tab ${activeTab === tab
+                                    ? 'tab-active'
+                                    : 'hover:bg-base-300 text-base-content'
+                                    }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
                     </div>
 
                     {/* ===== Tab Content ===== */}
                     {activeTab === 'Detail' && (
-                        <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 ">
-                            <Card className="h-[50vw] md:col-span-2">
-                                <img
-                                    src={`/storage/${event.image}`}
-                                    alt={event.title}
-                                    className="w-full h-full object-contain rounded"
-                                />
-                            </Card>
-
-                            <div className="flex flex-col gap-4 md:col-span-3">
-                                {/* Event Details */}
-                                <Card className="bg-base-100 shadow-xl">
+                        <div className='space-y-6'>
+                            {/* Detail Event */}
+                            <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 items-start">
+                                <Card className="md:col-span-2">
+                                    <img
+                                        src={`/storage/${event.image}`}
+                                        alt={event.title}
+                                        className="w-full h-full object-contain rounded"
+                                    />
+                                </Card>
+                                <Card className="bg-base-100 shadow-xl md:col-span-3">
                                     <div className="card-body">
-                                        <div className="badge badge-outline badge-lg">{event.category.name}</div>
                                         <h1 className="text-3xl font-bold my-4">{event.title}</h1>
-                                        <div
-                                            className="prose max-w-none"
-                                            dangerouslySetInnerHTML={{ __html: event.description }}
-                                        />
+                                        <div className="badge badge-outline badge-lg">{event.category.name}</div>
                                         <div className="divider"></div>
                                         <div className="space-y-4">
-                                            <h3 className="text-xl font-semibold">Event Details</h3>
                                             <div className="space-y-3">
                                                 <div className="flex">
                                                     <div className="font-semibold w-32">Start Date</div>
@@ -185,48 +182,60 @@ function Show({ event }) {
                                         </div>
                                     </div>
                                 </Card>
-                                <Card className="bg-base-100 shadow-xl p-6">
-                                    <div className="space-y-4">
-                                        <h3 className="text-xl font-semibold">Ticket Information</h3>
-                                        {event.ticket_types?.length ? (
-                                            <ul className="space-y-3">
-                                                {event.ticket_types.map((ticketType) => (
-                                                    <li
-                                                        key={ticketType.id}
-                                                        className="p-3 bg-base-200 rounded-lg flex justify-between items-center"
-                                                    >
-                                                        <div>
-                                                            <span className="font-semibold">{ticketType.name}</span>
-                                                            <p className="text-xs">{ticketType.description}</p>
-                                                            <div className="text-sm text-gray-500">
-                                                                Quota: {ticketType.quota}
-                                                            </div>
-                                                            <div className="text-xs">
-                                                                {formatDate(ticketType.purchase_date)} -{' '}
-                                                                {formatDate(ticketType.end_purchase_date)}
-                                                            </div>
-                                                        </div>
-                                                        <div className="font-bold text-lg">
-                                                            {formatPrice(ticketType.price)}
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <p>No ticket types configured for this event.</p>
-                                        )}
-                                        <div className="divider my-2"></div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-semibold">Max Tickets per User</span>
-                                            <span className="font-bold">{event.limit_ticket_user}</span>
-                                        </div>
-                                    </div>
-                                </Card>
+                            </div>
+                            {/* Deskripsi Event */}
+                            <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
+                                <input type="checkbox" />
+                                <div className="collapse-title font-semibold">Deskripsi</div>
+                                <div className="collapse-content text-sm w-full">
+                                    <div className="prose prose-sm prose-p:my-2 prose-h2:mb-1 prose-li:my-0 m-4 max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
+                                </div>
                             </div>
 
-                        </div>
-                    )}
+                            {/* Ticket Event */}
+                            <Card className="bg-base-100 shadow-xl p-6">
+                                <div className="space-y-4">
+                                    <h3 className="text-xl font-semibold">Ticket Information</h3>
+                                    {event.ticket_types?.length ? (
+                                        <ul className="space-y-3">
+                                            {event.ticket_types.map((ticketType) => (
+                                                <li
+                                                    key={ticketType.id}
+                                                    className="p-3 bg-base-200 rounded-lg flex justify-between items-center"
+                                                >
+                                                    <div>
+                                                        <span className="font-semibold">{ticketType.name}</span>
+                                                        <p className="text-xs">{ticketType.description}</p>
+                                                        <div className="text-sm text-gray-500">
+                                                            Quota: {ticketType.quota}
+                                                        </div>
+                                                        <div className="text-xs">
+                                                            {formatDate(ticketType.purchase_date)} -{' '}
+                                                            {formatDate(ticketType.end_purchase_date)}
+                                                        </div>
+                                                    </div>
+                                                    <div className="font-bold text-lg">
+                                                        {formatPrice(ticketType.price)}
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>No ticket types configured for this event.</p>
+                                    )}
+                                    <div className="divider my-2"></div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold">Max Tickets per User</span>
+                                        <span className="font-bold">{event.limit_ticket_user}</span>
+                                    </div>
+                                </div>
+                            </Card>
 
+
+
+                        </div>
+
+                    )}
 
                     {activeTab === 'Participants' && (
                         <div className='px-2 md:px-0'>
@@ -243,6 +252,7 @@ function Show({ event }) {
                                             <thead>
                                                 <tr>
                                                     <th>Ticket Code</th>
+                                                    <th>Ticket Kategori</th>
                                                     <th>Name</th>
                                                     <th>Email</th>
                                                     <th>Status</th>
@@ -254,6 +264,7 @@ function Show({ event }) {
                                                     event.tickets.map((ticket) => (
                                                         <tr key={ticket.id}>
                                                             <td>{ticket.ticket_code}</td>
+                                                            <td>{ticket.ticket_type.name}</td>
                                                             <td>{ticket.user.name}</td>
                                                             <td>{ticket.user.email}</td>
                                                             <td>{getStatusBadge(ticket.status)}</td>
@@ -290,6 +301,7 @@ function Show({ event }) {
                                                     <th>Nama</th>
                                                     <th>Email</th>
                                                     <th>Status</th>
+                                                    <th>Harga Tiket</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -300,7 +312,7 @@ function Show({ event }) {
                                                             <td>{transaction.user.name}</td>
                                                             <td>{transaction.user.email}</td>
                                                             <td>{getStatusTransactionBadge(transaction.status)}</td>
-
+                                                            <td>{formatRupiah(transaction.amount)}</td>
                                                         </tr>
                                                     ))
                                                 ) : (
@@ -321,7 +333,7 @@ function Show({ event }) {
             </div>
 
             {/* Detail Modal */}
-            <Modal show={isDetailModalOpen} onClose={closeDetailModal}>
+            <Modal maxWidth='5xl' show={isDetailModalOpen} onClose={closeDetailModal}>
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
                     {selectedTicket ? (
@@ -347,9 +359,44 @@ function Show({ event }) {
                             {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
                                 <div className="space-y-3">
                                     {selectedTicket.event_field_responses.map(response => (
-                                        <div key={response.id} className="flex">
-                                            <div className="font-semibold md:w-32 capitalize">{response.field_name.replace(/_/g, ' ')}</div>
-                                            <div>: {response.field_value}</div>
+                                        <div key={response.id} className="flex items-start">
+                                            {/* Kolom Label / Pertanyaan */}
+                                            <div className="font-semibold md:w-32 capitalize shrink-0">
+                                                {response.field_name.replace(/_/g, ' ')}
+                                            </div>
+
+                                            {/* Kolom Jawaban */}
+                                            <div className="flex-1 flex items-start">
+                                                <span className="mr-2">:</span>
+
+                                                {/* Logika Tampilan Berdasarkan Tipe Field */}
+                                                {response.field_type === 'image' ? (
+                                                    <div className="mt-1">
+                                                        <img
+                                                            src={'/storage/' + response.field_value}
+                                                            alt={response.field_name}
+                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
+                                                        />
+                                                    </div>
+                                                ) : response.field_type === 'file' ? (
+                                                    <div className="flex items-center gap-3">
+                                                        <a
+                                                            href={'/storage/' + response.field_value}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            download
+                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                            </svg>
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    <span>{response.field_value}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -366,7 +413,7 @@ function Show({ event }) {
                 </div>
             </Modal>
 
-            <Modal maxWidth='2xl' show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
+            <Modal maxWidth='5xl' show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
                     {selectedTicket ? (
@@ -374,26 +421,64 @@ function Show({ event }) {
                             {selectedTicket.detail_pendaftar && (
                                 <div className="space-y-3 pb-4 border-b mb-4">
                                     <div className="flex">
-                                        <div className="font-semibold w-32">Name</div>
+                                        <div className="font-semibold">Name</div>
                                         <div>: {selectedTicket.detail_pendaftar.nama}</div>
                                     </div>
                                     <div className="flex">
-                                        <div className="font-semibold w-32">Email</div>
+                                        <div className="font-semibold">Email</div>
                                         <div>: {selectedTicket.detail_pendaftar.email}</div>
                                     </div>
                                     <div className="flex">
-                                        <div className="font-semibold w-32">Phone</div>
+                                        <div className="font-semibold">Phone</div>
                                         <div>: {selectedTicket.detail_pendaftar.no_hp}</div>
                                     </div>
                                 </div>
                             )}
                             <h3 className="text-xl font-bold mb-2">Jawaban Pendaftar</h3>
-                            {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
+                            {selectedTicket.submission ? (
                                 <div className="space-y-3">
                                     {selectedTicket.submission.submission_custom_fields.map(response => (
-                                        <div key={response.id} className="flex">
-                                            <div className="font-semibold w-32 capitalize">{response.field_name.replace(/_/g, ' ')}</div>
-                                            <div>: {response.field_value}</div>
+                                        <div key={response.id} className="flex items-start">
+                                            {/* Kolom Label / Pertanyaan */}
+                                            <div className="font-semibold capitalize w-1/3">
+                                                {response.field_name.replace(/_/g, ' ')}
+                                            </div>
+
+                                            {/* Kolom Jawaban */}
+                                            <div className="flex-1 flex items-start">
+                                                <span className="mr-2">:</span>
+
+                                                {/* Logika Tampilan Berdasarkan Tipe Field */}
+                                                {response.field_type == 'image' ? (
+                                                    <div className="mt-2">
+                                                        <img
+                                                            src={'/storage/' + response.field_value}
+                                                            alt={response.field_name}
+                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
+                                                        />
+                                                    </div>
+                                                ) : response.field_type == 'file' ? (
+                                                    /* --- BAGIAN BARU UNTUK FILE --- */
+                                                    <div className="flex items-center gap-3">
+                                                        <a
+                                                            href={'/storage/' + response.field_value}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            download
+                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
+                                                        >
+                                                            {/* Ikon Download Opsional */}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                            </svg>
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    /* --- BAGIAN TEXT BIASA --- */
+                                                    <span>{response.field_value}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
