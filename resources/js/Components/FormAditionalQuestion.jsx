@@ -2,20 +2,60 @@ import { useForm } from '@inertiajs/react';
 import React from 'react';
 
 function FormAditionalQuestion({ ticket, fields }) {
-    // Membuat state awal untuk form
+    // 1. Membuat state awal untuk form
     const initialFormState = fields.reduce((acc, field) => {
-        // Jika tipe file/image, inisialisasi dengan null, selain itu string kosong
-        const existingValue = ticket?.ticket_additional_questions?.[field.name];
-        acc[field.name] = (field.type === 'file' || field.type === 'image') ? null : (existingValue || '');
+        let existingValue = '';
+
+        if (ticket?.submission?.submission_custom_fields) {
+            const found = ticket.submission.submission_custom_fields.find(f => f.field_name === field.name);
+            if (found) existingValue = found.field_value;
+        } else if (ticket?.ticket_additional_questions?.[field.name]) {
+            existingValue = ticket.ticket_additional_questions[field.name];
+        }
+
+        // --- [MODIFIKASI] ---
+        // Jika tipenya checkbox dan ada opsi, pecah string menjadi array
+        if (field.type === 'checkbox' && field.options) {
+             acc[field.name] = existingValue ? existingValue.split(', ') : [];
+        } 
+        // File/Image selalu null di awal
+        else if (field.type === 'file' || field.type === 'image') {
+            acc[field.name] = null;
+        } 
+        // Default (Text, Textarea, Select, dll)
+        else {
+            acc[field.name] = existingValue || '';
+        }
+        
         return acc;
     }, {});
 
     const { data, setData, processing, errors, post } = useForm(initialFormState);
 
-    const handleInputChange = (e) => {
+    // 2. Perbaiki fungsi handle input agar support multiple checkbox
+    const handleInputChange = (field, e) => {
         const { name, value, type, checked } = e.target;
-        // Handle checkbox tunggal jika diperlukan
-        setData(name, type === 'checkbox' ? checked : value);
+
+        if (type === 'checkbox') {
+            const hasOptions = field.options && field.options.length > 0;
+            
+            if (hasOptions) {
+                // Checkbox Multiple Opsi (Hobby, Ukuran Baju) -> Array
+                let currentArray = Array.isArray(data[name]) ? [...data[name]] : [];
+                if (checked) {
+                    currentArray.push(value);
+                } else {
+                    currentArray = currentArray.filter(v => v !== value);
+                }
+                setData(name, currentArray);
+            } else {
+                // Checkbox Single (Yes/No, Terms Agreement) -> Boolean
+                setData(name, checked);
+            }
+        } else {
+            // Input Text, Select, Radio, dll
+            setData(name, value);
+        }
     };
 
     const handleFileChange = (name, file) => {
@@ -24,10 +64,16 @@ function FormAditionalQuestion({ ticket, fields }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Inertia otomatis mendeteksi objek File dan mengirimkan sebagai multipart/form-data
         post(route('ticket.additional', ticket.id), {
             preserveScroll: true,
         });
+    };
+
+    const hasExistingFile = (fieldName) => {
+        if (ticket?.submission?.submission_custom_fields) {
+            return ticket.submission.submission_custom_fields.some(f => f.field_name === fieldName && f.field_value);
+        }
+        return !!ticket?.ticket_additional_questions?.[fieldName];
     };
 
     const renderField = (field) => {
@@ -43,7 +89,7 @@ function FormAditionalQuestion({ ticket, fields }) {
                         placeholder={field.placeholder || ''}
                         className={`textarea ${commonClass}`}
                         value={value || ''}
-                        onChange={handleInputChange}
+                        onChange={(e) => handleInputChange(field, e)} // Pass 'field' object
                         required={field.is_required}
                     />
                 );
@@ -56,7 +102,7 @@ function FormAditionalQuestion({ ticket, fields }) {
                         name={field.name}
                         className={`select ${commonClass}`}
                         value={value || ''}
-                        onChange={handleInputChange}
+                        onChange={(e) => handleInputChange(field, e)}
                         required={field.is_required}
                     >
                         <option value="" disabled>Pilih {field.label}</option>
@@ -68,6 +114,7 @@ function FormAditionalQuestion({ ticket, fields }) {
 
             case 'image':
             case 'file':
+                const isFileUploaded = hasExistingFile(field.name);
                 return (
                     <div className="space-y-2">
                         <input
@@ -76,17 +123,17 @@ function FormAditionalQuestion({ ticket, fields }) {
                             accept={field.type === 'image' ? 'image/*' : undefined}
                             onChange={(e) => handleFileChange(field.name, e.target.files[0])}
                             className={`file-input file-input-bordered w-full`}
-                            required={field.is_required && !ticket?.ticket_additional_questions?.[field.name]}
+                            required={field.is_required && !isFileUploaded}
                         />
 
                         <p className="text-xs text-gray-500">
                             Hanya bisa mengirim max {field.type === 'file' ? '5MB' : '2MB'}
                         </p>
-                        {/* Menampilkan indikator jika sudah ada file lama atau file baru terpilih */}
+                        
                         {value instanceof File ? (
                             <p className="text-xs text-blue-600 font-medium italic">File baru terpilih: {value.name}</p>
-                        ) : ticket?.ticket_additional_questions?.[field.name] && (
-                            <p className="text-xs text-green-600 italic">File sudah terunggah (biarkan kosong jika tidak ingin mengubah)</p>
+                        ) : isFileUploaded && (
+                            <p className="text-xs text-green-600 italic font-medium">✅ File sudah terunggah. Biarkan kosong jika tidak ingin mengubah.</p>
                         )}
                     </div>
                 );
@@ -98,43 +145,50 @@ function FormAditionalQuestion({ ticket, fields }) {
                         id={field.name}
                         name={field.name}
                         value={value || ''}
-                        onChange={handleInputChange}
+                        onChange={(e) => handleInputChange(field, e)}
                         className={`input ${commonClass}`}
                         required={field.is_required}
                     />
                 );
 
             case 'checkbox':
-                // Logika radio group jika ada opsi (konsisten dengan checkout)
                 const options = field.options ? (Array.isArray(field.options) ? field.options : field.options.split(',')) : [];
                 if (options.length > 0) {
                     return (
                         <div className="flex flex-col gap-2 p-3 rounded-lg bg-secondary/30">
-                            {options.map(option => (
-                                <label key={option.trim()} className="label cursor-pointer justify-start gap-3">
-                                    <input
-                                        type="radio"
-                                        name={field.name}
-                                        value={option.trim()}
-                                        checked={value === option.trim()}
-                                        onChange={handleInputChange}
-                                        className="radio radio-primary radio-sm"
-                                        required={field.is_required}
-                                    />
-                                    <span className="label-text">{option.trim()}</span>
-                                </label>
-                            ))}
+                            {options.map(option => {
+                                const optVal = option.trim();
+                                // Cek apakah value array termasuk opsi ini
+                                const isChecked = Array.isArray(value) ? value.includes(optVal) : false;
+                                
+                                return (
+                                    <label key={optVal} className="label cursor-pointer justify-start gap-3">
+                                        <input
+                                            type="checkbox" // Tetap checkbox (bukan radio) agar bisa pilih multiple
+                                            name={field.name}
+                                            value={optVal}
+                                            checked={isChecked}
+                                            onChange={(e) => handleInputChange(field, e)}
+                                            className="checkbox checkbox-primary checkbox-sm"
+                                        />
+                                        <span className="label-text">{optVal}</span>
+                                    </label>
+                                );
+                            })}
                         </div>
                     );
                 }
+                
+                // Jika checkbox tidak memiliki opsi (Yes/No questions)
                 return (
                     <label className="label cursor-pointer justify-start gap-3">
                         <input
                             type="checkbox"
                             name={field.name}
                             checked={!!value}
-                            onChange={handleInputChange}
+                            onChange={(e) => handleInputChange(field, e)}
                             className="checkbox checkbox-primary"
+                            required={field.is_required}
                         />
                         <span className="label-text">{field.placeholder || field.label}</span>
                     </label>
@@ -151,7 +205,7 @@ function FormAditionalQuestion({ ticket, fields }) {
                         name={field.name}
                         placeholder={field.placeholder || ''}
                         value={value || ''}
-                        onChange={handleInputChange}
+                        onChange={(e) => handleInputChange(field, e)}
                         className={`input ${commonClass}`}
                         required={field.is_required}
                     />
