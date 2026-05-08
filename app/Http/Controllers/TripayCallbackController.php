@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Mail\PaymentSuccessfulMail;
 use App\Models\Transaction;
 use App\Services\TicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
 
 class TripayCallbackController extends Controller
 {
@@ -49,6 +49,12 @@ class TripayCallbackController extends Controller
             // Panggil service untuk membuat tiket
             $ticketService->issueTicket($transaction);
             DB::commit();
+
+            $emailData =  $transaction->load('user', 'event');
+
+            DB::afterCommit(function () use ($emailData) {
+                Mail::to($emailData->user->email)->send(new PaymentSuccessfulMail($emailData));
+            });
         }
 
         return response()->json(['success' => true]);

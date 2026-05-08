@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PaymentSuccessfulMail;
 use App\Models\DetailPendaftar;
 use App\Models\Event;
 use App\Models\EventField;
@@ -13,6 +14,7 @@ use App\Services\TicketService;
 use App\Services\TripayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -199,6 +201,11 @@ class TransactionController extends Controller
                     ]);
 
                     $ticketServices->issueTicket($transaction);
+
+
+                    $emailData =  $transaction->load('user', 'event');
+                    $email =  Mail::to($emailData->user->email)->send(new PaymentSuccessfulMail($emailData));
+                 
                 } else {
                     // TRANSAKSI BERBAYAR (Tripay)
                     $result = $tripay->createTransaction($ticketType, $user, $validated);
