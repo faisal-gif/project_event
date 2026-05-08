@@ -79,13 +79,47 @@ class EventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Event created successfully.');
     }
 
-    public function show(Event $event)
+    public function show(Event $event, Request $request)
     {
-        $event->load('transaction.user', 'tickets.user', 'tickets.ticket_type', 'tickets.detail_pendaftar', 'tickets.submission.submission_custom_fields', 'tickets.event_field_responses', 'category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+        // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
+        $event->load('category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
 
-        return Inertia::render('Admin/Events/Show', ['event' => $event]);
+        // 2. Query Transaksi (Search & Paginate)
+        $transactions = $event->transaction()
+            ->with('user')
+            ->when($request->search_transaction, function ($query, $search) {
+                $query->where('reference', 'like', "%{$search}%") // Sesuaikan dengan nama kolom nomor invoice/referensi Anda
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%"); // Cari berdasarkan nama user
+                    });
+            })
+            ->paginate(10, ['*'], 'transaction_page') // Gunakan nama page custom: ?transaction_page=2
+            ->withQueryString(); // Mempertahankan parameter pencarian saat ganti halaman
+
+        // 3. Query Tiket (Search & Paginate)
+        $tickets = $event->tickets()
+            ->with(['user', 'ticket_type', 'detail_pendaftar', 'submission.submission_custom_fields', 'event_field_responses'])
+            ->when($request->search_ticket, function ($query, $search) {
+                $query->where('ticket_code', 'like', "%{$search}%") // Sesuaikan dengan kolom kode tiket Anda
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%"); // Cari berdasarkan nama user
+                    });
+            })
+            ->paginate(10, ['*'], 'ticket_page') // Gunakan nama page custom: ?ticket_page=2
+            ->withQueryString();
+
+        // 4. Kirim ke Inertia
+        return Inertia::render('Admin/Events/Show', [
+            'event' => $event,
+            'transactions' => $transactions,
+            'tickets' => $tickets,
+            'filters' => [
+                'search_transaction' => $request->search_transaction ?? '',
+                'search_ticket' => $request->search_ticket ?? '',
+            ]
+        ]);
     }
-
+    
     public function edit(Event $event)
     {
         $category = CategoryEvents::all();
