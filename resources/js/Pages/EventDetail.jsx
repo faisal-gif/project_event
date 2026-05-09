@@ -237,7 +237,7 @@ function EventDetail({ event, seo }) {
                                                                     </span>
                                                                 </div>
                                                             )}
-                                                            <p className="text-xs text-gray-500 mt-1">Sisa kuota: {ticketType.remaining_quota}</p>
+                                                            {/* <p className="text-xs text-gray-500 mt-1">Sisa kuota: {ticketType.remaining_quota}</p> */}
 
                                                             {isSoldOut && <span className="badge badge-error badge-sm mt-2">Habis</span>}
                                                             {!isSoldOut && isBeforePurchase && <span className="badge badge-outline badge-warning badge-sm mt-2">Belum dibuka</span>}
@@ -284,7 +284,7 @@ function EventDetail({ event, seo }) {
                                                 <div className="join">
                                                     <button onClick={() => handleQuantityChange(-1)} className="btn join-item" disabled={quantity <= 1}>-</button>
                                                     <input type="text" readOnly value={quantity} className="input input-bordered join-item w-16 text-center" />
-                                                    {/* <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button> */}
+                                                    <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button>
                                                 </div>
                                             </div>
                                             <div className="divider"></div>
