@@ -284,7 +284,7 @@ function EventDetail({ event, seo }) {
                                                 <div className="join">
                                                     <button onClick={() => handleQuantityChange(-1)} className="btn join-item" disabled={quantity <= 1}>-</button>
                                                     <input type="text" readOnly value={quantity} className="input input-bordered join-item w-16 text-center" />
-                                                    <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button>
+                                                    {/* <button onClick={() => handleQuantityChange(1)} className="btn join-item" disabled={quantity >= selectedTicket.remaining_quota || quantity >= event.limit_ticket_user}>+</button> */}
                                                 </div>
                                             </div>
                                             <div className="divider"></div>

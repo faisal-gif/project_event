@@ -82,7 +82,7 @@ class EventController extends Controller
     public function show(Event $event, Request $request)
     {
         // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
-        $event->load('category', 'ticketTypes', 'eventFields', 'eventSubmissionFields');
+        $event->load('category', 'ticketTypes');
 
         // 2. Query Transaksi (Search & Paginate)
         $transactions = $event->transaction()
@@ -98,7 +98,7 @@ class EventController extends Controller
 
         // 3. Query Tiket (Search & Paginate)
         $tickets = $event->tickets()
-            ->with(['user', 'ticket_type', 'detail_pendaftar', 'submission.submission_custom_fields', 'event_field_responses'])
+            ->with(['user', 'ticket_type', 'detail_pendaftar'])
             ->when($request->search_ticket, function ($query, $search) {
                 $query->where('ticket_code', 'like', "%{$search}%") // Sesuaikan dengan kolom kode tiket Anda
                     ->orWhereHas('user', function ($q) use ($search) {

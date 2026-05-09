@@ -1,10 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
-import React, { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
 import Card from '@/Components/ui/Card';
-import Modal from '@/Components/Modal'; // Assuming you have a Modal component
+import Modal from '@/Components/Modal';
 import QrCode from '@/Components/QrCode';
-import { QrCodeIcon } from 'lucide-react';
+import { QrCodeIcon, Search } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
 
 // Helper functions
@@ -49,23 +49,58 @@ const getStatusTransactionBadge = (status) => {
     }
 };
 
-function Show({ event }) {
+// --- KOMPONEN PAGINATION SEDERHANA ---
+const Pagination = ({ links }) => {
+    if (!links || links.length <= 3) return null; // Jangan tampilkan jika hanya ada prev dan next tanpa halaman
 
-    const [activeTab, setActiveTab] = useState('Detail');
-    const [isDetailModalOpen, setDetailModalOpen] = useState(false);
-    const [isSubmissionModalOpen, setSubmissionModalOpen] = useState(false);
-    const [selectedTicket, setSelectedTicket] = useState(null);
-    console.log(selectedTicket);
+    return (
+        <div className="flex justify-center mt-6 gap-1 flex-wrap">
+            {links.map((link, index) => (
+                <Link
+                    key={index}
+                    href={link.url || '#'}
+                    preserveScroll
+                    preserveState
+                    className={`btn btn-sm ${link.active ? 'btn-primary' : 'btn-outline'} ${!link.url ? 'btn-disabled opacity-50' : ''}`}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                />
+            ))}
+        </div>
+    );
+};
 
+// --- UPDATE 1: Tambahkan props tickets, transactions, dan filters ---
+function Show({ event, tickets, transactions, filters }) {
 
-    // --- PERUBAHAN 1: Ganti nama state ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTab = urlParams.get('tab') || 'Detail';
+
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
-    const handleScanSuccess = (decodedText) => {
+    // --- UPDATE 2: State untuk Search berdasarkan Filter dari Controller ---
+    const [searchTicket, setSearchTicket] = useState(filters?.search_ticket || '');
+    const [searchTransaction, setSearchTransaction] = useState(filters?.search_transaction || '');
 
-        // --- PERUBAHAN 2: Tutup modal scanner ---
+    // --- UPDATE 3: Debounce Pencarian (Otomatis search setelah ngetik) ---
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            // Cek jika filter berubah dari nilai awal agar tidak me-render ulang terus saat pertama dimuat
+            if (searchTicket !== (filters?.search_ticket || '') || searchTransaction !== (filters?.search_transaction || '')) {
+                router.get(route('admin.events.show', event.id), {
+                    search_ticket: searchTicket,
+                    search_transaction: searchTransaction
+                }, { preserveState: true, preserveScroll: true, replace: true });
+            }
+        }, 500); // Tunggu 500ms setelah selesai mengetik
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTicket, searchTransaction]);
+
+
+    const handleScanSuccess = (decodedText) => {
         setScannerModalOpen(false);
-        router.get(route('ticket.validate'), { qr_data: decodedText }, {
+        router.post(route('ticket.validate'), { qr_data: decodedText }, { // Asumsi post jika update data, atau ganti get lagi jika perlu
             onSuccess: (params) => {
                 Swal.fire({
                     icon: 'success',
@@ -93,27 +128,7 @@ function Show({ event }) {
         );
     }
 
-    const openDetailModal = (ticket) => {
-        setSelectedTicket(ticket);
-        setDetailModalOpen(true);
-    };
-
-    const closeDetailModal = () => {
-        setDetailModalOpen(false);
-        setSelectedTicket(null);
-    };
-
-    const openSubmissionModal = (ticket) => {
-        setSelectedTicket(ticket);
-        setSubmissionModalOpen(true);
-    };
-
-    const closeSubmissionModal = () => {
-        setDetailModalOpen(false);
-        setSubmissionModalOpen(null);
-    };
-
-    // --- PERUBAHAN 3: Tambah fungsi untuk tutup modal scanner ---
+  
     const closeScannerModal = () => {
         setScannerModalOpen(false);
     };
@@ -125,7 +140,6 @@ function Show({ event }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
                     {/* ===== Manual Tab Navigation ===== */}
-
                     <div className="tabs tabs-border">
                         {['Detail', 'Participants', 'Transaction'].map((tab) => (
                             <button
@@ -156,7 +170,7 @@ function Show({ event }) {
                                 <Card className="bg-base-100 shadow-xl md:col-span-3">
                                     <div className="card-body">
                                         <h1 className="text-3xl font-bold my-4">{event.title}</h1>
-                                        <div className="badge badge-outline badge-lg">{event.category.name}</div>
+                                        <div className="badge badge-outline badge-lg">{event.category?.name}</div>
                                         <div className="divider"></div>
                                         <div className="space-y-4">
                                             <div className="space-y-3">
@@ -230,21 +244,33 @@ function Show({ event }) {
                                     </div>
                                 </div>
                             </Card>
-
-
-
                         </div>
-
                     )}
 
+                    {/* --- TAB PARTICIPANTS DENGAN PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Participants' && (
                         <div className='px-2 md:px-0'>
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
-                                    <div className='flex justify-between items-start'>
-                                        <h2 className="card-title mb-4">Participants</h2>
-                                        {/* --- PERUBAHAN 4: Update onClick button --- */}
-                                        <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary"><QrCodeIcon size={16} className="mr-1" /> Scan QR</button>
+                                    <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
+                                        <h2 className="card-title">Participants</h2>
+                                        <div className="flex gap-2 w-full sm:w-auto">
+                                            <div className="relative w-full sm:w-64">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <Search className="h-4 w-4 text-gray-400" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Cari Tiket / Nama..."
+                                                    className="input input-sm input-bordered w-full pl-10"
+                                                    value={searchTicket}
+                                                    onChange={(e) => setSearchTicket(e.target.value)}
+                                                />
+                                            </div>
+                                            <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary shrink-0">
+                                                <QrCodeIcon size={16} className="mr-1" /> Scan QR
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className="overflow-x-auto">
@@ -260,39 +286,56 @@ function Show({ event }) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {event.tickets && event.tickets.length > 0 ? (
-                                                    event.tickets.map((ticket) => (
+                                                {/* UPDATE: Gunakan tickets.data dari props, bukan event.tickets */}
+                                                {tickets?.data && tickets.data.length > 0 ? (
+                                                    tickets.data.map((ticket) => (
                                                         <tr key={ticket.id}>
                                                             <td>{ticket.ticket_code}</td>
-                                                            <td>{ticket.ticket_type.name}</td>
-                                                            <td>{ticket.user.name}</td>
-                                                            <td>{ticket.user.email}</td>
+                                                            <td>{ticket.ticket_type?.name}</td>
+                                                            <td>{ticket.user?.name}</td>
+                                                            <td>{ticket.user?.email}</td>
                                                             <td>{getStatusBadge(ticket.status)}</td>
                                                             <td className="space-x-2">
-                                                                <button onClick={() => openDetailModal(ticket)} className="btn btn-sm btn-info">Detail</button>
-
-                                                                {event.needs_submission === 1 && (
-                                                                    <button onClick={() => openSubmissionModal(ticket)} className="btn btn-sm btn-accent">Submission</button>
-                                                                )}
+                                                                <Link href={route('organizer.participant.show', ticket.id)} className="btn btn-sm btn-info text-white">
+                                                                    Detail Profil
+                                                                </Link>
                                                             </td>
                                                         </tr>
                                                     ))
                                                 ) : (
-                                                    <tr><td colSpan="5" className="text-center">No participants yet.</td></tr>
+                                                    <tr><td colSpan="6" className="text-center">No participants found.</td></tr>
                                                 )}
                                             </tbody>
                                         </table>
                                     </div>
+                                    {/* UPDATE: Komponen Pagination */}
+                                    <Pagination links={tickets?.links} />
                                 </div>
                             </Card>
                         </div>
                     )}
 
+                    {/* --- TAB TRANSACTION DENGAN PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Transaction' && (
                         <div className='px-2 md:px-0'>
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
-                                    <h2 className="card-title mb-4">Riwayat Transaksi</h2>
+                                    <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
+                                        <h2 className="card-title">Riwayat Transaksi</h2>
+                                        <div className="relative w-full sm:w-64">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <Search className="h-4 w-4 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Cari Invoice / Nama..."
+                                                className="input input-sm input-bordered w-full pl-10"
+                                                value={searchTransaction}
+                                                onChange={(e) => setSearchTransaction(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
                                     <div className="overflow-x-auto">
                                         <table className="table table-zebra">
                                             <thead>
@@ -305,12 +348,13 @@ function Show({ event }) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {event.transaction?.length ? (
-                                                    event.transaction.map((transaction) => (
+                                                {/* UPDATE: Gunakan transactions.data dari props */}
+                                                {transactions?.data && transactions.data.length > 0 ? (
+                                                    transactions.data.map((transaction) => (
                                                         <tr key={transaction.id}>
                                                             <td>{transaction.reference}</td>
-                                                            <td>{transaction.user.name}</td>
-                                                            <td>{transaction.user.email}</td>
+                                                            <td>{transaction.user?.name}</td>
+                                                            <td>{transaction.user?.email}</td>
                                                             <td>{getStatusTransactionBadge(transaction.status)}</td>
                                                             <td>{formatRupiah(transaction.amount)}</td>
                                                         </tr>
@@ -318,13 +362,15 @@ function Show({ event }) {
                                                 ) : (
                                                     <tr>
                                                         <td colSpan="5" className="text-center">
-                                                            No participants yet.
+                                                            No transactions found.
                                                         </td>
                                                     </tr>
                                                 )}
                                             </tbody>
                                         </table>
                                     </div>
+                                    {/* UPDATE: Komponen Pagination */}
+                                    <Pagination links={transactions?.links} />
                                 </div>
                             </Card>
                         </div>
@@ -332,170 +378,7 @@ function Show({ event }) {
                 </div>
             </div>
 
-            {/* Detail Modal */}
-            <Modal maxWidth='5xl' show={isDetailModalOpen} onClose={closeDetailModal}>
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
-                    {selectedTicket ? (
-                        <>
-                            {selectedTicket.detail_pendaftar && (
-                                <div className="space-y-3 pb-4 border-b mb-4">
-                                    <div className="flex">
-                                        <div className="font-semibold md:w-32">Name</div>
-                                        <div>: {selectedTicket.detail_pendaftar.nama}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold md:w-32">Email</div>
-                                        <div>: {selectedTicket.detail_pendaftar.email}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold md:w-32">Phone</div>
-                                        <div>: {selectedTicket.detail_pendaftar.no_hp}</div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <h3 className="text-xl font-bold mb-2">Additional Questions</h3>
-                            {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
-                                <div className="space-y-3">
-                                    {selectedTicket.event_field_responses.map(response => (
-                                        <div key={response.id} className="flex items-start">
-                                            {/* Kolom Label / Pertanyaan */}
-                                            <div className="font-semibold md:w-32 capitalize shrink-0">
-                                                {response.field_name.replace(/_/g, ' ')}
-                                            </div>
-
-                                            {/* Kolom Jawaban */}
-                                            <div className="flex-1 flex items-start">
-                                                <span className="mr-2">:</span>
-
-                                                {/* Logika Tampilan Berdasarkan Tipe Field */}
-                                                {response.field_type === 'image' ? (
-                                                    <div className="mt-1">
-                                                        <img
-                                                            src={'/storage/' + response.field_value}
-                                                            alt={response.field_name}
-                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
-                                                        />
-                                                    </div>
-                                                ) : response.field_type === 'file' ? (
-                                                    <div className="flex items-center gap-3">
-                                                        <a
-                                                            href={'/storage/' + response.field_value}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            download
-                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                            </svg>
-                                                            Download
-                                                        </a>
-                                                    </div>
-                                                ) : (
-                                                    <span>{response.field_value}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No additional questions answered.</p>
-                            )}
-                        </>
-                    ) : (
-                        <p>Details not available.</p>
-                    )}
-                    <div className="mt-6 flex justify-end">
-                        <button onClick={closeDetailModal} className="btn">Close</button>
-                    </div>
-                </div>
-            </Modal>
-
-            <Modal maxWidth='5xl' show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
-                    {selectedTicket ? (
-                        <>
-                            {selectedTicket.detail_pendaftar && (
-                                <div className="space-y-3 pb-4 border-b mb-4">
-                                    <div className="flex">
-                                        <div className="font-semibold">Name</div>
-                                        <div>: {selectedTicket.detail_pendaftar.nama}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold">Email</div>
-                                        <div>: {selectedTicket.detail_pendaftar.email}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold">Phone</div>
-                                        <div>: {selectedTicket.detail_pendaftar.no_hp}</div>
-                                    </div>
-                                </div>
-                            )}
-                            <h3 className="text-xl font-bold mb-2">Jawaban Pendaftar</h3>
-                            {selectedTicket.submission ? (
-                                <div className="space-y-3">
-                                    {selectedTicket.submission.submission_custom_fields.map(response => (
-                                        <div key={response.id} className="flex items-start">
-                                            {/* Kolom Label / Pertanyaan */}
-                                            <div className="font-semibold capitalize w-1/3">
-                                                {response.field_name.replace(/_/g, ' ')}
-                                            </div>
-
-                                            {/* Kolom Jawaban */}
-                                            <div className="flex-1 flex items-start">
-                                                <span className="mr-2">:</span>
-
-                                                {/* Logika Tampilan Berdasarkan Tipe Field */}
-                                                {response.field_type == 'image' ? (
-                                                    <div className="mt-2">
-                                                        <img
-                                                            src={'/storage/' + response.field_value}
-                                                            alt={response.field_name}
-                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
-                                                        />
-                                                    </div>
-                                                ) : response.field_type == 'file' ? (
-                                                    /* --- BAGIAN BARU UNTUK FILE --- */
-                                                    <div className="flex items-center gap-3">
-                                                        <a
-                                                            href={'/storage/' + response.field_value}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            download
-                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
-                                                        >
-                                                            {/* Ikon Download Opsional */}
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                            </svg>
-                                                            Download
-                                                        </a>
-                                                    </div>
-                                                ) : (
-                                                    /* --- BAGIAN TEXT BIASA --- */
-                                                    <span>{response.field_value}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No additional questions answered.</p>
-                            )}
-                        </>
-                    ) : (
-                        <p>Details not available.</p>
-                    )}
-                    <div className="mt-6 flex justify-end">
-                        <button onClick={closeSubmissionModal} className="btn">Close</button>
-                    </div>
-                </div>
-            </Modal>
-
-            {/* --- PERUBAHAN 5: Tambahkan Modal untuk QR Scanner --- */}
+            {/* Modal QR Scanner */}
             <Modal show={isScannerModalOpen} onClose={closeScannerModal} maxWidth="2xl">
                 <div className="p-6">
                     <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>

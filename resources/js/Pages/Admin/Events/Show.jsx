@@ -72,10 +72,10 @@ const Pagination = ({ links }) => {
 // --- UPDATE 1: Tambahkan props tickets, transactions, dan filters ---
 function Show({ event, tickets, transactions, filters }) {
 
-    const [activeTab, setActiveTab] = useState('Detail');
-    const [isDetailModalOpen, setDetailModalOpen] = useState(false);
-    const [isSubmissionModalOpen, setSubmissionModalOpen] = useState(false);
-    const [selectedTicket, setSelectedTicket] = useState(null);
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTab = urlParams.get('tab') || 'Detail';
+
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
     // --- UPDATE 2: State untuk Search berdasarkan Filter dari Controller ---
@@ -128,27 +128,7 @@ function Show({ event, tickets, transactions, filters }) {
         );
     }
 
-    const openDetailModal = (ticket) => {
-        setSelectedTicket(ticket);
-        setDetailModalOpen(true);
-    };
-
-    const closeDetailModal = () => {
-        setDetailModalOpen(false);
-        setSelectedTicket(null);
-    };
-
-    const openSubmissionModal = (ticket) => {
-        setSelectedTicket(ticket);
-        setSubmissionModalOpen(true);
-    };
-
-    const closeSubmissionModal = () => {
-        setDetailModalOpen(false);
-        setSubmissionModalOpen(null); // Wait, this should probably be false instead of null based on your state
-        setSelectedTicket(null);
-    };
-
+  
     const closeScannerModal = () => {
         setScannerModalOpen(false);
     };
@@ -316,11 +296,9 @@ function Show({ event, tickets, transactions, filters }) {
                                                             <td>{ticket.user?.email}</td>
                                                             <td>{getStatusBadge(ticket.status)}</td>
                                                             <td className="space-x-2">
-                                                                <button onClick={() => openDetailModal(ticket)} className="btn btn-sm btn-info">Detail</button>
-
-                                                                {event.needs_submission === 1 && (
-                                                                    <button onClick={() => openSubmissionModal(ticket)} className="btn btn-sm btn-accent">Submission</button>
-                                                                )}
+                                                                <Link href={route('admin.participant.show', ticket.id)} className="btn btn-sm btn-info text-white">
+                                                                    Detail Profil
+                                                                </Link>
                                                             </td>
                                                         </tr>
                                                     ))
@@ -357,7 +335,7 @@ function Show({ event, tickets, transactions, filters }) {
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     <div className="overflow-x-auto">
                                         <table className="table table-zebra">
                                             <thead>
@@ -399,147 +377,6 @@ function Show({ event, tickets, transactions, filters }) {
                     )}
                 </div>
             </div>
-
-            {/* Modal Detail Pendaftar (Sama seperti sebelumnya) */}
-            <Modal maxWidth='5xl' show={isDetailModalOpen} onClose={closeDetailModal}>
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold mb-4">Participant Details</h2>
-                    {selectedTicket ? (
-                        <>
-                            {selectedTicket.detail_pendaftar && (
-                                <div className="space-y-3 pb-4 border-b mb-4">
-                                    <div className="flex">
-                                        <div className="font-semibold md:w-32">Name</div>
-                                        <div>: {selectedTicket.detail_pendaftar.nama}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold md:w-32">Email</div>
-                                        <div>: {selectedTicket.detail_pendaftar.email}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold md:w-32">Phone</div>
-                                        <div>: {selectedTicket.detail_pendaftar.no_hp}</div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <h3 className="text-xl font-bold mb-2">Additional Questions</h3>
-                            {selectedTicket.event_field_responses && selectedTicket.event_field_responses.length > 0 ? (
-                                <div className="space-y-3">
-                                    {selectedTicket.event_field_responses.map(response => (
-                                        <div key={response.id} className="flex items-start">
-                                            <div className="font-semibold md:w-32 capitalize shrink-0">
-                                                {response.field_name.replace(/_/g, ' ')}
-                                            </div>
-                                            <div className="flex-1 flex items-start">
-                                                <span className="mr-2">:</span>
-                                                {response.field_type === 'image' ? (
-                                                    <div className="mt-1">
-                                                        <img
-                                                            src={'/storage/' + response.field_value}
-                                                            alt={response.field_name}
-                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
-                                                        />
-                                                    </div>
-                                                ) : response.field_type === 'file' ? (
-                                                    <div className="flex items-center gap-3">
-                                                        <a
-                                                            href={'/storage/' + response.field_value}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            download
-                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
-                                                        >
-                                                            Download
-                                                        </a>
-                                                    </div>
-                                                ) : (
-                                                    <span>{response.field_value}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No additional questions answered.</p>
-                            )}
-                        </>
-                    ) : (
-                        <p>Details not available.</p>
-                    )}
-                    <div className="mt-6 flex justify-end">
-                        <button onClick={closeDetailModal} className="btn">Close</button>
-                    </div>
-                </div>
-            </Modal>
-
-            {/* Modal Submission (Sama seperti sebelumnya) */}
-            <Modal maxWidth='5xl' show={isSubmissionModalOpen} onClose={closeSubmissionModal}>
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold mb-4">Submission Details</h2>
-                    {selectedTicket ? (
-                        <>
-                            {selectedTicket.detail_pendaftar && (
-                                <div className="space-y-3 pb-4 border-b mb-4">
-                                    <div className="flex">
-                                        <div className="font-semibold w-32">Name</div>
-                                        <div>: {selectedTicket.detail_pendaftar.nama}</div>
-                                    </div>
-                                    <div className="flex">
-                                        <div className="font-semibold w-32">Email</div>
-                                        <div>: {selectedTicket.detail_pendaftar.email}</div>
-                                    </div>
-                                </div>
-                            )}
-                            <h3 className="text-xl font-bold mb-2">Jawaban Pendaftar</h3>
-                            {selectedTicket.submission ? (
-                                <div className="space-y-3">
-                                    {selectedTicket.submission.submission_custom_fields.map(response => (
-                                        <div key={response.id} className="flex items-start">
-                                            <div className="font-semibold capitalize w-1/3">
-                                                {response.field_name.replace(/_/g, ' ')}
-                                            </div>
-                                            <div className="flex-1 flex items-start">
-                                                <span className="mr-2">:</span>
-                                                {response.field_type == 'image' ? (
-                                                    <div className="mt-2">
-                                                        <img
-                                                            src={'/storage/' + response.field_value}
-                                                            alt={response.field_name}
-                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
-                                                        />
-                                                    </div>
-                                                ) : response.field_type == 'file' ? (
-                                                    <div className="flex items-center gap-3">
-                                                        <a
-                                                            href={'/storage/' + response.field_value}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            download
-                                                            className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
-                                                        >
-                                                            Download
-                                                        </a>
-                                                    </div>
-                                                ) : (
-                                                    <span>{response.field_value}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>No submission answered.</p>
-                            )}
-                        </>
-                    ) : (
-                        <p>Details not available.</p>
-                    )}
-                    <div className="mt-6 flex justify-end">
-                        <button onClick={closeSubmissionModal} className="btn">Close</button>
-                    </div>
-                </div>
-            </Modal>
 
             {/* Modal QR Scanner */}
             <Modal show={isScannerModalOpen} onClose={closeScannerModal} maxWidth="2xl">

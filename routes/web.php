@@ -8,6 +8,8 @@ use App\Http\Controllers\Judge\JudgeDashboardController;
 use App\Http\Controllers\Judge\JudgeEventController;
 use App\Http\Controllers\Organizer\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\OrganizerEventController;
+use App\Http\Controllers\Organizer\OrganizerParticipantController;
+use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketController;
@@ -51,6 +53,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
     Route::resource('events', EventController::class);
+    Route::get('events/participant/{id}', [ParticipantController::class, 'show'])->name('participant.show');
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::resource('category', CategoryEventsController::class);
@@ -96,6 +99,7 @@ Route::post('/users/tripay/callback', [TripayCallbackController::class, 'handle'
 Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.')->group(function () {
     Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('dashboard');
     Route::resource('events', OrganizerEventController::class);
+    Route::get('events/participant/{id}', [OrganizerParticipantController::class, 'show'])->name('participant.show');
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
@@ -105,7 +109,7 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
 Route::middleware(['auth', 'judge'])->prefix('judge')->name('judge.')->group(function () {
     Route::get('/', [JudgeDashboardController::class, 'index'])->name('dashboard');
     Route::get('/events', [JudgeEventController::class, 'index'])->name('events.index');
-    Route::get('/events/penjurian/{id}',[JudgeEventController::class,'penjurian'])->name('event.penjurian');
+    Route::get('/events/penjurian/{id}', [JudgeEventController::class, 'penjurian'])->name('event.penjurian');
 });
 
 require __DIR__ . '/auth.php';
