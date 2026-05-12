@@ -24,7 +24,7 @@ class OrganizerDashboardController extends Controller
         // Total revenue from successful transactions for the organizer's events
         $totalRevenue = Transaction::whereIn('event_id', $eventIds)
             ->where('status', 'paid')
-            ->sum('subtotal');
+            ->sum('amount');
 
         // Total tickets sold for the organizer's events
         $ticketsSold = Transaction::whereIn('event_id', $eventIds)
