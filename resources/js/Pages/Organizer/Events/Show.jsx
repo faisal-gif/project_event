@@ -87,7 +87,7 @@ function Show({ event, tickets, transactions, filters }) {
         const delayDebounceFn = setTimeout(() => {
             // Cek jika filter berubah dari nilai awal agar tidak me-render ulang terus saat pertama dimuat
             if (searchTicket !== (filters?.search_ticket || '') || searchTransaction !== (filters?.search_transaction || '')) {
-                router.get(route('admin.events.show', event.id), {
+                router.get(route('organizer.events.show', event.id), {
                     search_ticket: searchTicket,
                     search_transaction: searchTransaction
                 }, { preserveState: true, preserveScroll: true, replace: true });
