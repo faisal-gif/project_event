@@ -8,7 +8,7 @@ use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel; 
 
 class OrganizerParticipantController extends Controller
 {
