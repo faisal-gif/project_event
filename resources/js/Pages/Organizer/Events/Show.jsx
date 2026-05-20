@@ -276,9 +276,7 @@ function Show({ event, tickets, transactions, filters }) {
                                             <a
                                                 href={route('organizer.events.export', event.id)}
                                                 className="btn btn-success text-white"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
+                                                >
                                                 <Download className="w-4 h-4 mr-2" />
                                                 Export Excel
                                             </a>
