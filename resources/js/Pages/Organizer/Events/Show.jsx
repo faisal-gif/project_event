@@ -292,7 +292,7 @@ function Show({ event, tickets, transactions, filters }) {
                                                         <tr key={ticket.id}>
                                                             <td>{ticket.ticket_code}</td>
                                                             <td>{ticket.ticket_type?.name}</td>
-                                                            <td>{ticket.detail_pendaftar?.name}</td>
+                                                            <td>{ticket.detail_pendaftar?.nama}</td>
                                                             <td>{ticket.user?.email}</td>
                                                             <td>{getStatusBadge(ticket.status)}</td>
                                                             <td className="space-x-2">
