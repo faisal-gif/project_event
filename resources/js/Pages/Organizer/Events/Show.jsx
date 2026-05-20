@@ -254,32 +254,37 @@ function Show({ event, tickets, transactions, filters }) {
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
                                         <h2 className="card-title">Participants</h2>
-                                        <div className="flex gap-2 w-full sm:w-auto">
-                                            <div className="relative w-full sm:w-64">
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <Search className="h-4 w-4 text-gray-400" />
+                                        <div className='flex flex-col sm:flex-row gap-2'>
+                                            <div className="flex gap-2 w-full sm:w-auto">
+                                                <div className="relative w-full sm:w-64">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <Search className="h-4 w-4 text-black" />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Cari Tiket / Nama..."
+                                                        className="input input-sm input-bordered w-full pl-10"
+                                                        value={searchTicket}
+                                                        onChange={(e) => setSearchTicket(e.target.value)}
+                                                    />
                                                 </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Cari Tiket / Nama..."
-                                                    className="input input-sm input-bordered w-full pl-10"
-                                                    value={searchTicket}
-                                                    onChange={(e) => setSearchTicket(e.target.value)}
-                                                />
+                                                <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary shrink-0">
+                                                    <QrCodeIcon size={16} className="mr-1" /> Scan QR
+                                                </button>
                                             </div>
-                                            <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary shrink-0">
-                                                <QrCodeIcon size={16} className="mr-1" /> Scan QR
-                                            </button>
+
+                                            <a
+                                                href={route('organizer.events.export', event.id)}
+                                                className="btn btn-success text-white"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <Download className="w-4 h-4 mr-2" />
+                                                Export Excel
+                                            </a>
+
                                         </div>
-                                        <a
-                                            href={route('organizer.events.export', event.id)}
-                                            className="btn btn-success text-white"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Download className="w-4 h-4 mr-2" />
-                                            Export Excel
-                                        </a>
+
                                     </div>
 
                                     <div className="overflow-x-auto">
