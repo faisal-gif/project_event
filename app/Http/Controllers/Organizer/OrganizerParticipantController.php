@@ -32,8 +32,17 @@ class OrganizerParticipantController extends Controller
 
     public function exportExcel(Event $event)
     {
-        $fileName = 'Peserta_' . $event->slug . '_' . date('Y-md') . '.xlsx';
+      $fileName = 'Peserta_' . $event->slug . '_' . date('Y-md') . '.xlsx';
+        $path = 'exports/' . $fileName;
         
-        return Excel::download(new ParticipantsExport($event->id), $fileName);
+        // 1. Simpan file secara fisik ke storage/app/public/exports/
+        Excel::store(new ParticipantsExport($event->id), $path, 'public');
+
+        // 2. Dapatkan URL lengkap dari file tersebut
+        $downloadUrl = asset('storage/' . $path);
+
+        // 3. Alihkan (redirect) user langsung ke link file tersebut
+        // Browser akan otomatis men-downloadnya!
+        return redirect($downloadUrl);
     }
 }
