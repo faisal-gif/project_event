@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Organizer;
 
+use App\Exports\ParticipantsExport;
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Excel;
 
 class OrganizerParticipantController extends Controller
 {
@@ -25,5 +28,12 @@ class OrganizerParticipantController extends Controller
         return Inertia::render('Organizer/Participants/Show', [
             'ticket' => $ticket
         ]);
+    }
+
+    public function exportExcel(Event $event)
+    {
+        $fileName = 'Peserta_' . $event->slug . '_' . date('Y-md') . '.xlsx';
+        
+        return Excel::download(new ParticipantsExport($event->id), $fileName);
     }
 }

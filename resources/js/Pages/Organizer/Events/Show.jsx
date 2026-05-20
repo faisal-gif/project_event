@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '@/Components/ui/Card';
 import Modal from '@/Components/Modal';
 import QrCode from '@/Components/QrCode';
-import { QrCodeIcon, Search } from 'lucide-react';
+import { Download, QrCodeIcon, Search } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
 
 // Helper functions
@@ -128,7 +128,7 @@ function Show({ event, tickets, transactions, filters }) {
         );
     }
 
-  
+
     const closeScannerModal = () => {
         setScannerModalOpen(false);
     };
@@ -271,6 +271,15 @@ function Show({ event, tickets, transactions, filters }) {
                                                 <QrCodeIcon size={16} className="mr-1" /> Scan QR
                                             </button>
                                         </div>
+                                        <a
+                                            href={route('organizer.events.export', event.id)}
+                                            className="btn btn-success text-white"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <Download className="w-4 h-4 mr-2" />
+                                            Export Excel
+                                        </a>
                                     </div>
 
                                     <div className="overflow-x-auto">

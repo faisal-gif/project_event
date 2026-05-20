@@ -104,6 +104,7 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
+    Route::get('/events/{event}/export-participants', [OrganizerEventController::class, 'exportExcel'])->name('events.export');
 });
 
 Route::middleware(['auth', 'judge'])->prefix('judge')->name('judge.')->group(function () {
