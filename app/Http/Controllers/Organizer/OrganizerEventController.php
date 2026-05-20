@@ -108,8 +108,8 @@ class OrganizerEventController extends Controller
                 // BUNGKUS DENGAN WHERE CLOSURE
                 $query->where(function ($q) use ($search) {
                     $q->where('ticket_code', 'like', "%{$search}%")
-                        ->orWhereHas('user', function ($uq) use ($search) {
-                            $uq->where('name', 'like', "%{$search}%");
+                        ->orWhereHas('detail_pendaftar', function ($dp) use ($search) {
+                            $dp->where('nama', 'like', "%{$search}%");
                         });
                 });
             })
