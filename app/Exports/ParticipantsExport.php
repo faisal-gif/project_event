@@ -25,7 +25,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, WithMapping, S
     public function collection()
     {
         // Ambil data Tiket beserta relasinya (Hanya yang lunas/PAID)
-        return Ticket::with(['detail_pendaftar', 'ticketType', 'eventFieldResponses'])
+        return Ticket::with(['detail_pendaftar', 'ticket_type', 'event_field_responses'])
             ->where('event_id', $this->eventId)
             ->whereHas('transaction', function($q) {
                 $q->where('status', 'PAID');
@@ -61,7 +61,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, WithMapping, S
         // Data Statis
         $baseData = [
             $ticket->ticket_code,
-            $ticket->ticketType->name ?? '-',
+            $ticket->ticket_type->name ?? '-',
             $ticket->detail_pendaftar->nama ?? '-',
             $ticket->detail_pendaftar->email ?? '-',
             $ticket->detail_pendaftar->no_hp ?? '-',
@@ -73,7 +73,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, WithMapping, S
         // Data Dinamis (Jawaban Peserta)
         $dynamicData = [];
         // Jadikan responses ke format Key-Value agar mudah dicari berdasarkan nama field
-        $responses = $ticket->eventFieldResponses->keyBy('field_name');
+        $responses = $ticket->event_field_responses->keyBy('field_name');
 
         foreach ($this->dynamicFields as $field) {
             $value = '-';
