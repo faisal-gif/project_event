@@ -25,7 +25,7 @@ class ParticipantsExport implements FromCollection, WithHeadings, WithMapping, S
     public function collection()
     {
         // Ambil data Tiket beserta relasinya (Hanya yang lunas/PAID)
-        return Ticket::with(['detailPendaftar', 'ticketType', 'eventFieldResponses'])
+        return Ticket::with(['detail_pendaftar', 'ticketType', 'eventFieldResponses'])
             ->where('event_id', $this->eventId)
             ->whereHas('transaction', function($q) {
                 $q->where('status', 'PAID');
@@ -62,11 +62,11 @@ class ParticipantsExport implements FromCollection, WithHeadings, WithMapping, S
         $baseData = [
             $ticket->ticket_code,
             $ticket->ticketType->name ?? '-',
-            $ticket->detailPendaftar->nama ?? '-',
-            $ticket->detailPendaftar->email ?? '-',
-            $ticket->detailPendaftar->no_hp ?? '-',
-            $ticket->detailPendaftar->usia ?? '-',
-            $ticket->detailPendaftar->pekerjaan ?? '-',
+            $ticket->detail_pendaftar->nama ?? '-',
+            $ticket->detail_pendaftar->email ?? '-',
+            $ticket->detail_pendaftar->no_hp ?? '-',
+            $ticket->detail_pendaftar->usia ?? '-',
+            $ticket->detail_pendaftar->pekerjaan ?? '-',
             strtoupper($ticket->status), // unused / used
         ];
 
