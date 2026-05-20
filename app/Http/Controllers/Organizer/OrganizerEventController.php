@@ -90,24 +90,30 @@ class OrganizerEventController extends Controller
         $transactions = $event->transaction()
             ->with('user')
             ->when($request->search_transaction, function ($query, $search) {
-                $query->where('reference', 'like', "%{$search}%") // Sesuaikan dengan nama kolom nomor invoice/referensi Anda
-                    ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%"); // Cari berdasarkan nama user
-                    });
+                // BUNGKUS DENGAN WHERE CLOSURE
+                $query->where(function ($q) use ($search) {
+                    $q->where('reference', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', "%{$search}%");
+                        });
+                });
             })
-            ->paginate(10, ['*'], 'transaction_page') // Gunakan nama page custom: ?transaction_page=2
-            ->withQueryString(); // Mempertahankan parameter pencarian saat ganti halaman
+            ->paginate(10, ['*'], 'transaction_page')
+            ->withQueryString();
 
         // 3. Query Tiket (Search & Paginate)
         $tickets = $event->tickets()
             ->with(['user', 'ticket_type', 'detail_pendaftar'])
             ->when($request->search_ticket, function ($query, $search) {
-                $query->where('ticket_code', 'like', "%{$search}%") // Sesuaikan dengan kolom kode tiket Anda
-                    ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%"); // Cari berdasarkan nama user
-                    });
+                // BUNGKUS DENGAN WHERE CLOSURE
+                $query->where(function ($q) use ($search) {
+                    $q->where('ticket_code', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', "%{$search}%");
+                        });
+                });
             })
-            ->paginate(10, ['*'], 'ticket_page') // Gunakan nama page custom: ?ticket_page=2
+            ->paginate(10, ['*'], 'ticket_page')
             ->withQueryString();
 
         // 4. Kirim ke Inertia
