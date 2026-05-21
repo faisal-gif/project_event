@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import React from 'react';
 import Card from '@/Components/ui/Card';
 import { ArrowLeft, Download, Image as ImageIcon } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 // Helper function untuk status
 const getStatusBadge = (status) => {
