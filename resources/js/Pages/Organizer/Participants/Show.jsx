@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import React from 'react';
 import Card from '@/Components/ui/Card';
 import { ArrowLeft, Download, Image as ImageIcon } from 'lucide-react';
@@ -16,6 +16,31 @@ const getStatusBadge = (status) => {
 
 function ShowParticipant({ ticket }) {
     if (!ticket) return <div className="text-center p-16">Data tiket tidak ditemukan.</div>;
+
+    const handleStatusChange = (ticketId, newStatus) => {
+        router.patch(route('organizer.events.participants.update-status', { event: ticket.event_id, ticket: ticketId }), {
+            status: newStatus
+        }, {
+            preserveScroll: true, // Agar halaman tidak scroll ke atas setelah loading
+            onSuccess: () => {
+                // Opsional: Tampilkan notifikasi sukses
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Status berhasil diperbarui'
+                });
+            },
+            onError: () => {
+                Swal.fire('Error', 'Gagal memperbarui status', 'error');
+            }
+        });
+    };
 
     return (
         <AuthenticatedLayout>
@@ -59,7 +84,17 @@ function ShowParticipant({ ticket }) {
                                         </div>
                                         <div>
                                             <p className="text-gray-500 font-semibold text-xs">STATUS</p>
-                                            <div className="mt-1">{getStatusBadge(ticket.status)}</div>
+                                            <div className="mt-1">
+                                                <select
+                                                    className={`select select-bordered select-sm w-full max-w-xs ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
+                                                        }`}
+                                                    value={ticket.status}
+                                                    onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                                                >
+                                                    <option value="unused">Belum Hadir (Unused)</option>
+                                                    <option value="used">Sudah Hadir (Used)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
