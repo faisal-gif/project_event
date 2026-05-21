@@ -45,4 +45,24 @@ class OrganizerParticipantController extends Controller
         // Browser akan otomatis men-downloadnya!
         return redirect($downloadUrl);
     }
+
+   public function updateStatus(Request $request, Event $event, Ticket $ticket)
+    {
+        // Validasi input status yang diizinkan
+        $request->validate([
+            'status' => 'required|in:unused,used' // Sesuaikan jika ada status lain
+        ]);
+
+        // Pastikan tiket ini benar-benar milik event yang sedang dibuka
+        if ($ticket->event_id !== $event->id) {
+            return back()->with('error', 'Tiket tidak valid untuk event ini.');
+        }
+
+        // Update status tiket
+        $ticket->update([
+            'status' => $request->status
+        ]);
+
+        return back()->with('success', 'Status kehadiran berhasil diperbarui!');
+    }
 }
