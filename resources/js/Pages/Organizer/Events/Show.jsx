@@ -335,7 +335,7 @@ function Show({ event, tickets, transactions, filters }) {
                                                             <td>{ticket.detail_pendaftar?.nama}</td>
                                                             <td>{ticket.user?.email}</td>
                                                             <td><select
-                                                                className={`select select-bordered select-sm w-32 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
+                                                                className={`select select-bordered select-sm w-48 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
                                                                     }`}
                                                                 value={ticket.status}
                                                                 onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
