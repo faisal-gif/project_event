@@ -101,21 +101,13 @@ function Show({ event, tickets, transactions, filters }) {
 
     const handleScanSuccess = (decodedText) => {
         setScannerModalOpen(false);
-        router.post(route('ticket.validate'), { qr_data: decodedText }, { // Asumsi post jika update data, atau ganti get lagi jika perlu
-            onSuccess: (params) => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'QR berhasil divalidasi.',
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
-            },
+        router.get(route('organizer.participant.show', decodedText), {}, {
             onError: (errors) => {
+                // Error ini akan muncul jika backend mengembalikan error (misal 404 Not Found)
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal',
-                    text: errors.message || 'QR tidak valid atau sudah digunakan.',
+                    text: errors.message || 'QR tidak valid atau tiket tidak ditemukan.',
                 });
             }
         });
