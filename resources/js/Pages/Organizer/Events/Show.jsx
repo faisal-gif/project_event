@@ -6,6 +6,7 @@ import Modal from '@/Components/Modal';
 import QrCode from '@/Components/QrCode';
 import { Download, QrCodeIcon, Search } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
+import Swal from 'sweetalert2';
 
 // Helper functions
 const formatPrice = (price) => {
