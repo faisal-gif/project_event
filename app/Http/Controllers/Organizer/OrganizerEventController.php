@@ -92,7 +92,7 @@ class OrganizerEventController extends Controller
       
 
         if ($event->created_by !== $user) {
-
+            dd($user);
             redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
         }
 
