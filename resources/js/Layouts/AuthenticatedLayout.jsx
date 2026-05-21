@@ -40,14 +40,14 @@ export default function AuthenticatedLayout({ children }) {
                             <Dropdown.Trigger>
                                 <button className="btn btn-ghost flex items-center gap-2">
                                     <User size={20} />
-                                    <span>{user.name}</span>
+                                    <span className='hidden lg:block'>{user.name}</span>
                                     <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                         <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
                                     </svg>
                                 </button>
                             </Dropdown.Trigger>
                             <Dropdown.Content>
-                                 {user.role === 'admin' && (
+                                {user.role === 'admin' && (
                                     <Dropdown.Link href={route('admin.dashboard')}>
                                         Admin Dashboard
                                     </Dropdown.Link>
@@ -114,7 +114,7 @@ export default function AuthenticatedLayout({ children }) {
                                 </>
                             )}
 
-                             {user.role === 'user' && (
+                            {user.role === 'user' && (
                                 <>
                                     <li>
                                         <Link href={route('user.dashboard')}>
