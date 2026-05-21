@@ -89,7 +89,7 @@ class OrganizerEventController extends Controller
         // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
         $event->load('category', 'ticketTypes');
         $user = Auth::id();
-        dd($user);
+        dd($event->created_by);
 
         if ($event->created_by != $user) {
 
