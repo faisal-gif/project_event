@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CategoryEvents;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
@@ -83,8 +84,16 @@ class OrganizerEventController extends Controller
 
     public function show(Event $event, Request $request)
     {
+
+
         // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
         $event->load('category', 'ticketTypes');
+        $user = Auth::id();
+
+        if ($event->created_by != $user) {
+
+            redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
+        }
 
         // 2. Query Transaksi (Search & Paginate)
         $transactions = $event->transaction()
