@@ -8,7 +8,7 @@ use App\Models\Event;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Maatwebsite\Excel\Facades\Excel; 
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrganizerParticipantController extends Controller
 {
@@ -32,9 +32,9 @@ class OrganizerParticipantController extends Controller
 
     public function exportExcel(Event $event)
     {
-      $fileName = 'Peserta_' . $event->slug . '_' . date('Y-md') . '.xlsx';
+        $fileName = 'Peserta_' . $event->slug . '_' . date('Y-md') . '.xlsx';
         $path = 'exports/' . $fileName;
-        
+
         // 1. Simpan file secara fisik ke storage/app/public/exports/
         Excel::store(new ParticipantsExport($event->id), $path, 'public');
 
@@ -46,7 +46,7 @@ class OrganizerParticipantController extends Controller
         return redirect($downloadUrl);
     }
 
-   public function updateStatus(Request $request, Event $event, Ticket $ticket)
+    public function updateStatus(Request $request, Event $event, Ticket $ticket)
     {
         // Validasi input status yang diizinkan
         $request->validate([
