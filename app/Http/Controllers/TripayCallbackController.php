@@ -52,9 +52,9 @@ class TripayCallbackController extends Controller
 
             $emailData =  $transaction->load('user', 'event');
 
-            DB::afterCommit(function () use ($emailData) {
-                Mail::to($emailData->user->email)->send(new PaymentSuccessfulMail($emailData));
-            });
+            // DB::afterCommit(function () use ($emailData) {
+            //     Mail::to($emailData->user->email)->send(new PaymentSuccessfulMail($emailData));
+            // });
         }
 
         return response()->json(['success' => true]);
