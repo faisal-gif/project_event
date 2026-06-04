@@ -75,8 +75,8 @@ class TripayCallbackController extends Controller
         // 6. Kirim email di luar DB Transaction agar aman
         if ($status === 'PAID') {
             $emailData = $transaction->load('user', 'event');
-            // Sangat disarankan menggunakan Job/Queue agar response ke Tripay tidak timeout
-            Mail::to($emailData->user->email)->send(new PaymentSuccessfulMail($emailData));
+            // Ubah send() menjadi queue()
+            Mail::to($emailData->user->email)->queue(new PaymentSuccessfulMail($emailData));
         }
 
         return response()->json(['success' => true]);
