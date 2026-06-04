@@ -6,7 +6,7 @@ module.exports = {
             script: "artisan",
             args: "queue:work --sleep=3 --tries=3 --max-time=3600",
             interpreter: "php", // Menggunakan PHP untuk menjalankan artisan
-            cwd: "/path/to/your/laravel-project", // Ganti dengan path absolut project Laravel kamu
+            cwd: "/home/runcloud/webapps/event/project_event",// Ganti dengan path absolut project Laravel kamu
             instances: 1, // Biasanya 1 sudah cukup, tambah jika antrean sangat padat
             autorestart: true,
             watch: false,
