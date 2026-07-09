@@ -49,9 +49,8 @@ const getStatusTransactionBadge = (status) => {
     }
 };
 
-// --- KOMPONEN PAGINATION SEDERHANA ---
 const Pagination = ({ links }) => {
-    if (!links || links.length <= 3) return null; // Jangan tampilkan jika hanya ada prev dan next tanpa halaman
+    if (!links || links.length <= 3) return null;
 
     return (
         <div className="flex justify-center mt-6 gap-1 flex-wrap">
@@ -69,8 +68,8 @@ const Pagination = ({ links }) => {
     );
 };
 
-// --- UPDATE 1: Tambahkan props tickets, transactions, dan filters ---
-function Show({ event, tickets, transactions, filters }) {
+// --- TAMBAHKAN PROPS "summary" ---
+function Show({ event, tickets, transactions, filters, summary }) {
 
     const urlParams = new URLSearchParams(window.location.search);
     const initialTab = urlParams.get('tab') || 'Detail';
@@ -78,21 +77,18 @@ function Show({ event, tickets, transactions, filters }) {
     const [activeTab, setActiveTab] = useState(initialTab);
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
-    // --- UPDATE 2: State untuk Search berdasarkan Filter dari Controller ---
     const [searchTicket, setSearchTicket] = useState(filters?.search_ticket || '');
     const [searchTransaction, setSearchTransaction] = useState(filters?.search_transaction || '');
 
-    // --- UPDATE 3: Debounce Pencarian (Otomatis search setelah ngetik) ---
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            // Cek jika filter berubah dari nilai awal agar tidak me-render ulang terus saat pertama dimuat
             if (searchTicket !== (filters?.search_ticket || '') || searchTransaction !== (filters?.search_transaction || '')) {
                 router.get(route('admin.events.show', event.id), {
                     search_ticket: searchTicket,
                     search_transaction: searchTransaction
                 }, { preserveState: true, preserveScroll: true, replace: true });
             }
-        }, 500); // Tunggu 500ms setelah selesai mengetik
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTicket, searchTransaction]);
@@ -100,7 +96,7 @@ function Show({ event, tickets, transactions, filters }) {
 
     const handleScanSuccess = (decodedText) => {
         setScannerModalOpen(false);
-        router.post(route('ticket.validate'), { qr_data: decodedText }, { // Asumsi post jika update data, atau ganti get lagi jika perlu
+        router.post(route('ticket.validate'), { qr_data: decodedText }, {
             onSuccess: (params) => {
                 Swal.fire({
                     icon: 'success',
@@ -128,7 +124,6 @@ function Show({ event, tickets, transactions, filters }) {
         );
     }
 
-  
     const closeScannerModal = () => {
         setScannerModalOpen(false);
     };
@@ -157,47 +152,31 @@ function Show({ event, tickets, transactions, filters }) {
 
                     {/* ===== Tab Content ===== */}
                     {activeTab === 'Detail' && (
+                        // ... Bagian Tampilan Detail Event tetap sama ...
                         <div className='space-y-6'>
-                            {/* Detail Event */}
                             <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 items-start">
                                 <Card className="md:col-span-2">
-                                    <img
-                                        src={`/storage/${event.image}`}
-                                        alt={event.title}
-                                        className="w-full h-full object-contain rounded"
-                                    />
+                                    <img src={`/storage/${event.image}`} alt={event.title} className="w-full h-full object-contain rounded" />
                                 </Card>
                                 <Card className="bg-base-100 shadow-xl md:col-span-3">
+                                    {/* ... isi card ... */}
                                     <div className="card-body">
                                         <h1 className="text-3xl font-bold my-4">{event.title}</h1>
                                         <div className="badge badge-outline badge-lg">{event.category?.name}</div>
                                         <div className="divider"></div>
                                         <div className="space-y-4">
                                             <div className="space-y-3">
-                                                <div className="flex">
-                                                    <div className="font-semibold w-32">Start Date</div>
-                                                    <div>: {formatDate(event.start_date)}</div>
-                                                </div>
-                                                <div className="flex">
-                                                    <div className="font-semibold w-32">End Date</div>
-                                                    <div>: {formatDate(event.end_date)}</div>
-                                                </div>
-                                                <div className="flex">
-                                                    <div className="font-semibold w-32">Location Type</div>
-                                                    <div className="capitalize">: {event.location_type}</div>
-                                                </div>
+                                                <div className="flex"><div className="font-semibold w-32">Start Date</div><div>: {formatDate(event.start_date)}</div></div>
+                                                <div className="flex"><div className="font-semibold w-32">End Date</div><div>: {formatDate(event.end_date)}</div></div>
+                                                <div className="flex"><div className="font-semibold w-32">Location Type</div><div className="capitalize">: {event.location_type}</div></div>
                                                 {event.location_details && (
-                                                    <div className="flex">
-                                                        <div className="font-semibold w-32">Details</div>
-                                                        <div>: {event.location_details}</div>
-                                                    </div>
+                                                    <div className="flex"><div className="font-semibold w-32">Details</div><div>: {event.location_details}</div></div>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
                                 </Card>
                             </div>
-                            {/* Deskripsi Event */}
                             <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
                                 <input type="checkbox" />
                                 <div className="collapse-title font-semibold">Deskripsi</div>
@@ -205,38 +184,24 @@ function Show({ event, tickets, transactions, filters }) {
                                     <div className="prose prose-sm prose-p:my-2 prose-h2:mb-1 prose-li:my-0 m-4 max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
                                 </div>
                             </div>
-
-                            {/* Ticket Event */}
                             <Card className="bg-base-100 shadow-xl p-6">
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-semibold">Ticket Information</h3>
                                     {event.ticket_types?.length ? (
                                         <ul className="space-y-3">
                                             {event.ticket_types.map((ticketType) => (
-                                                <li
-                                                    key={ticketType.id}
-                                                    className="p-3 bg-base-200 rounded-lg flex justify-between items-center"
-                                                >
+                                                <li key={ticketType.id} className="p-3 bg-base-200 rounded-lg flex justify-between items-center">
                                                     <div>
                                                         <span className="font-semibold">{ticketType.name}</span>
                                                         <p className="text-xs">{ticketType.description}</p>
-                                                        <div className="text-sm text-gray-500">
-                                                            Quota: {ticketType.quota}
-                                                        </div>
-                                                        <div className="text-xs">
-                                                            {formatDate(ticketType.purchase_date)} -{' '}
-                                                            {formatDate(ticketType.end_purchase_date)}
-                                                        </div>
+                                                        <div className="text-sm text-gray-500">Quota: {ticketType.quota}</div>
+                                                        <div className="text-xs">{formatDate(ticketType.purchase_date)} - {formatDate(ticketType.end_purchase_date)}</div>
                                                     </div>
-                                                    <div className="font-bold text-lg">
-                                                        {formatPrice(ticketType.price)}
-                                                    </div>
+                                                    <div className="font-bold text-lg">{formatPrice(ticketType.price)}</div>
                                                 </li>
                                             ))}
                                         </ul>
-                                    ) : (
-                                        <p>No ticket types configured for this event.</p>
-                                    )}
+                                    ) : (<p>No ticket types configured for this event.</p>)}
                                     <div className="divider my-2"></div>
                                     <div className="flex justify-between items-center">
                                         <span className="font-semibold">Max Tickets per User</span>
@@ -247,9 +212,24 @@ function Show({ event, tickets, transactions, filters }) {
                         </div>
                     )}
 
-                    {/* --- TAB PARTICIPANTS DENGAN PENCARIAN & PAGINATION --- */}
+                    {/* --- TAB PARTICIPANTS DENGAN SUMMARY --- */}
                     {activeTab === 'Participants' && (
-                        <div className='px-2 md:px-0'>
+                        <div className='px-2 md:px-0 space-y-6'>
+                            
+                            {/* --- WIDGET SUMMARY TIKET --- */}
+                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full border border-base-200 bg-base-100">
+                                <div className="stat">
+                                    <div className="stat-title text-sm font-semibold">Total Seluruh Tiket</div>
+                                    <div className="stat-value">{summary?.total_tickets || 0}</div>
+                                </div>
+                                {summary?.tickets_by_type?.map((type, index) => (
+                                    <div key={index} className="stat">
+                                        <div className="stat-title text-sm">{type.name}</div>
+                                        <div className="stat-value text-primary">{type.total}</div>
+                                    </div>
+                                ))}
+                            </div>
+
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
@@ -259,7 +239,6 @@ function Show({ event, tickets, transactions, filters }) {
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <Search className="h-4 w-4 text-gray-400" />
                                                 </div>
-                                            
                                                 <input
                                                     type="text"
                                                     placeholder="Cari Tiket / Nama..."
@@ -287,7 +266,6 @@ function Show({ event, tickets, transactions, filters }) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* UPDATE: Gunakan tickets.data dari props, bukan event.tickets */}
                                                 {tickets?.data && tickets.data.length > 0 ? (
                                                     tickets.data.map((ticket) => (
                                                         <tr key={ticket.id}>
@@ -309,16 +287,28 @@ function Show({ event, tickets, transactions, filters }) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    {/* UPDATE: Komponen Pagination */}
                                     <Pagination links={tickets?.links} />
                                 </div>
                             </Card>
                         </div>
                     )}
 
-                    {/* --- TAB TRANSACTION DENGAN PENCARIAN & PAGINATION --- */}
+                    {/* --- TAB TRANSACTION DENGAN SUMMARY --- */}
                     {activeTab === 'Transaction' && (
-                        <div className='px-2 md:px-0'>
+                        <div className='px-2 md:px-0 space-y-6'>
+                            
+                            {/* --- WIDGET SUMMARY TRANSAKSI --- */}
+                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-1/2 border border-base-200 bg-base-100">
+                                <div className="stat">
+                                    <div className="stat-title text-sm font-semibold">Total Seluruh Transaksi</div>
+                                    <div className="stat-value">{summary?.total_transactions || 0}</div>
+                                </div>
+                                <div className="stat">
+                                    <div className="stat-title text-sm">Transaksi Paid</div>
+                                    <div className="stat-value text-success">{summary?.paid_transactions || 0}</div>
+                                </div>
+                            </div>
+
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
@@ -349,7 +339,6 @@ function Show({ event, tickets, transactions, filters }) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* UPDATE: Gunakan transactions.data dari props */}
                                                 {transactions?.data && transactions.data.length > 0 ? (
                                                     transactions.data.map((transaction) => (
                                                         <tr key={transaction.id}>
@@ -362,15 +351,12 @@ function Show({ event, tickets, transactions, filters }) {
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="5" className="text-center">
-                                                            No transactions found.
-                                                        </td>
+                                                        <td colSpan="5" className="text-center">No transactions found.</td>
                                                     </tr>
                                                 )}
                                             </tbody>
                                         </table>
                                     </div>
-                                    {/* UPDATE: Komponen Pagination */}
                                     <Pagination links={transactions?.links} />
                                 </div>
                             </Card>
@@ -389,7 +375,6 @@ function Show({ event, tickets, transactions, filters }) {
                     />
                 </div>
             </Modal>
-
         </AuthenticatedLayout>
     );
 }

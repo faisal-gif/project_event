@@ -88,38 +88,69 @@ class EventController extends Controller
         $transactions = $event->transaction()
             ->with('user')
             ->when($request->search_transaction, function ($query, $search) {
-                $query->where('reference', 'like', "%{$search}%") // Sesuaikan dengan nama kolom nomor invoice/referensi Anda
+                $query->where('reference', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%"); // Cari berdasarkan nama user
+                        $q->where('name', 'like', "%{$search}%");
                     });
             })
-            ->paginate(10, ['*'], 'transaction_page') // Gunakan nama page custom: ?transaction_page=2
-            ->withQueryString(); // Mempertahankan parameter pencarian saat ganti halaman
+            ->paginate(10, ['*'], 'transaction_page')
+            ->withQueryString();
 
         // 3. Query Tiket (Search & Paginate)
         $tickets = $event->tickets()
             ->with(['user', 'ticket_type', 'detail_pendaftar'])
             ->when($request->search_ticket, function ($query, $search) {
-                $query->where('ticket_code', 'like', "%{$search}%") // Sesuaikan dengan kolom kode tiket Anda
+                $query->where('ticket_code', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%"); // Cari berdasarkan nama user
+                        $q->where('name', 'like', "%{$search}%");
                     });
             })
-            ->paginate(10, ['*'], 'ticket_page') // Gunakan nama page custom: ?ticket_page=2
+            ->paginate(10, ['*'], 'ticket_page')
             ->withQueryString();
+
+        // ==========================================
+        // FITUR BARU: Menghitung Ringkasan / Summary
+        // ==========================================
+
+        // A. Ringkasan Transaksi
+        $totalTransactions = $event->transaction()->count();
+        $paidTransactions = $event->transaction()->where('status', 'PAID')->count();
+
+        // B. Ringkasan Tiket (Total & Per Tipe Tiket)
+        $totalTickets = $event->tickets()->count();
+
+        // Menghitung jumlah tiket dikelompokkan berdasarkan tipe
+        $ticketsByType = $event->tickets()
+            ->select('ticket_type_id', \DB::raw('count(*) as total'))
+            ->groupBy('ticket_type_id')
+            ->with('ticket_type:id,name') // Pastikan relasi ticket_type dimuat
+            ->get()
+            ->map(function ($ticket) {
+                return [
+                    'name' => $ticket->ticket_type ? $ticket->ticket_type->name : 'Tidak Diketahui',
+                    'total' => $ticket->total,
+                ];
+            });
 
         // 4. Kirim ke Inertia
         return Inertia::render('Admin/Events/Show', [
             'event' => $event,
             'transactions' => $transactions,
             'tickets' => $tickets,
+            // Kirim data summary ke Frontend
+            'summary' => [
+                'total_transactions' => $totalTransactions,
+                'paid_transactions'  => $paidTransactions,
+                'total_tickets'      => $totalTickets,
+                'tickets_by_type'    => $ticketsByType,
+            ],
             'filters' => [
                 'search_transaction' => $request->search_transaction ?? '',
                 'search_ticket' => $request->search_ticket ?? '',
             ]
         ]);
     }
-    
+
     public function edit(Event $event)
     {
         $category = CategoryEvents::all();
