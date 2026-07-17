@@ -14,7 +14,7 @@ class OrganizerParticipantController extends Controller
 {
     public function show($id)
     {
-        dd($id);
+      
         $ticket = Ticket::find($id);
         // Load semua relasi yang berhubungan dengan peserta ini
         $ticket->load([
