@@ -14,20 +14,16 @@ class OrganizerParticipantController extends Controller
 {
     public function show($id)
     {
-
-        // Cari berdasarkan ID terlebih dahulu
-        $ticket = Ticket::find($id);
-
-        // Jika tidak ditemukan berdasarkan ID, cari berdasarkan ticket_code
-        if (!$ticket) {
-            $ticket = Ticket::where('ticket_code', $id)->firstOrFail();
-        }
+        // Langsung cari berdasarkan ID atau ticket_code
+        $ticket = Ticket::where('id', $id)
+            ->orWhere('ticket_code', $id)
+            ->firstOrFail();
 
         // Load semua relasi yang berhubungan dengan peserta ini
         $ticket->load([
             'user',
             'ticket_type',
-            'event', // Untuk link kembali ke event
+            'event',
             'detail_pendaftar',
             'event_field_responses',
             'submission.submission_custom_fields'
