@@ -77,21 +77,30 @@ function Show({ event, tickets, transactions, filters, summary }) {
     const [activeTab, setActiveTab] = useState(initialTab);
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
+    // State untuk Search dan Filter
     const [searchTicket, setSearchTicket] = useState(filters?.search_ticket || '');
+    const [statusTicket, setStatusTicket] = useState(filters?.status_ticket || ''); // UPDATE: State filter status
     const [searchTransaction, setSearchTransaction] = useState(filters?.search_transaction || '');
 
+    // UPDATE: Tambahkan statusTicket ke dependency array agar terpicu saat diganti
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            if (searchTicket !== (filters?.search_ticket || '') || searchTransaction !== (filters?.search_transaction || '')) {
+            if (
+                searchTicket !== (filters?.search_ticket || '') ||
+                searchTransaction !== (filters?.search_transaction || '') ||
+                statusTicket !== (filters?.status_ticket || '')
+            ) {
                 router.get(route('organizer.events.show', event.id), {
                     search_ticket: searchTicket,
-                    search_transaction: searchTransaction
+                    search_transaction: searchTransaction,
+                    status_ticket: statusTicket,
+                    tab: activeTab // Mengingat tab yang sedang aktif saat filter
                 }, { preserveState: true, preserveScroll: true, replace: true });
             }
-        }, 500);
+        }, 500); 
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTicket, searchTransaction]);
+    }, [searchTicket, searchTransaction, statusTicket]);
 
     const handleScanSuccess = (decodedText) => {
         setScannerModalOpen(false);
@@ -110,7 +119,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
         router.patch(route('organizer.events.participants.update-status', { event: event.id, ticket: ticketId }), {
             status: newStatus
         }, {
-            preserveScroll: true,
+            preserveScroll: true, 
             onSuccess: () => {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -167,7 +176,6 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     {/* ===== Tab Content ===== */}
                     {activeTab === 'Detail' && (
                         <div className='space-y-6'>
-                            {/* Detail Event */}
                             <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 items-start">
                                 <Card className="md:col-span-2">
                                     <img
@@ -206,7 +214,6 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                     </div>
                                 </Card>
                             </div>
-                            {/* Deskripsi Event */}
                             <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
                                 <input type="checkbox" />
                                 <div className="collapse-title font-semibold">Deskripsi</div>
@@ -215,7 +222,6 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                 </div>
                             </div>
 
-                            {/* Ticket Event */}
                             <Card className="bg-base-100 shadow-xl p-6">
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-semibold">Ticket Information</h3>
@@ -259,8 +265,6 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     {/* --- TAB PARTICIPANTS DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Participants' && (
                         <div className='px-2 md:px-0 space-y-6'>
-
-                            {/* --- WIDGET SUMMARY TIKET --- */}
                             <div className="stats stats-vertical lg:stats-horizontal shadow w-full border border-base-200 bg-base-100">
                                 <div className="stat">
                                     <div className="stat-title text-sm font-semibold">Total Seluruh Tiket</div>
@@ -278,22 +282,36 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
                                         <h2 className="card-title">Participants</h2>
-                                        <div className='flex flex-col sm:flex-row gap-2'>
+                                        
+                                        {/* FILTER, SEARCH BAR & ACTIONS AREA */}
+                                        <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
+                                            
+                                            {/* UPDATE: Pilihan Filter Status */}
+                                            <select
+                                                className="select select-sm select-bordered w-full sm:w-auto"
+                                                value={statusTicket}
+                                                onChange={(e) => setStatusTicket(e.target.value)}
+                                            >
+                                                <option value="">Semua Status</option>
+                                                <option value="unused">Belum Hadir (Unused)</option>
+                                                <option value="used">Sudah Hadir (Used)</option>
+                                            </select>
+
                                             <div className="flex gap-2 w-full sm:w-auto">
-                                                <div className="relative w-full sm:w-64">
+                                                <div className="relative w-full sm:w-56">
                                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                        <Search className="h-4 w-4 text-black" />
+                                                        <Search className="h-4 w-4 text-gray-400" />
                                                     </div>
                                                     <input
                                                         type="text"
-                                                        placeholder="Cari Tiket / Nama..."
-                                                        className="input input-sm input-bordered w-full pl-10"
+                                                        placeholder="Cari Tiket/Akun/Nama..."
+                                                        className="input input-sm input-bordered w-full pl-9"
                                                         value={searchTicket}
                                                         onChange={(e) => setSearchTicket(e.target.value)}
                                                     />
                                                 </div>
                                                 <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary shrink-0">
-                                                    <QrCodeIcon size={16} className="mr-1" /> Scan QR
+                                                    <QrCodeIcon size={16} className="mr-1" /> Scan
                                                 </button>
                                             </div>
 
@@ -303,8 +321,8 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                                                <Download className="w-4 h-4 mr-2" />
-                                                Export Excel
+                                                <Download className="w-4 h-4 mr-1" />
+                                                Export
                                             </a>
                                         </div>
                                     </div>
@@ -315,8 +333,8 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                 <tr>
                                                     <th>Ticket Code</th>
                                                     <th>Ticket Kategori</th>
-                                                    <th>Akun Pendaftar</th>
                                                     <th>Nama Pendaftar</th>
+                                                    <th>Akun</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -327,16 +345,15 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                         <tr key={ticket.id}>
                                                             <td>{ticket.ticket_code}</td>
                                                             <td>{ticket.ticket_type?.name}</td>
+                                                            <td>{ticket.detail_pendaftar?.nama}</td>
                                                             <td>
                                                                 <div className="font-semibold text-sm">
-                                                                    {ticket.user?.name}
+                                                                    {ticket.user?.username || ticket.user?.name}
                                                                 </div>
                                                                 <div className="text-xs text-gray-500">
                                                                     {ticket.user?.email}
                                                                 </div>
                                                             </td>
-                                                            <td>{ticket.detail_pendaftar?.nama}</td>
-                                                            {/* UPDATE: Menampilkan Username dan Email dalam satu kolom */}
                                                             <td>
                                                                 <select
                                                                     className={`select select-bordered select-sm w-48 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
@@ -370,8 +387,6 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     {/* --- TAB TRANSACTION DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Transaction' && (
                         <div className='px-2 md:px-0 space-y-6'>
-
-                            {/* --- WIDGET SUMMARY TRANSAKSI --- */}
                             <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-1/2 border border-base-200 bg-base-100">
                                 <div className="stat">
                                     <div className="stat-title text-sm font-semibold">Total Seluruh Transaksi</div>

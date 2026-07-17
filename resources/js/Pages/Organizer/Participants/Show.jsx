@@ -1,122 +1,25 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Card from '@/Components/ui/Card';
-import Modal from '@/Components/Modal';
-import QrCode from '@/Components/QrCode';
-import { Download, QrCodeIcon, Search } from 'lucide-react';
-import { formatRupiah } from '@/Utils/formatter';
+import { ArrowLeft, Download, Image as ImageIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-// Helper functions
-const formatPrice = (price) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    }).format(price);
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-};
-
+// Helper function untuk status
 const getStatusBadge = (status) => {
     switch (status) {
-        case 'unused':
-            return <div className="badge badge-success">VALID</div>;
-        case 'used':
-            return <div className="badge badge-warning">USED</div>;
-        case 'expired':
-            return <div className="badge badge-error">EXPIRED</div>;
-        default:
-            return <div className="badge badge-ghost">UNKNOWN</div>;
+        case 'unused': return <div className="badge badge-success">VALID</div>;
+        case 'used': return <div className="badge badge-warning">USED</div>;
+        case 'expired': return <div className="badge badge-error">EXPIRED</div>;
+        default: return <div className="badge badge-ghost">UNKNOWN</div>;
     }
 };
 
-const getStatusTransactionBadge = (status) => {
-    switch (status) {
-        case 'PAID':
-            return <div className="badge badge-success">PAID</div>;
-        case 'UNPAID':
-            return <div className="badge badge-warning">UNPAID</div>;
-        case 'EXPIRED':
-            return <div className="badge badge-error">EXPIRED</div>;
-        default:
-            return <div className="badge badge-ghost">UNKNOWN</div>;
-    }
-};
-
-const Pagination = ({ links }) => {
-    if (!links || links.length <= 3) return null;
-
-    return (
-        <div className="flex justify-center mt-6 gap-1 flex-wrap">
-            {links.map((link, index) => (
-                <Link
-                    key={index}
-                    href={link.url || '#'}
-                    preserveScroll
-                    preserveState
-                    className={`btn btn-sm ${link.active ? 'btn-primary' : 'btn-outline'} ${!link.url ? 'btn-disabled opacity-50' : ''}`}
-                    dangerouslySetInnerHTML={{ __html: link.label }}
-                />
-            ))}
-        </div>
-    );
-};
-
-function Show({ event, tickets, transactions, filters, summary }) {
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialTab = urlParams.get('tab') || 'Detail';
-
-    const [activeTab, setActiveTab] = useState(initialTab);
-    const [isScannerModalOpen, setScannerModalOpen] = useState(false);
-
-    // State untuk Search dan Filter
-    const [searchTicket, setSearchTicket] = useState(filters?.search_ticket || '');
-    const [statusTicket, setStatusTicket] = useState(filters?.status_ticket || ''); // UPDATE: State filter status
-    const [searchTransaction, setSearchTransaction] = useState(filters?.search_transaction || '');
-
-    // UPDATE: Tambahkan statusTicket ke dependency array agar terpicu saat diganti
-    useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            if (
-                searchTicket !== (filters?.search_ticket || '') ||
-                searchTransaction !== (filters?.search_transaction || '') ||
-                statusTicket !== (filters?.status_ticket || '')
-            ) {
-                router.get(route('organizer.events.show', event.id), {
-                    search_ticket: searchTicket,
-                    search_transaction: searchTransaction,
-                    status_ticket: statusTicket,
-                    tab: activeTab // Mengingat tab yang sedang aktif saat filter
-                }, { preserveState: true, preserveScroll: true, replace: true });
-            }
-        }, 500);
-
-        return () => clearTimeout(delayDebounceFn);
-    }, [searchTicket, searchTransaction, statusTicket]);
-
-    const handleScanSuccess = (decodedText) => {
-        setScannerModalOpen(false);
-        router.get(route('organizer.participant.show', decodedText), {}, {
-            onError: (errors) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: errors.message || 'QR tidak valid atau tiket tidak ditemukan.',
-                });
-            }
-        });
-    };
+function ShowParticipant({ ticket }) {
+    if (!ticket) return <div className="text-center p-16">Data tiket tidak ditemukan.</div>;
 
     const handleStatusChange = (ticketId, newStatus) => {
-        router.patch(route('organizer.events.participants.update-status', { event: event.id, ticket: ticketId }), {
+        router.patch(route('organizer.events.participants.update-status', { event: ticket.event_id, ticket: ticketId }), {
             status: newStatus
         }, {
             preserveScroll: true,
@@ -139,336 +42,207 @@ function Show({ event, tickets, transactions, filters, summary }) {
         });
     };
 
-    if (!event) {
-        return (
-            <AuthenticatedLayout>
-                <div className="text-center p-16">Event not found.</div>
-            </AuthenticatedLayout>
-        );
-    }
-
-    const closeScannerModal = () => {
-        setScannerModalOpen(false);
-    };
-
     return (
         <AuthenticatedLayout>
-            <Head title={`View Event: ${event.title}`} />
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            <Head title={`Detail Peserta: ${ticket.detail_pendaftar?.nama || ticket.user?.name}`} />
 
-                    {/* ===== Manual Tab Navigation ===== */}
-                    <div className="tabs tabs-border">
-                        {['Detail', 'Participants', 'Transaction'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`tab ${activeTab === tab
-                                    ? 'tab-active'
-                                    : 'hover:bg-base-300 text-base-content'
-                                    }`}
+            <div className="py-6 sm:py-12"> 
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
+
+                    {/* Header Action */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
+                            <Link 
+                                href={route('organizer.events.show', { event: ticket.event_id, tab: 'Participants' })} 
+                                className="btn btn-sm btn-ghost px-2 sm:px-3"
                             >
-                                {tab}
-                            </button>
-                        ))}
+                                <ArrowLeft size={16} /> 
+                                <span className="hidden sm:inline">Kembali ke Participants</span>
+                                <span className="sm:hidden">Kembali</span>
+                            </Link>
+                            <h2 className="text-xl sm:text-2xl font-bold leading-tight text-gray-800">
+                                Profil Peserta
+                            </h2>
+                        </div>
                     </div>
 
-                    {/* ===== Tab Content ===== */}
-                    {activeTab === 'Detail' && (
-                        <div className='space-y-6'>
-                            <div className="grid md:grid-cols-5 gap-4 px-2 md:px-0 items-start">
-                                <Card className="md:col-span-2">
-                                    <img
-                                        src={`/storage/${event.image}`}
-                                        alt={event.title}
-                                        className="w-full h-full object-contain rounded"
-                                    />
-                                </Card>
-                                <Card className="bg-base-100 shadow-xl md:col-span-3">
-                                    <div className="card-body">
-                                        <h1 className="text-3xl font-bold my-4">{event.title}</h1>
-                                        <div className="badge badge-outline badge-lg">{event.category?.name}</div>
-                                        <div className="divider"></div>
-                                        <div className="space-y-4">
-                                            <div className="space-y-3">
-                                                <div className="flex">
-                                                    <div className="font-semibold w-32">Start Date</div>
-                                                    <div>: {formatDate(event.start_date)}</div>
-                                                </div>
-                                                <div className="flex">
-                                                    <div className="font-semibold w-32">End Date</div>
-                                                    <div>: {formatDate(event.end_date)}</div>
-                                                </div>
-                                                <div className="flex">
-                                                    <div className="font-semibold w-32">Location Type</div>
-                                                    <div className="capitalize">: {event.location_type}</div>
-                                                </div>
-                                                {event.location_details && (
-                                                    <div className="flex">
-                                                        <div className="font-semibold w-32">Details</div>
-                                                        <div>: {event.location_details}</div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card>
-                            </div>
-                            <div className="collapse collapse-arrow bg-base-100 shadow-xl border border-base-300">
-                                <input type="checkbox" />
-                                <div className="collapse-title font-semibold">Deskripsi</div>
-                                <div className="collapse-content text-sm w-full">
-                                    <div className="prose prose-sm prose-p:my-2 prose-h2:mb-1 prose-li:my-0 m-4 max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
-                                </div>
-                            </div>
+                    <div className="grid md:grid-cols-3 gap-4 sm:gap-6 items-start">
+                        {/* --- KOLOM KIRI: INFO TIKET & PENDAFTAR --- */}
+                        <div className="md:col-span-1 space-y-4 sm:space-y-6">
 
-                            <Card className="bg-base-100 shadow-xl p-6">
-                                <div className="space-y-4">
-                                    <h3 className="text-xl font-semibold">Ticket Information</h3>
-                                    {event.ticket_types?.length ? (
-                                        <ul className="space-y-3">
-                                            {event.ticket_types.map((ticketType) => (
-                                                <li
-                                                    key={ticketType.id}
-                                                    className="p-3 bg-base-200 rounded-lg flex justify-between items-center"
-                                                >
-                                                    <div>
-                                                        <span className="font-semibold">{ticketType.name}</span>
-                                                        <p className="text-xs">{ticketType.description}</p>
-                                                        <div className="text-sm text-gray-500">
-                                                            Quota: {ticketType.quota}
-                                                        </div>
-                                                        <div className="text-xs">
-                                                            {formatDate(ticketType.purchase_date)} -{' '}
-                                                            {formatDate(ticketType.end_purchase_date)}
-                                                        </div>
-                                                    </div>
-                                                    <div className="font-bold text-lg">
-                                                        {formatPrice(ticketType.price)}
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>No ticket types configured for this event.</p>
-                                    )}
-                                    <div className="divider my-2"></div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-semibold">Max Tickets per User</span>
-                                        <span className="font-bold">{event.limit_ticket_user}</span>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-                    )}
-
-                    {/* --- TAB PARTICIPANTS DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
-                    {activeTab === 'Participants' && (
-                        <div className='px-2 md:px-0 space-y-6'>
-                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full border border-base-200 bg-base-100">
-                                <div className="stat">
-                                    <div className="stat-title text-sm font-semibold">Total Seluruh Tiket</div>
-                                    <div className="stat-value">{summary?.total_tickets || 0}</div>
-                                </div>
-                                {summary?.tickets_by_type?.map((type, index) => (
-                                    <div key={index} className="stat">
-                                        <div className="stat-title text-sm">{type.name}</div>
-                                        <div className="stat-value text-primary">{type.total}</div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <Card className="bg-base-100 shadow-xl">
-                                <div className="card-body">
-                                    <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
-                                        <h2 className="card-title">Participants</h2>
-
-                                        {/* FILTER, SEARCH BAR & ACTIONS AREA */}
-                                        <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
-
-                                            {/* UPDATE: Pilihan Filter Status */}
-                                            <select
-                                                className="select select-sm select-bordered w-full sm:w-auto"
-                                                value={statusTicket}
-                                                onChange={(e) => setStatusTicket(e.target.value)}
-                                            >
-                                                <option value="">Semua Status</option>
-                                                <option value="unused">Belum Hadir (Unused)</option>
-                                                <option value="used">Sudah Hadir (Used)</option>
-                                            </select>
-
-                                            <div className="flex gap-2 w-full sm:w-auto">
-                                                <div className="relative w-full sm:w-56">
-                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                        <Search className="h-4 w-4 text-gray-400" />
-                                                    </div>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Cari Tiket/Akun/Nama..."
-                                                        className="input input-sm input-bordered w-full pl-9"
-                                                        value={searchTicket}
-                                                        onChange={(e) => setSearchTicket(e.target.value)}
+                            {/* Card 1: Status Tiket & Tampilan QR Code */}
+                            <Card className="bg-base-100 shadow-xl overflow-hidden">
+                                <div className="card-body p-4 sm:p-6"> 
+                                    <h3 className="card-title text-lg border-b pb-2 mb-4">Informasi Tiket</h3>
+                                    
+                                    <div className="flex flex-col items-center sm:items-start gap-6">
+                                        
+                                        {/* Menampilkan Gambar QR Code dari Database */}
+                                        {ticket.qr_image ? (
+                                            <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 w-fit">
+                                                <a href={`/storage/${ticket.qr_image}`} target="_blank" rel="noopener noreferrer">
+                                                    <img 
+                                                        src={`/storage/${ticket.qr_image}`} 
+                                                        alt={`QR Code ${ticket.ticket_code}`} 
+                                                        className="w-[150px] h-[150px] object-cover hover:opacity-80 transition-opacity"
                                                     />
-                                                </div>
-                                                <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary shrink-0">
-                                                    <QrCodeIcon size={16} className="mr-1" /> Scan
-                                                </button>
+                                                </a>
                                             </div>
+                                        ) : (
+                                            <div className="w-[150px] h-[150px] bg-gray-100 flex items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-400 text-sm text-center p-4">
+                                                QR Code tidak tersedia
+                                            </div>
+                                        )}
 
-                                            <a
-                                                href={route('organizer.events.export', event.id)}
-                                                className="btn btn-success btn-sm text-white flex items-center h-8"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <Download className="w-4 h-4 mr-1" />
-                                                Export
-                                            </a>
+                                        <div className="space-y-3 text-sm w-full">
+                                            <div>
+                                                <p className="text-gray-500 font-semibold text-xs">KODE TIKET</p>
+                                                <p className="font-mono text-lg font-bold">{ticket.ticket_code}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-500 font-semibold text-xs">EVENT</p>
+                                                <p className="font-medium">{ticket.event?.title}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-500 font-semibold text-xs">KATEGORI TIKET</p>
+                                                <p className="font-medium">{ticket.ticket_type?.name}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-500 font-semibold text-xs mb-1">STATUS</p>
+                                                <select
+                                                    className={`select select-bordered select-sm w-full ${
+                                                        ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
+                                                    }`}
+                                                    value={ticket.status}
+                                                    onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                                                >
+                                                    <option value="unused">Belum Hadir (Unused)</option>
+                                                    <option value="used">Sudah Hadir (Used)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div className="overflow-x-auto">
-                                        <table className="table table-zebra">
-                                            <thead>
-                                                <tr>
-                                                    <th>Ticket Code</th>
-                                                    <th>Ticket Kategori</th>
-                                                    <th>Akun</th>
-                                                    <th>Nama Pendaftar</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {tickets?.data && tickets.data.length > 0 ? (
-                                                    tickets.data.map((ticket) => (
-                                                        <tr key={ticket.id}>
-                                                            <td>{ticket.ticket_code}</td>
-                                                            <td>{ticket.ticket_type?.name}</td>
-                                                            <td>
-                                                                <div className="font-semibold text-sm">
-                                                                    {ticket.user?.name}
-                                                                </div>
-                                                                <div className="text-xs text-gray-500">
-                                                                    {ticket.user?.email}
-                                                                </div>
-                                                            </td>
-                                                            <td>{ticket.detail_pendaftar?.nama}</td>
-                                                            <td>
-                                                                <select
-                                                                    className={`select select-bordered select-sm w-48 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
-                                                                        }`}
-                                                                    value={ticket.status}
-                                                                    onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
-                                                                >
-                                                                    <option value="unused">Belum Hadir (Unused)</option>
-                                                                    <option value="used">Sudah Hadir (Used)</option>
-                                                                </select>
-                                                            </td>
-                                                            <td className="space-x-2">
-                                                                <Link href={route('organizer.participant.show', ticket.id)} className="btn btn-sm btn-info text-white">
-                                                                    Detail Profil
-                                                                </Link>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr><td colSpan="6" className="text-center">No participants found.</td></tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <Pagination links={tickets?.links} />
                                 </div>
                             </Card>
-                        </div>
-                    )}
 
-                    {/* --- TAB TRANSACTION DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
-                    {activeTab === 'Transaction' && (
-                        <div className='px-2 md:px-0 space-y-6'>
-                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-1/2 border border-base-200 bg-base-100">
-                                <div className="stat">
-                                    <div className="stat-title text-sm font-semibold">Total Seluruh Transaksi</div>
-                                    <div className="stat-value">{summary?.total_transactions || 0}</div>
-                                </div>
-                                <div className="stat">
-                                    <div className="stat-title text-sm">Transaksi Paid</div>
-                                    <div className="stat-value text-success">{summary?.paid_transactions || 0}</div>
-                                </div>
-                            </div>
-
+                            {/* Card 2: Detail Pendaftar */}
                             <Card className="bg-base-100 shadow-xl">
-                                <div className="card-body">
-                                    <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
-                                        <h2 className="card-title">Riwayat Transaksi</h2>
-                                        <div className="relative w-full sm:w-64">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Search className="h-4 w-4 text-gray-400" />
-                                            </div>
-                                            <input
-                                                type="text"
-                                                placeholder="Cari Invoice / Nama..."
-                                                className="input input-sm input-bordered w-full pl-10"
-                                                value={searchTransaction}
-                                                onChange={(e) => setSearchTransaction(e.target.value)}
-                                            />
+                                <div className="card-body p-4 sm:p-6">
+                                    <h3 className="card-title text-lg border-b pb-2 mb-3">Data Personal</h3>
+                                    <div className="space-y-3 text-sm">
+                                        <div>
+                                            <p className="text-gray-500 font-semibold text-xs">NAMA LENGKAP</p>
+                                            <p className="font-medium">{ticket.detail_pendaftar?.nama || ticket.user?.name}</p>
+                                        </div>
+                                        <div className="break-all">
+                                            <p className="text-gray-500 font-semibold text-xs">EMAIL</p>
+                                            <p className="font-medium">{ticket.detail_pendaftar?.email || ticket.user?.email}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-500 font-semibold text-xs">NOMOR HP</p>
+                                            <p className="font-medium">{ticket.detail_pendaftar?.no_hp || '-'}</p>
                                         </div>
                                     </div>
-
-                                    <div className="overflow-x-auto">
-                                        <table className="table table-zebra">
-                                            <thead>
-                                                <tr>
-                                                    <th>Kode Transaksi</th>
-                                                    <th>Nama</th>
-                                                    <th>Email</th>
-                                                    <th>Status</th>
-                                                    <th>Harga Tiket</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {transactions?.data && transactions.data.length > 0 ? (
-                                                    transactions.data.map((transaction) => (
-                                                        <tr key={transaction.id}>
-                                                            <td>{transaction.reference}</td>
-                                                            <td>{transaction.user?.name}</td>
-                                                            <td>{transaction.user?.email}</td>
-                                                            <td>{getStatusTransactionBadge(transaction.status)}</td>
-                                                            <td>{formatRupiah(transaction.amount)}</td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="5" className="text-center">
-                                                            No transactions found.
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <Pagination links={transactions?.links} />
                                 </div>
                             </Card>
                         </div>
-                    )}
+
+                        {/* --- KOLOM KANAN: KUESIONER & SUBMISSION --- */}
+                        <div className="md:col-span-2 space-y-4 sm:space-y-6">
+
+                            {/* Card 3: Event Fields */}
+                            <Card className="bg-base-100 shadow-xl">
+                                <div className="card-body p-4 sm:p-6">
+                                    <h3 className="card-title text-lg border-b pb-2 mb-4">Jawaban Pendaftaran</h3>
+
+                                    {ticket.event_field_responses && ticket.event_field_responses.length > 0 ? (
+                                        <div className="space-y-3 sm:space-y-4">
+                                            {ticket.event_field_responses.map(response => (
+                                                <div key={response.id} className="bg-base-200 p-3 sm:p-4 rounded-lg break-words">
+                                                    <p className="text-xs sm:text-sm font-semibold capitalize mb-1 sm:mb-2 text-gray-700">
+                                                        {response.field_name.replace(/_/g, ' ')}
+                                                    </p>
+                                                    <div className="text-sm sm:text-base text-gray-900">
+                                                        {RenderFieldValue(response.field_type, response.field_value, response.field_name)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm italic">Tidak ada data jawaban tambahan.</p>
+                                    )}
+                                </div>
+                            </Card>
+
+                            {/* Card 4: Submission Fields */}
+                            {ticket.event?.needs_submission === 1 && (
+                                <Card className="bg-base-100 shadow-xl border border-primary/20">
+                                    <div className="card-body p-4 sm:p-6">
+                                        <h3 className="card-title text-lg text-primary border-b pb-2 mb-4">Dokumen Submission</h3>
+
+                                        {ticket.submission && ticket.submission.submission_custom_fields?.length > 0 ? (
+                                            <div className="space-y-3 sm:space-y-4">
+                                                {ticket.submission.submission_custom_fields.map(response => (
+                                                    <div key={response.id} className="bg-base-200/50 p-3 sm:p-4 rounded-lg break-words">
+                                                        <p className="text-xs sm:text-sm font-semibold capitalize mb-1 sm:mb-2 text-primary">
+                                                            {response.field_name.replace(/_/g, ' ')}
+                                                        </p>
+                                                        <div className="text-sm sm:text-base text-gray-900">
+                                                            {RenderFieldValue(response.field_type, response.field_value, response.field_name)}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-500 text-sm italic">Peserta belum mengunggah dokumen submission.</p>
+                                        )}
+                                    </div>
+                                </Card>
+                            )}
+
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            {/* Modal QR Scanner */}
-            <Modal show={isScannerModalOpen} onClose={closeScannerModal} maxWidth="2xl">
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>
-                    <QrCode
-                        onScanSuccess={handleScanSuccess}
-                        startScan={isScannerModalOpen}
-                    />
-                </div>
-            </Modal>
-
         </AuthenticatedLayout>
     );
 }
 
-export default Show;
+// Komponen mini untuk merender file, image, atau text
+const RenderFieldValue = (type, value, name) => {
+    if (!value) return <span>-</span>;
+
+    if (type === 'image') {
+        return (
+            <div className="mt-2">
+                <a href={'/storage/' + value} target="_blank" rel="noopener noreferrer" className="block">
+                    <img
+                        src={'/storage/' + value}
+                        alt={name}
+                        className="w-full sm:max-w-[250px] h-auto rounded-lg border border-gray-300 shadow-sm hover:opacity-90 transition"
+                    />
+                </a>
+            </div>
+        );
+    }
+
+    if (type === 'file') {
+        return (
+            <div className="mt-2 flex items-center gap-3">
+                <a
+                    href={'/storage/' + value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="btn btn-sm btn-primary w-full sm:w-auto" 
+                >
+                    <Download size={16} /> <span className="truncate">Download File</span>
+                </a>
+            </div>
+        );
+    }
+
+    return <span>{value}</span>;
+};
+
+export default ShowParticipant;
