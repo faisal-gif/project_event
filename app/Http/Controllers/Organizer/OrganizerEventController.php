@@ -7,6 +7,7 @@ use App\Models\CategoryEvents;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
@@ -82,21 +83,20 @@ class OrganizerEventController extends Controller
         return redirect()->route('organizer.events.index')->with('success', 'Event created successfully.');
     }
 
-    public function show(Event $event, Request $request)
+   public function show(Event $event, Request $request)
     {
         // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
         $event->load('category', 'ticketTypes');
         $user = Auth::id();
 
         if ($event->created_by !== $user) {
-            return redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
+           return redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
         }
 
         // 2. Query Transaksi (Search & Paginate)
         $transactions = $event->transaction()
             ->with('user')
             ->when($request->search_transaction, function ($query, $search) {
-                // BUNGKUS DENGAN WHERE CLOSURE
                 $query->where(function ($q) use ($search) {
                     $q->where('reference', 'like', "%{$search}%")
                         ->orWhereHas('user', function ($uq) use ($search) {
@@ -107,17 +107,26 @@ class OrganizerEventController extends Controller
             ->paginate(10, ['*'], 'transaction_page')
             ->withQueryString();
 
-        // 3. Query Tiket (Search & Paginate)
+        // 3. Query Tiket (Search, Filter Status, & Paginate)
         $tickets = $event->tickets()
             ->with(['user', 'ticket_type', 'detail_pendaftar'])
             ->when($request->search_ticket, function ($query, $search) {
-                // BUNGKUS DENGAN WHERE CLOSURE
+                // UPDATE: Pencarian meluas ke ticket_code, user.name, user.email, dan detail_pendaftar.nama
                 $query->where(function ($q) use ($search) {
                     $q->where('ticket_code', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', "%{$search}%")
+                               ->orWhere('email', 'like', "%{$search}%")
+                               ->orWhere('username', 'like', "%{$search}%"); // Opsional jika ada kolom username
+                        })
                         ->orWhereHas('detail_pendaftar', function ($dp) use ($search) {
                             $dp->where('nama', 'like', "%{$search}%");
                         });
                 });
+            })
+            ->when($request->status_ticket, function ($query, $status) {
+                // UPDATE: Filter berdasarkan status tiket (used / unused)
+                $query->where('status', $status);
             })
             ->paginate(10, ['*'], 'ticket_page')
             ->withQueryString();
@@ -135,7 +144,7 @@ class OrganizerEventController extends Controller
 
         // Menghitung jumlah tiket dikelompokkan berdasarkan tipe
         $ticketsByType = $event->tickets()
-            ->select('ticket_type_id', \DB::raw('count(*) as total'))
+            ->select('ticket_type_id', DB::raw('count(*) as total'))
             ->groupBy('ticket_type_id')
             ->with('ticket_type:id,name') // Pastikan relasi ticket_type dimuat
             ->get()
@@ -160,7 +169,8 @@ class OrganizerEventController extends Controller
             ],
             'filters' => [
                 'search_transaction' => $request->search_transaction ?? '',
-                'search_ticket' => $request->search_ticket ?? '',
+                'search_ticket'      => $request->search_ticket ?? '',
+                'status_ticket'      => $request->status_ticket ?? '', // UPDATE: Kirim parameter filter ke UI
             ]
         ]);
     }
