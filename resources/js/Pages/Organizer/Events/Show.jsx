@@ -97,7 +97,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     tab: activeTab // Mengingat tab yang sedang aktif saat filter
                 }, { preserveState: true, preserveScroll: true, replace: true });
             }
-        }, 500); 
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTicket, searchTransaction, statusTicket]);
@@ -119,7 +119,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
         router.patch(route('organizer.events.participants.update-status', { event: event.id, ticket: ticketId }), {
             status: newStatus
         }, {
-            preserveScroll: true, 
+            preserveScroll: true,
             onSuccess: () => {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -265,27 +265,46 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     {/* --- TAB PARTICIPANTS DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Participants' && (
                         <div className='px-2 md:px-0 space-y-6'>
-                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full border border-base-200 bg-base-100">
-                                <div className="stat">
-                                    <div className="stat-title text-sm font-semibold">Total Seluruh Tiket</div>
-                                    <div className="stat-value">{summary?.total_tickets || 0}</div>
-                                </div>
-                                {summary?.tickets_by_type?.map((type, index) => (
-                                    <div key={index} className="stat">
-                                        <div className="stat-title text-sm">{type.name}</div>
-                                        <div className="stat-value text-primary">{type.total}</div>
+
+
+
+                            {/* --- WIDGET SUMMARY TIKET --- */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {/* Card 1: Ringkasan Status Tiket */}
+                                <div className="stats stats-vertical sm:stats-horizontal shadow border border-base-200 bg-base-100 w-full">
+                                    <div className="stat">
+                                        <div className="stat-title text-sm font-semibold">Total Seluruh Tiket</div>
+                                        <div className="stat-value">{summary?.total_tickets || 0}</div>
                                     </div>
-                                ))}
+                                    <div className="stat">
+                                        <div className="stat-title text-sm font-semibold">Sudah Hadir</div>
+                                        <div className="stat-value text-success">{summary?.used_tickets || 0}</div>
+                                    </div>
+                                    <div className="stat">
+                                        <div className="stat-title text-sm font-semibold">Belum Hadir</div>
+                                        <div className="stat-value text-warning">{summary?.unused_tickets || 0}</div>
+                                    </div>
+                                </div>
+
+                                {/* Card 2: Ringkasan per Kategori Tiket */}
+                                <div className="stats stats-vertical sm:stats-horizontal shadow border border-base-200 bg-base-100 w-full overflow-x-auto">
+                                    {summary?.tickets_by_type?.map((type, index) => (
+                                        <div key={index} className="stat">
+                                            <div className="stat-title text-sm">{type.name}</div>
+                                            <div className="stat-value text-primary">{type.total}</div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
                                         <h2 className="card-title">Participants</h2>
-                                        
+
                                         {/* FILTER, SEARCH BAR & ACTIONS AREA */}
                                         <div className='flex flex-col sm:flex-row gap-2 w-full sm:w-auto'>
-                                            
+
                                             {/* UPDATE: Pilihan Filter Status */}
                                             <select
                                                 className="select select-sm select-bordered w-full sm:w-auto"

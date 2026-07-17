@@ -83,14 +83,14 @@ class OrganizerEventController extends Controller
         return redirect()->route('organizer.events.index')->with('success', 'Event created successfully.');
     }
 
-   public function show(Event $event, Request $request)
+    public function show(Event $event, Request $request)
     {
         // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
         $event->load('category', 'ticketTypes');
         $user = Auth::id();
 
         if ($event->created_by !== $user) {
-           return redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
+            return redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
         }
 
         // 2. Query Transaksi (Search & Paginate)
@@ -111,12 +111,12 @@ class OrganizerEventController extends Controller
         $tickets = $event->tickets()
             ->with(['user', 'ticket_type', 'detail_pendaftar'])
             ->when($request->search_ticket, function ($query, $search) {
-                // UPDATE: Pencarian meluas ke ticket_code, user.name, user.email, dan detail_pendaftar.nama
                 $query->where(function ($q) use ($search) {
                     $q->where('ticket_code', 'like', "%{$search}%")
                         ->orWhereHas('user', function ($uq) use ($search) {
                             $uq->where('name', 'like', "%{$search}%")
-                               ->orWhere('email', 'like', "%{$search}%");
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('username', 'like', "%{$search}%");
                         })
                         ->orWhereHas('detail_pendaftar', function ($dp) use ($search) {
                             $dp->where('nama', 'like', "%{$search}%");
@@ -124,7 +124,6 @@ class OrganizerEventController extends Controller
                 });
             })
             ->when($request->status_ticket, function ($query, $status) {
-                // UPDATE: Filter berdasarkan status tiket (used / unused)
                 $query->where('status', $status);
             })
             ->paginate(10, ['*'], 'ticket_page')
@@ -138,14 +137,17 @@ class OrganizerEventController extends Controller
         $totalTransactions = $event->transaction()->count();
         $paidTransactions = $event->transaction()->where('status', 'PAID')->count();
 
-        // B. Ringkasan Tiket (Total & Per Tipe Tiket)
+        // B. Ringkasan Tiket (Total, Status, & Per Tipe Tiket)
         $totalTickets = $event->tickets()->count();
 
-        // Menghitung jumlah tiket dikelompokkan berdasarkan tipe
+        // UPDATE: Hitung tiket berdasarkan status
+        $usedTickets = $event->tickets()->where('status', 'used')->count();
+        $unusedTickets = $event->tickets()->where('status', 'unused')->count();
+
         $ticketsByType = $event->tickets()
-            ->select('ticket_type_id', DB::raw('count(*) as total'))
+            ->select('ticket_type_id', \DB::raw('count(*) as total'))
             ->groupBy('ticket_type_id')
-            ->with('ticket_type:id,name') // Pastikan relasi ticket_type dimuat
+            ->with('ticket_type:id,name')
             ->get()
             ->map(function ($ticket) {
                 return [
@@ -159,17 +161,18 @@ class OrganizerEventController extends Controller
             'event' => $event,
             'transactions' => $transactions,
             'tickets' => $tickets,
-            // Kirim data summary ke Frontend
             'summary' => [
                 'total_transactions' => $totalTransactions,
                 'paid_transactions'  => $paidTransactions,
                 'total_tickets'      => $totalTickets,
+                'used_tickets'       => $usedTickets,       // UPDATE: Kirim ke Frontend
+                'unused_tickets'     => $unusedTickets,     // UPDATE: Kirim ke Frontend
                 'tickets_by_type'    => $ticketsByType,
             ],
             'filters' => [
                 'search_transaction' => $request->search_transaction ?? '',
                 'search_ticket'      => $request->search_ticket ?? '',
-                'status_ticket'      => $request->status_ticket ?? '', // UPDATE: Kirim parameter filter ke UI
+                'status_ticket'      => $request->status_ticket ?? '',
             ]
         ]);
     }
