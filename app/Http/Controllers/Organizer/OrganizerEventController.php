@@ -84,16 +84,12 @@ class OrganizerEventController extends Controller
 
     public function show(Event $event, Request $request)
     {
-
-
         // 1. Eager load hanya untuk relasi dasar/kecil yang menempel pada event
         $event->load('category', 'ticketTypes');
         $user = Auth::id();
-      
 
         if ($event->created_by !== $user) {
-          
-           return redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
+            return redirect()->route('organizer.events.index')->with('success', 'Event ini bukan anda yang buat.');
         }
 
         // 2. Query Transaksi (Search & Paginate)
@@ -126,11 +122,42 @@ class OrganizerEventController extends Controller
             ->paginate(10, ['*'], 'ticket_page')
             ->withQueryString();
 
+        // ==========================================
+        // FITUR BARU: Menghitung Ringkasan / Summary
+        // ==========================================
+
+        // A. Ringkasan Transaksi
+        $totalTransactions = $event->transaction()->count();
+        $paidTransactions = $event->transaction()->where('status', 'PAID')->count();
+
+        // B. Ringkasan Tiket (Total & Per Tipe Tiket)
+        $totalTickets = $event->tickets()->count();
+
+        // Menghitung jumlah tiket dikelompokkan berdasarkan tipe
+        $ticketsByType = $event->tickets()
+            ->select('ticket_type_id', \DB::raw('count(*) as total'))
+            ->groupBy('ticket_type_id')
+            ->with('ticket_type:id,name') // Pastikan relasi ticket_type dimuat
+            ->get()
+            ->map(function ($ticket) {
+                return [
+                    'name' => $ticket->ticket_type ? $ticket->ticket_type->name : 'Tidak Diketahui',
+                    'total' => $ticket->total,
+                ];
+            });
+
         // 4. Kirim ke Inertia
         return Inertia::render('Organizer/Events/Show', [
             'event' => $event,
             'transactions' => $transactions,
             'tickets' => $tickets,
+            // Kirim data summary ke Frontend
+            'summary' => [
+                'total_transactions' => $totalTransactions,
+                'paid_transactions'  => $paidTransactions,
+                'total_tickets'      => $totalTickets,
+                'tickets_by_type'    => $ticketsByType,
+            ],
             'filters' => [
                 'search_transaction' => $request->search_transaction ?? '',
                 'search_ticket' => $request->search_ticket ?? '',

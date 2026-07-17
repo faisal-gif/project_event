@@ -52,7 +52,7 @@ const getStatusTransactionBadge = (status) => {
 
 // --- KOMPONEN PAGINATION SEDERHANA ---
 const Pagination = ({ links }) => {
-    if (!links || links.length <= 3) return null; // Jangan tampilkan jika hanya ada prev dan next tanpa halaman
+    if (!links || links.length <= 3) return null;
 
     return (
         <div className="flex justify-center mt-6 gap-1 flex-wrap">
@@ -70,8 +70,8 @@ const Pagination = ({ links }) => {
     );
 };
 
-// --- UPDATE 1: Tambahkan props tickets, transactions, dan filters ---
-function Show({ event, tickets, transactions, filters }) {
+// --- UPDATE 1: Tambahkan props summary ---
+function Show({ event, tickets, transactions, filters, summary }) {
 
     const urlParams = new URLSearchParams(window.location.search);
     const initialTab = urlParams.get('tab') || 'Detail';
@@ -79,32 +79,27 @@ function Show({ event, tickets, transactions, filters }) {
     const [activeTab, setActiveTab] = useState(initialTab);
     const [isScannerModalOpen, setScannerModalOpen] = useState(false);
 
-    // --- UPDATE 2: State untuk Search berdasarkan Filter dari Controller ---
     const [searchTicket, setSearchTicket] = useState(filters?.search_ticket || '');
     const [searchTransaction, setSearchTransaction] = useState(filters?.search_transaction || '');
 
-    // --- UPDATE 3: Debounce Pencarian (Otomatis search setelah ngetik) ---
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            // Cek jika filter berubah dari nilai awal agar tidak me-render ulang terus saat pertama dimuat
             if (searchTicket !== (filters?.search_ticket || '') || searchTransaction !== (filters?.search_transaction || '')) {
                 router.get(route('organizer.events.show', event.id), {
                     search_ticket: searchTicket,
                     search_transaction: searchTransaction
                 }, { preserveState: true, preserveScroll: true, replace: true });
             }
-        }, 500); // Tunggu 500ms setelah selesai mengetik
+        }, 500); 
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTicket, searchTransaction]);
 
 
     const handleScanSuccess = (decodedText) => {
-        
         setScannerModalOpen(false);
         router.get(route('organizer.participant.show', decodedText), {}, {
             onError: (errors) => {
-                // Error ini akan muncul jika backend mengembalikan error (misal 404 Not Found)
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal',
@@ -118,9 +113,8 @@ function Show({ event, tickets, transactions, filters }) {
         router.patch(route('organizer.events.participants.update-status', { event: event.id, ticket: ticketId }), {
             status: newStatus
         }, {
-            preserveScroll: true, // Agar halaman tidak scroll ke atas setelah loading
+            preserveScroll: true, 
             onSuccess: () => {
-                // Opsional: Tampilkan notifikasi sukses
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -146,7 +140,6 @@ function Show({ event, tickets, transactions, filters }) {
             </AuthenticatedLayout>
         );
     }
-
 
     const closeScannerModal = () => {
         setScannerModalOpen(false);
@@ -266,9 +259,24 @@ function Show({ event, tickets, transactions, filters }) {
                         </div>
                     )}
 
-                    {/* --- TAB PARTICIPANTS DENGAN PENCARIAN & PAGINATION --- */}
+                    {/* --- TAB PARTICIPANTS DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Participants' && (
-                        <div className='px-2 md:px-0'>
+                        <div className='px-2 md:px-0 space-y-6'>
+                            
+                            {/* --- WIDGET SUMMARY TIKET --- */}
+                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full border border-base-200 bg-base-100">
+                                <div className="stat">
+                                    <div className="stat-title text-sm font-semibold">Total Seluruh Tiket</div>
+                                    <div className="stat-value">{summary?.total_tickets || 0}</div>
+                                </div>
+                                {summary?.tickets_by_type?.map((type, index) => (
+                                    <div key={index} className="stat">
+                                        <div className="stat-title text-sm">{type.name}</div>
+                                        <div className="stat-value text-primary">{type.total}</div>
+                                    </div>
+                                ))}
+                            </div>
+
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
@@ -294,16 +302,14 @@ function Show({ event, tickets, transactions, filters }) {
 
                                             <a
                                                 href={route('organizer.events.export', event.id)}
-                                                className="btn btn-success text-white"
+                                                className="btn btn-success btn-sm text-white flex items-center h-8"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
                                                 <Download className="w-4 h-4 mr-2" />
                                                 Export Excel
                                             </a>
-
                                         </div>
-
                                     </div>
 
                                     <div className="overflow-x-auto">
@@ -319,7 +325,6 @@ function Show({ event, tickets, transactions, filters }) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* UPDATE: Gunakan tickets.data dari props, bukan event.tickets */}
                                                 {tickets?.data && tickets.data.length > 0 ? (
                                                     tickets.data.map((ticket) => (
                                                         <tr key={ticket.id}>
@@ -327,15 +332,17 @@ function Show({ event, tickets, transactions, filters }) {
                                                             <td>{ticket.ticket_type?.name}</td>
                                                             <td>{ticket.detail_pendaftar?.nama}</td>
                                                             <td>{ticket.user?.email}</td>
-                                                            <td><select
-                                                                className={`select select-bordered select-sm w-48 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
-                                                                    }`}
-                                                                value={ticket.status}
-                                                                onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
-                                                            >
-                                                                <option value="unused">Belum Hadir (Unused)</option>
-                                                                <option value="used">Sudah Hadir (Used)</option>
-                                                            </select></td>
+                                                            <td>
+                                                                <select
+                                                                    className={`select select-bordered select-sm w-48 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
+                                                                        }`}
+                                                                    value={ticket.status}
+                                                                    onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                                                                >
+                                                                    <option value="unused">Belum Hadir (Unused)</option>
+                                                                    <option value="used">Sudah Hadir (Used)</option>
+                                                                </select>
+                                                            </td>
                                                             <td className="space-x-2">
                                                                 <Link href={route('organizer.participant.show', ticket.id)} className="btn btn-sm btn-info text-white">
                                                                     Detail Profil
@@ -349,16 +356,28 @@ function Show({ event, tickets, transactions, filters }) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    {/* UPDATE: Komponen Pagination */}
                                     <Pagination links={tickets?.links} />
                                 </div>
                             </Card>
                         </div>
                     )}
 
-                    {/* --- TAB TRANSACTION DENGAN PENCARIAN & PAGINATION --- */}
+                    {/* --- TAB TRANSACTION DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Transaction' && (
-                        <div className='px-2 md:px-0'>
+                        <div className='px-2 md:px-0 space-y-6'>
+                            
+                            {/* --- WIDGET SUMMARY TRANSAKSI --- */}
+                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-1/2 border border-base-200 bg-base-100">
+                                <div className="stat">
+                                    <div className="stat-title text-sm font-semibold">Total Seluruh Transaksi</div>
+                                    <div className="stat-value">{summary?.total_transactions || 0}</div>
+                                </div>
+                                <div className="stat">
+                                    <div className="stat-title text-sm">Transaksi Paid</div>
+                                    <div className="stat-value text-success">{summary?.paid_transactions || 0}</div>
+                                </div>
+                            </div>
+
                             <Card className="bg-base-100 shadow-xl">
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
@@ -389,7 +408,6 @@ function Show({ event, tickets, transactions, filters }) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* UPDATE: Gunakan transactions.data dari props */}
                                                 {transactions?.data && transactions.data.length > 0 ? (
                                                     transactions.data.map((transaction) => (
                                                         <tr key={transaction.id}>
@@ -410,7 +428,6 @@ function Show({ event, tickets, transactions, filters }) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    {/* UPDATE: Komponen Pagination */}
                                     <Pagination links={transactions?.links} />
                                 </div>
                             </Card>
