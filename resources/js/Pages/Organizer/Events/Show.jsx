@@ -267,9 +267,8 @@ function Show({ event, tickets, transactions, filters, summary }) {
                         <div className='px-2 md:px-0 space-y-6'>
 
 
-
                             {/* --- WIDGET SUMMARY TIKET --- */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4">
                                 {/* Card 1: Ringkasan Status Tiket */}
                                 <div className="stats stats-vertical sm:stats-horizontal shadow border border-base-200 bg-base-100 w-full">
                                     <div className="stat">
