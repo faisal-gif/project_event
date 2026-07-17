@@ -100,6 +100,8 @@ function Show({ event, tickets, transactions, filters }) {
 
 
     const handleScanSuccess = (decodedText) => {
+        console.log(decodedText);
+        
         setScannerModalOpen(false);
         router.get(route('organizer.participant.show', decodedText), {}, {
             onError: (errors) => {
