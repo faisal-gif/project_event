@@ -50,7 +50,6 @@ const getStatusTransactionBadge = (status) => {
     }
 };
 
-// --- KOMPONEN PAGINATION SEDERHANA ---
 const Pagination = ({ links }) => {
     if (!links || links.length <= 3) return null;
 
@@ -70,7 +69,6 @@ const Pagination = ({ links }) => {
     );
 };
 
-// --- UPDATE 1: Tambahkan props summary ---
 function Show({ event, tickets, transactions, filters, summary }) {
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -90,11 +88,10 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     search_transaction: searchTransaction
                 }, { preserveState: true, preserveScroll: true, replace: true });
             }
-        }, 500); 
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTicket, searchTransaction]);
-
 
     const handleScanSuccess = (decodedText) => {
         setScannerModalOpen(false);
@@ -113,7 +110,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
         router.patch(route('organizer.events.participants.update-status', { event: event.id, ticket: ticketId }), {
             status: newStatus
         }, {
-            preserveScroll: true, 
+            preserveScroll: true,
             onSuccess: () => {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -262,7 +259,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     {/* --- TAB PARTICIPANTS DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Participants' && (
                         <div className='px-2 md:px-0 space-y-6'>
-                            
+
                             {/* --- WIDGET SUMMARY TIKET --- */}
                             <div className="stats stats-vertical lg:stats-horizontal shadow w-full border border-base-200 bg-base-100">
                                 <div className="stat">
@@ -318,8 +315,8 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                 <tr>
                                                     <th>Ticket Code</th>
                                                     <th>Ticket Kategori</th>
+                                                    <th>Akun Pendaftar</th>
                                                     <th>Nama Pendaftar</th>
-                                                    <th>Email</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -330,8 +327,16 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                         <tr key={ticket.id}>
                                                             <td>{ticket.ticket_code}</td>
                                                             <td>{ticket.ticket_type?.name}</td>
+                                                            <td>
+                                                                <div className="font-semibold text-sm">
+                                                                    {ticket.user?.name}
+                                                                </div>
+                                                                <div className="text-xs text-gray-500">
+                                                                    {ticket.user?.email}
+                                                                </div>
+                                                            </td>
                                                             <td>{ticket.detail_pendaftar?.nama}</td>
-                                                            <td>{ticket.user?.email}</td>
+                                                            {/* UPDATE: Menampilkan Username dan Email dalam satu kolom */}
                                                             <td>
                                                                 <select
                                                                     className={`select select-bordered select-sm w-48 ${ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
@@ -365,7 +370,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                     {/* --- TAB TRANSACTION DENGAN SUMMARY PENCARIAN & PAGINATION --- */}
                     {activeTab === 'Transaction' && (
                         <div className='px-2 md:px-0 space-y-6'>
-                            
+
                             {/* --- WIDGET SUMMARY TRANSAKSI --- */}
                             <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-1/2 border border-base-200 bg-base-100">
                                 <div className="stat">
