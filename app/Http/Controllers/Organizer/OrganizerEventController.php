@@ -115,8 +115,7 @@ class OrganizerEventController extends Controller
                     $q->where('ticket_code', 'like', "%{$search}%")
                         ->orWhereHas('user', function ($uq) use ($search) {
                             $uq->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%")
-                                ->orWhere('username', 'like', "%{$search}%");
+                                ->orWhere('email', 'like', "%{$search}%");
                         })
                         ->orWhereHas('detail_pendaftar', function ($dp) use ($search) {
                             $dp->where('nama', 'like', "%{$search}%");
