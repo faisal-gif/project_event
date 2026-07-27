@@ -6,7 +6,6 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import DynamicIcon from '@/Components/DynamicIcon';
 import { FolderPlus, ArrowLeft } from 'lucide-react';
 
 export default function Create() {
@@ -51,19 +50,14 @@ export default function Create() {
 
                             <div>
                                 <InputLabel htmlFor="icon" value="Icon" required />
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center shrink-0">
-                                        <DynamicIcon name={data.icon} />
-                                    </span>
-                                    <TextInput
-                                        id="icon"
-                                        className="w-full"
-                                        value={data.icon}
-                                        onChange={(e) => setData('icon', e.target.value)}
-                                        placeholder="cth. Music, Ticket"
-                                    />
-                                </div>
-                                <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="text-sm text-primary">Lihat daftar icon</a>
+                                <TextInput
+                                    id="icon"
+                                    className="mt-1 w-full"
+                                    value={data.icon}
+                                    onChange={(e) => setData('icon', e.target.value)}
+                                    placeholder="cth. Music, Ticket"
+                                />
+                                <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="text-sm text-primary">Lihat daftar nama icon</a>
                                 <InputError message={errors.icon} className="mt-1" />
                             </div>
 

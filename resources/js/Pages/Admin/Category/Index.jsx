@@ -1,6 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import DynamicIcon from '@/Components/DynamicIcon';
 import { Pencil, Plus, FolderTree } from 'lucide-react';
 
 export default function Index({ categories }) {
@@ -26,7 +25,6 @@ export default function Index({ categories }) {
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Icon</th>
                                         <th>Nama</th>
                                         <th>Slug</th>
                                         <th className="text-right">Aksi</th>
@@ -39,12 +37,10 @@ export default function Index({ categories }) {
                                     {categories.map((category, index) => (
                                         <tr key={category.id} className="hover">
                                             <td className="text-gray-400">{index + 1}</td>
-                                            <td>
-                                                <span className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center text-primary">
-                                                    <DynamicIcon name={category.icon} />
-                                                </span>
+                                            <td className="font-medium">
+                                                {category.name}
+                                                {category.icon && <span className="ml-2 text-xs text-gray-400 font-mono">({category.icon})</span>}
                                             </td>
-                                            <td className="font-medium">{category.name}</td>
                                             <td className="text-sm text-gray-500">{category.slug}</td>
                                             <td>
                                                 <div className="flex justify-end">
