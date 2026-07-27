@@ -15,11 +15,28 @@ use Intervention\Image\ImageManager;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with('creator', 'category', 'ticketTypes')->latest()->get();
+        $events = Event::with('creator', 'category', 'ticketTypes')
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhereHas('creator', fn ($c) => $c->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('category', fn ($c) => $c->where('name', 'like', "%{$search}%"));
+                });
+            })
+            ->when($request->status, fn ($query, $status) => $query->where('status', $status))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        return Inertia::render('Admin/Events/Index', ['events' => $events]);
+        return Inertia::render('Admin/Events/Index', [
+            'events' => $events,
+            'filters' => [
+                'search' => $request->search ?? '',
+                'status' => $request->status ?? '',
+            ],
+        ]);
     }
 
     public function create()
