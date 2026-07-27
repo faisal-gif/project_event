@@ -1,48 +1,55 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Edit } from 'lucide-react';
-import React from 'react';
+import DynamicIcon from '@/Components/DynamicIcon';
+import { Pencil, Plus, FolderTree } from 'lucide-react';
 
-function Index({ categories }) {
+export default function Index({ categories }) {
     return (
         <AuthenticatedLayout>
-            <Head title="Events" />
-            <div className="container mx-auto px-4 py-8">
-                <div className="card bg-base-200 shadow-sm mb-8">
-                    <div className="card-body">
-                        <h2 className="card-title">Category</h2>
-                        <div className="flex flex-wrap gap-4 justify-end items-center">
-                            <Link href={route('admin.category.create')} className='btn btn-primary btn-md mt-10'>
-                                Tambah Event
-                            </Link>
-                        </div>
+            <Head title="Kategori" />
 
+            <div className="py-10">
+                <div className="mx-auto max-w-4xl px-4 lg:px-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-2">
+                            <FolderTree className="w-6 h-6 text-primary" />
+                            <h1 className="font-bold text-2xl">Kategori</h1>
+                        </div>
+                        <Link href={route('admin.category.create')} className="btn btn-primary">
+                            <Plus className="w-4 h-4 mr-1" /> Tambah Kategori
+                        </Link>
+                    </div>
+
+                    <div className="card bg-base-100 border border-base-200 shadow-sm">
                         <div className="overflow-x-auto">
-                            <table className="table table-zebra">
-                                {/* head */}
+                            <table className="table">
                                 <thead>
                                     <tr>
-                                        <th></th>
-                                        <th>Name</th>
+                                        <th>#</th>
+                                        <th>Icon</th>
+                                        <th>Nama</th>
                                         <th>Slug</th>
-                                        <th></th>
+                                        <th className="text-right">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {/* row 1 */}
+                                    {categories.length === 0 && (
+                                        <tr><td colSpan={5} className="text-center text-gray-400 py-8">Belum ada kategori.</td></tr>
+                                    )}
                                     {categories.map((category, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            
-                                            <td>{category.name}</td>
-                                            <td>{category.slug}</td>
+                                        <tr key={category.id} className="hover">
+                                            <td className="text-gray-400">{index + 1}</td>
                                             <td>
-                                                <div className="flex gap-2">
-                                                    <Link
-                                                        className="btn btn-sm btn-warning"
-                                                        href={route('admin.category.edit', category)}
-                                                    >
-                                                        <Edit size={16} />
+                                                <span className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center text-primary">
+                                                    <DynamicIcon name={category.icon} />
+                                                </span>
+                                            </td>
+                                            <td className="font-medium">{category.name}</td>
+                                            <td className="text-sm text-gray-500">{category.slug}</td>
+                                            <td>
+                                                <div className="flex justify-end">
+                                                    <Link className="btn btn-sm btn-warning btn-outline" href={route('admin.category.edit', category)}>
+                                                        <Pencil className="w-4 h-4" />
                                                     </Link>
                                                 </div>
                                             </td>
@@ -57,5 +64,3 @@ function Index({ categories }) {
         </AuthenticatedLayout>
     );
 }
-
-export default Index;

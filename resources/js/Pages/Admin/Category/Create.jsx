@@ -1,8 +1,15 @@
-import { useForm, Head } from '@inertiajs/react';
+import { useForm, Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import React from 'react';
+import Card from '@/Components/ui/Card';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DynamicIcon from '@/Components/DynamicIcon';
+import { FolderPlus, ArrowLeft } from 'lucide-react';
 
-function Create() {
+export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         icon: '',
@@ -10,50 +17,68 @@ function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('admin.category.store'), {
-            data,
-        });
+        post(route('admin.category.store'));
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title="Create Category" />
+            <Head title="Tambah Kategori" />
 
-            <div className="py-12">
-                <div className="card bg-base-100 shadow-sm md:max-w-6xl md:mx-auto mx-2 p-6">
-                    <div className="card-body">
-                        <h2 className="card-title mb-2">Category Create</h2>
+            <div className="py-10">
+                <div className="mx-auto max-w-2xl px-4 lg:px-8">
+                    <Link href={route('admin.category.index')} className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary mb-4">
+                        <ArrowLeft className="w-4 h-4" /> Kembali ke daftar kategori
+                    </Link>
+
+                    <Card className="bg-base-100 p-6 shadow-medium">
+                        <div className="flex items-center gap-2 mb-6">
+                            <FolderPlus className="w-5 h-5 text-primary" />
+                            <h1 className="text-lg font-semibold">Tambah Kategori</h1>
+                        </div>
+
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="form-control w-full">
-                                <label className="label">Name Category</label>
-                                <input
-                                    type="text"
+                            <div>
+                                <InputLabel htmlFor="name" value="Nama Kategori" required />
+                                <TextInput
+                                    id="name"
+                                    className="mt-1 w-full"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
-                                    className="input input-bordered w-full"
+                                    placeholder="cth. Konser, Workshop"
                                 />
-                                {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
+                                <InputError message={errors.name} className="mt-1" />
                             </div>
-                            <div className="form-control w-full">
-                                <label className="label">Icon</label>
-                                <input
-                                    type="text"
-                                    value={data.icon}
-                                    onChange={(e) => setData('icon', e.target.value)}
-                                    className="input input-bordered w-full"
-                                />
-                                <a href="https://lucide.dev/icons/" target="_blank" className="text-sm text-blue-500">Browse icons</a>
-                                {errors.icon && <div className="text-red-500 text-sm">{errors.icon}</div>}
+
+                            <div>
+                                <InputLabel htmlFor="icon" value="Icon" required />
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center shrink-0">
+                                        <DynamicIcon name={data.icon} />
+                                    </span>
+                                    <TextInput
+                                        id="icon"
+                                        className="w-full"
+                                        value={data.icon}
+                                        onChange={(e) => setData('icon', e.target.value)}
+                                        placeholder="cth. Music, Ticket"
+                                    />
+                                </div>
+                                <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="text-sm text-primary">Lihat daftar icon</a>
+                                <InputError message={errors.icon} className="mt-1" />
                             </div>
-                            <button type="submit" disabled={processing} className="btn btn-primary w-full">
-                                {processing ? 'Saving...' : 'Create Category'}
-                            </button>
+
+                            <div className="flex justify-end gap-2 pt-2">
+                                <Link href={route('admin.category.index')}>
+                                    <SecondaryButton type="button">Batal</SecondaryButton>
+                                </Link>
+                                <PrimaryButton type="submit" disabled={processing}>
+                                    {processing ? 'Menyimpan...' : 'Simpan'}
+                                </PrimaryButton>
+                            </div>
                         </form>
-                    </div>
+                    </Card>
                 </div>
             </div>
         </AuthenticatedLayout>
     );
 }
-
-export default Create;
