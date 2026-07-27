@@ -241,7 +241,7 @@ function EventDetail({ event, seo }) {
                                                     <div className="card-body flex-row justify-between items-center">
                                                         <div>
                                                             <h3 className="card-title text-xl">{ticketType.name}</h3>
-                                                            <p className='text-sm'>{ticketType.description}</p>
+                                                            <p className='text-sm text-gray-500 mb-2 whitespace-pre-line'>{ticketType.description}</p>
                                                             {ticketType.purchase_date && ticketType.end_purchase_date && (
                                                                 <div className="flex items-start">
                                                                     <span className="flex-1 text-xs mt-1">
