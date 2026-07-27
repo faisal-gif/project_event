@@ -114,9 +114,12 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        $user = \App\Models\User::findOrFail($id);
-        return \Inertia\Inertia::render('Admin/Users/Edit', [
+        $user = User::findOrFail($id);
+
+        return Inertia::render('Admin/Users/Edit', [
             'user' => $user,
+            'events' => Event::select('id', 'title')->get(),
+            'assignedEventIds' => $user->judgedEvents()->pluck('events.id'),
         ]);
     }
 
@@ -125,22 +128,31 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = User::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
-            'role' => 'required|string|in:user,admin,organizer',
+            'role' => 'required|string|in:user,admin,organizer,judge',
+            'event_ids' => 'required_if:role,judge|array',
+            'event_ids.*' => 'exists:events,id',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
         if ($request->password) {
-            $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         }
         $user->role = $request->role;
         $user->save();
+
+        // Sinkronkan event juri sesuai role.
+        if ($request->role === 'judge') {
+            $user->judgedEvents()->sync($request->event_ids ?? []);
+        } else {
+            $user->judgedEvents()->detach();
+        }
 
         return redirect()->route('admin.users.index');
     }
