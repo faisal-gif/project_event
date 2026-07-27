@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import FlashAlert from '@/Components/FlashAlert';
 import AffiliateTutorial from '@/Components/AffiliateTutorial';
 import { formatRupiah } from '@/Utils/formatter';
-import { CheckCircle2, Clock, XCircle, Share2, Copy, HelpCircle } from 'lucide-react';
+import { CheckCircle2, Clock, XCircle, Share2, Copy, HelpCircle, FileDown } from 'lucide-react';
 
 const STATUS = {
     pending: { label: 'Menunggu Persetujuan', cls: 'text-amber-600', Icon: Clock },
@@ -59,14 +59,26 @@ export default function Me({ affiliate }) {
                                 <Share2 className="w-5 h-5 text-primary" />
                                 <h2 className="text-lg font-semibold">Program Affiliate</h2>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => window.dispatchEvent(new Event('open-affiliate-tutorial'))}
-                                className="btn btn-ghost btn-sm gap-1"
-                                title="Buka panduan"
-                            >
-                                <HelpCircle className="w-4 h-4" /> Panduan
-                            </button>
+                            <div className="flex items-center gap-1">
+                                <a
+                                    href="/panduan-affiliate.pdf"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    className="btn btn-ghost btn-sm gap-1"
+                                    title="Unduh panduan PDF"
+                                >
+                                    <FileDown className="w-4 h-4" /> PDF
+                                </a>
+                                <button
+                                    type="button"
+                                    onClick={() => window.dispatchEvent(new Event('open-affiliate-tutorial'))}
+                                    className="btn btn-ghost btn-sm gap-1"
+                                    title="Buka panduan"
+                                >
+                                    <HelpCircle className="w-4 h-4" /> Panduan
+                                </button>
+                            </div>
                         </div>
 
                         {!status && (
