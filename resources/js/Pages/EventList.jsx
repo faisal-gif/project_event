@@ -88,7 +88,7 @@ function EventList({ events }) {
 
                         >
                             <Card key={event.id} className="bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                                <figure className="w-full h-48 bg-base-200 flex items-center justify-center overflow-hidden">
+                                <figure className="w-full aspect-[3/4] bg-base-200 flex items-center justify-center overflow-hidden">
                                     {event.image && event.image !== '' ? (
                                         <img
                                             src={`/storage/${event.image}`}

@@ -264,11 +264,27 @@ class TransactionController extends Controller
     }
 
 
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        $transactions = Transaction::with(['event', 'user'])->latest()->get();
+        $transactions = Transaction::with(['event', 'user'])
+            ->when($request->status, fn ($query, $status) => $query->where('status', $status))
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('reference', 'like', "%{$search}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('event', fn ($e) => $e->where('title', 'like', "%{$search}%"));
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('Admin/Transaction/Index', [
             'transactions' => $transactions,
+            'filters' => [
+                'status' => $request->status ?? '',
+                'search' => $request->search ?? '',
+            ],
         ]);
     }
 }

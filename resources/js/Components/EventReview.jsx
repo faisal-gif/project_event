@@ -50,8 +50,8 @@ const EventReview = ({ data, category, onEdit, existingImageUrl = null }) => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-1">
                         {imageUrl
-                            ? <img src={imageUrl} alt="Thumbnail" className="w-full aspect-video object-cover rounded-lg border" />
-                            : <div className="w-full aspect-video rounded-lg border border-dashed flex items-center justify-center text-sm text-gray-400">Tanpa thumbnail</div>}
+                            ? <img src={imageUrl} alt="Thumbnail" className="w-full aspect-[3/4] object-cover rounded-lg border" />
+                            : <div className="w-full aspect-[3/4] rounded-lg border border-dashed flex items-center justify-center text-sm text-gray-400">Tanpa thumbnail</div>}
                     </div>
                     <div className="md:col-span-2 divide-y divide-gray-100">
                         <Row label="Judul">{data.title}</Row>

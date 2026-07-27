@@ -65,7 +65,7 @@ function HeroSection({ events, headline }) {
                             <Link
                                 href={route('events.guest.detail', { event: event.id, slug: event.slug })} >
                                 <div key={event.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                                    <figure className="w-full h-48 bg-base-200 flex items-center justify-center overflow-hidden">
+                                    <figure className="w-full aspect-[3/4] bg-base-200 flex items-center justify-center overflow-hidden">
                                         {event.image && event.image !== '' ? (
                                             <img
                                                 src={`/storage/${event.image}`}

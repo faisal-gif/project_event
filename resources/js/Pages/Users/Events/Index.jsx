@@ -82,7 +82,7 @@ function Index({ events }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredEvents.map((event) => (
                         <div key={event.id} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                           <figure className="w-full h-48 bg-base-200 flex items-center justify-center overflow-hidden">
+                           <figure className="w-full aspect-[3/4] bg-base-200 flex items-center justify-center overflow-hidden">
                                 {event.image && event.image !== '' ? (
                                     <img
                                         src={`/public/${event.image}`}

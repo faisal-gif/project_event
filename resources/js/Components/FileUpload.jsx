@@ -73,7 +73,7 @@ export const FileUpload = ({ name = "thumbnail", onChange, initialPreview = null
 
       {preview ? (
         <div className="relative group">
-          <div className="aspect-video w-full rounded-xl overflow-hidden bg-gradient-accent border-2 border-dashed border-primary/20">
+          <div className="aspect-[3/4] w-full rounded-xl overflow-hidden bg-gradient-accent border-2 border-dashed border-primary/20">
             <img
               src={preview}
               alt="Preview"
@@ -93,7 +93,7 @@ export const FileUpload = ({ name = "thumbnail", onChange, initialPreview = null
         </div>
       ) : (
         <div
-          className={`aspect-video w-full rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer
+          className={`aspect-[3/4] w-full rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer
             ${
               dragActive
                 ? "border-primary bg-gradient-accent scale-105"
@@ -125,7 +125,7 @@ export const FileUpload = ({ name = "thumbnail", onChange, initialPreview = null
                 Drag & drop or click to browse
               </p>
               <p className="text-xs text-muted-foreground">
-                PNG, JPG, GIF up to 10MB
+                PNG, JPG, GIF maks. 10MB • disarankan potret 3:4 (mis. 900×1200)
               </p>
             </div>
           </div>
