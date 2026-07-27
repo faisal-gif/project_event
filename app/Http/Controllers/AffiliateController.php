@@ -117,6 +117,7 @@ class AffiliateController extends Controller
             ->whereNotNull('promoter_id')
             ->where('commission_earned', '>', 0)
             ->when($user->role === 'organizer', fn ($q) => $q->whereHas('event', fn ($e) => $e->where('created_by', $user->id)))
+            ->when($request->event_id, fn ($q, $id) => $q->where('event_id', $id))
             ->when($request->search, function ($q, $search) {
                 $q->where(function ($qq) use ($search) {
                     $qq->whereHas('event', fn ($e) => $e->where('title', 'like', "%{$search}%"))
@@ -140,8 +141,59 @@ class AffiliateController extends Controller
         return Inertia::render('Affiliate/Report', [
             'rows' => $rows,
             'total_commission' => $rows->sum('commission'),
-            'filters' => ['search' => $request->search ?? ''],
+            'filters' => ['search' => $request->search ?? '', 'event_id' => $request->event_id ?? ''],
         ]);
+    }
+
+    // Pencarian event (yang punya komisi affiliate) untuk AsyncSelect (JSON, maks 20).
+    public function reportEventSearch(Request $request)
+    {
+        $user = Auth::user();
+        $q = $request->q;
+
+        $eventIds = Transaction::query()
+            ->where('status', 'PAID')
+            ->whereNotNull('promoter_id')
+            ->where('commission_earned', '>', 0)
+            ->when($user->role === 'organizer', fn ($x) => $x->whereHas('event', fn ($e) => $e->where('created_by', $user->id)))
+            ->distinct()
+            ->pluck('event_id');
+
+        $events = Event::whereIn('id', $eventIds)
+            ->when($q, fn ($query, $q) => $query->where('title', 'like', "%{$q}%"))
+            ->limit(20)
+            ->get(['id', 'title']);
+
+        return response()->json($events->map(fn ($e) => ['value' => $e->id, 'label' => $e->title]));
+    }
+
+    // Pencarian affiliate (promotor) untuk AsyncSelect di halaman komisi (JSON, maks 20).
+    public function reportSearch(Request $request)
+    {
+        $user = Auth::user();
+        $q = $request->q;
+
+        // Hanya promotor yang benar-benar punya komisi (scope organizer ke event miliknya).
+        $ids = Transaction::query()
+            ->where('status', 'PAID')
+            ->whereNotNull('promoter_id')
+            ->where('commission_earned', '>', 0)
+            ->when($user->role === 'organizer', fn ($x) => $x->whereHas('event', fn ($e) => $e->where('created_by', $user->id)))
+            ->distinct()
+            ->pluck('promoter_id');
+
+        $users = User::whereIn('id', $ids)
+            ->when($q, function ($query, $q) {
+                $query->where(function ($s) use ($q) {
+                    $s->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%");
+                });
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'email']);
+
+        return response()->json(
+            $users->map(fn ($u) => ['value' => $u->email, 'label' => "{$u->name} — {$u->email}"])
+        );
     }
 
     public function approve(User $user)

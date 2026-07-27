@@ -37,6 +37,29 @@ class UserController extends Controller
     }
 
     /**
+     * Pencarian user ringan untuk react-select AsyncSelect (JSON, dibatasi 20).
+     */
+    public function search(Request $request)
+    {
+        $q = $request->q;
+
+        $users = User::query()
+            ->when($q, function ($query, $q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%");
+                });
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'email']);
+
+        // value = email (unik) agar bisa langsung memfilter tabel lewat param search.
+        return response()->json(
+            $users->map(fn ($u) => ['value' => $u->email, 'label' => "{$u->name} — {$u->email}"])
+        );
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

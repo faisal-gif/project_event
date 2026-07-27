@@ -1,7 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
-import { Search, Plus, Pencil, Users as UsersIcon } from 'lucide-react';
+import AsyncSelect from 'react-select/async';
+import { Plus, Pencil, Users as UsersIcon } from 'lucide-react';
 
 const ROLE_BADGE = {
     admin: 'badge-error',
@@ -11,6 +12,23 @@ const ROLE_BADGE = {
 };
 
 const ROLES = ['user', 'admin', 'organizer', 'judge'];
+
+// Ambil opsi dari server sesuai ketikan (maks 20), didebounce agar ringan.
+let searchTimer;
+const loadUsers = (input) =>
+    new Promise((resolve) => {
+        clearTimeout(searchTimer);
+        if (!input) {
+            resolve([]);
+            return;
+        }
+        searchTimer = setTimeout(() => {
+            fetch(route('admin.users.search', { q: input }), { headers: { Accept: 'application/json' } })
+                .then((r) => r.json())
+                .then(resolve)
+                .catch(() => resolve([]));
+        }, 300);
+    });
 
 function Pagination({ links }) {
     if (!links || links.length <= 3) return null;
@@ -63,18 +81,20 @@ export default function UserManagement({ users, filters }) {
                         </Link>
                     </div>
 
-                    {/* Toolbar: search + filter role */}
+                    {/* Toolbar: search (AsyncSelect, server-side) + filter role */}
                     <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                        <label className="input input-bordered flex items-center gap-2 w-full sm:flex-1 h-12">
-                            <Search className="w-4 h-4 opacity-60 shrink-0" />
-                            <input
-                                type="text"
-                                className="grow w-full bg-transparent"
-                                placeholder="Cari nama atau email..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                        <div className="w-full sm:flex-1">
+                            <AsyncSelect
+                                cacheOptions
+                                isClearable
+                                loadOptions={loadUsers}
+                                onChange={(opt) => setSearch(opt ? opt.value : '')}
+                                placeholder="Cari nama atau email user..."
+                                noOptionsMessage={({ inputValue }) => (inputValue ? 'Tidak ditemukan' : 'Ketik untuk mencari...')}
+                                loadingMessage={() => 'Mencari...'}
+                                styles={{ control: (base) => ({ ...base, minHeight: '3rem' }) }}
                             />
-                        </label>
+                        </div>
                         <select
                             className="select select-bordered w-full sm:w-52 h-12"
                             value={role}

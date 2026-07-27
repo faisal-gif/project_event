@@ -66,10 +66,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Kelola pengajuan affiliate + laporan komisi
     Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
     Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
+    Route::get('affiliates/report/search', [AffiliateController::class, 'reportSearch'])->name('affiliates.report.search');
+    Route::get('affiliates/report/event-search', [AffiliateController::class, 'reportEventSearch'])->name('affiliates.report.eventSearch');
     Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
     Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
 
+    Route::get('transactions/search', [TransactionController::class, 'adminSearch'])->name('transactions.search');
+    Route::get('transactions/event-search', [TransactionController::class, 'adminEventSearch'])->name('transactions.eventSearch');
+
     Route::resource('category', CategoryEventsController::class);
+    Route::get('users/search', [UserController::class, 'search'])->name('users.search');
     Route::resource('users', UserController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
@@ -118,6 +124,8 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
 
     // Laporan komisi affiliate (approval/pengajuan hanya admin)
     Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
+    Route::get('affiliates/report/search', [AffiliateController::class, 'reportSearch'])->name('affiliates.report.search');
+    Route::get('affiliates/report/event-search', [AffiliateController::class, 'reportEventSearch'])->name('affiliates.report.eventSearch');
 
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');

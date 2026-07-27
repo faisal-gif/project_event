@@ -1,7 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
-import { Search, Wallet } from 'lucide-react';
+import AsyncSelect from 'react-select/async';
+import { Wallet } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
 
 export default function Report({ rows, total_commission, filters }) {
@@ -9,7 +10,38 @@ export default function Report({ rows, total_commission, filters }) {
     const prefix = auth.user.role === 'admin' ? 'admin' : 'organizer';
 
     const [search, setSearch] = useState(filters?.search || '');
+    const [eventOpt, setEventOpt] = useState(null);
     const isFirst = useRef(true);
+    const searchTimer = useRef();
+    const eventTimer = useRef();
+
+    // Ambil daftar affiliate (promotor) dari server sesuai ketikan (maks 20), didebounce.
+    const loadPromoters = (input) =>
+        new Promise((resolve) => {
+            clearTimeout(searchTimer.current);
+            if (!input) {
+                resolve([]);
+                return;
+            }
+            searchTimer.current = setTimeout(() => {
+                fetch(route(`${prefix}.affiliates.report.search`, { q: input }), { headers: { Accept: 'application/json' } })
+                    .then((r) => r.json())
+                    .then(resolve)
+                    .catch(() => resolve([]));
+            }, 300);
+        });
+
+    // Event yang punya komisi affiliate (untuk filter).
+    const loadEvents = (input) =>
+        new Promise((resolve) => {
+            clearTimeout(eventTimer.current);
+            eventTimer.current = setTimeout(() => {
+                fetch(route(`${prefix}.affiliates.report.eventSearch`, { q: input }), { headers: { Accept: 'application/json' } })
+                    .then((r) => r.json())
+                    .then(resolve)
+                    .catch(() => resolve([]));
+            }, 250);
+        });
 
     useEffect(() => {
         if (isFirst.current) {
@@ -17,10 +49,14 @@ export default function Report({ rows, total_commission, filters }) {
             return;
         }
         const t = setTimeout(() => {
-            router.get(route(`${prefix}.affiliates.report`), { search }, { preserveState: true, preserveScroll: true, replace: true });
+            router.get(
+                route(`${prefix}.affiliates.report`),
+                { search, event_id: eventOpt?.value || '' },
+                { preserveState: true, preserveScroll: true, replace: true }
+            );
         }, 300);
         return () => clearTimeout(t);
-    }, [search]);
+    }, [search, eventOpt]);
 
     return (
         <AuthenticatedLayout>
@@ -49,17 +85,35 @@ export default function Report({ rows, total_commission, filters }) {
                         </div>
                     </div>
 
-                    {/* Search */}
-                    <label className="input input-bordered flex items-center gap-2 w-full h-12 mb-4">
-                        <Search className="w-4 h-4 opacity-60 shrink-0" />
-                        <input
-                            type="text"
-                            className="grow w-full bg-transparent"
-                            placeholder="Cari event atau nama affiliate..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </label>
+                    {/* Filter: affiliate + event (AsyncSelect, server-side) */}
+                    <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                        <div className="w-full sm:flex-1">
+                            <AsyncSelect
+                                cacheOptions
+                                isClearable
+                                loadOptions={loadPromoters}
+                                onChange={(opt) => setSearch(opt ? opt.value : '')}
+                                placeholder="Cari nama atau email affiliate..."
+                                noOptionsMessage={({ inputValue }) => (inputValue ? 'Tidak ditemukan' : 'Ketik untuk mencari...')}
+                                loadingMessage={() => 'Mencari...'}
+                                styles={{ control: (base) => ({ ...base, minHeight: '3rem' }) }}
+                            />
+                        </div>
+                        <div className="w-full sm:w-64">
+                            <AsyncSelect
+                                cacheOptions
+                                defaultOptions
+                                isClearable
+                                value={eventOpt}
+                                loadOptions={loadEvents}
+                                onChange={setEventOpt}
+                                placeholder="Semua event"
+                                noOptionsMessage={() => 'Tidak ada event'}
+                                loadingMessage={() => 'Memuat...'}
+                                styles={{ control: (base) => ({ ...base, minHeight: '3rem' }) }}
+                            />
+                        </div>
+                    </div>
 
                     <div className="card bg-base-100 border border-base-200 shadow-sm">
                         <div className="overflow-x-auto">

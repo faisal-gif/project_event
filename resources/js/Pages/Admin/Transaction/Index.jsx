@@ -1,8 +1,38 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
-import { Search, Receipt } from 'lucide-react';
+import AsyncSelect from 'react-select/async';
+import { Receipt } from 'lucide-react';
 import { formatRupiah, formatDateLong } from '@/Utils/formatter';
+
+// Ambil opsi transaksi dari server sesuai ketikan (maks 20), didebounce.
+let trxSearchTimer;
+const loadTransactions = (input) =>
+    new Promise((resolve) => {
+        clearTimeout(trxSearchTimer);
+        if (!input) {
+            resolve([]);
+            return;
+        }
+        trxSearchTimer = setTimeout(() => {
+            fetch(route('admin.transactions.search', { q: input }), { headers: { Accept: 'application/json' } })
+                .then((r) => r.json())
+                .then(resolve)
+                .catch(() => resolve([]));
+        }, 300);
+    });
+
+let trxEventTimer;
+const loadTransactionEvents = (input) =>
+    new Promise((resolve) => {
+        clearTimeout(trxEventTimer);
+        trxEventTimer = setTimeout(() => {
+            fetch(route('admin.transactions.eventSearch', { q: input }), { headers: { Accept: 'application/json' } })
+                .then((r) => r.json())
+                .then(resolve)
+                .catch(() => resolve([]));
+        }, 250);
+    });
 
 const STATUS_BADGE = {
     PAID: 'badge-success',
@@ -32,6 +62,7 @@ function Pagination({ links }) {
 export default function Index({ transactions, filters }) {
     const [search, setSearch] = useState(filters?.search || '');
     const [status, setStatus] = useState(filters?.status || '');
+    const [eventOpt, setEventOpt] = useState(null);
     const isFirst = useRef(true);
 
     useEffect(() => {
@@ -40,10 +71,14 @@ export default function Index({ transactions, filters }) {
             return;
         }
         const t = setTimeout(() => {
-            router.get(route('admin.transactions.index'), { search, status }, { preserveState: true, preserveScroll: true, replace: true });
+            router.get(
+                route('admin.transactions.index'),
+                { search, status, event_id: eventOpt?.value || '' },
+                { preserveState: true, preserveScroll: true, replace: true }
+            );
         }, 300);
         return () => clearTimeout(t);
-    }, [search, status]);
+    }, [search, status, eventOpt]);
 
     return (
         <AuthenticatedLayout>
@@ -58,18 +93,34 @@ export default function Index({ transactions, filters }) {
 
                     {/* Toolbar */}
                     <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                        <label className="input input-bordered flex items-center gap-2 w-full sm:flex-1 h-12">
-                            <Search className="w-4 h-4 opacity-60 shrink-0" />
-                            <input
-                                type="text"
-                                className="grow w-full bg-transparent"
+                        <div className="w-full sm:flex-1">
+                            <AsyncSelect
+                                cacheOptions
+                                isClearable
+                                loadOptions={loadTransactions}
+                                onChange={(opt) => setSearch(opt ? opt.value : '')}
                                 placeholder="Cari referensi, user, atau event..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                noOptionsMessage={({ inputValue }) => (inputValue ? 'Tidak ditemukan' : 'Ketik untuk mencari...')}
+                                loadingMessage={() => 'Mencari...'}
+                                styles={{ control: (base) => ({ ...base, minHeight: '3rem' }) }}
                             />
-                        </label>
+                        </div>
+                        <div className="w-full sm:w-56">
+                            <AsyncSelect
+                                cacheOptions
+                                defaultOptions
+                                isClearable
+                                value={eventOpt}
+                                loadOptions={loadTransactionEvents}
+                                onChange={setEventOpt}
+                                placeholder="Semua event"
+                                noOptionsMessage={() => 'Tidak ada event'}
+                                loadingMessage={() => 'Memuat...'}
+                                styles={{ control: (base) => ({ ...base, minHeight: '3rem' }) }}
+                            />
+                        </div>
                         <select
-                            className="select select-bordered w-full sm:w-48 h-12"
+                            className="select select-bordered w-full sm:w-44 h-12"
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                         >
