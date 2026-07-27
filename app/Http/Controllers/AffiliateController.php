@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AffiliateCommissionExport;
 use App\Models\Event;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AffiliateController extends Controller
 {
@@ -110,9 +112,29 @@ class AffiliateController extends Controller
      */
     public function report(Request $request)
     {
+        $rows = $this->commissionRows($request);
+
+        return Inertia::render('Affiliate/Report', [
+            'rows' => $rows,
+            'total_commission' => $rows->sum('commission'),
+            'filters' => ['search' => $request->search ?? '', 'event_id' => $request->event_id ?? ''],
+        ]);
+    }
+
+    // Export laporan komisi (mengikuti filter yang sama) ke Excel.
+    public function reportExport(Request $request)
+    {
+        $rows = $this->commissionRows($request);
+
+        return Excel::download(new AffiliateCommissionExport($rows), 'komisi-affiliate-' . now()->format('Ymd-His') . '.xlsx');
+    }
+
+    // Query agregasi komisi per event + per user (dipakai report & export).
+    private function commissionRows(Request $request)
+    {
         $user = Auth::user();
 
-        $rows = Transaction::query()
+        return Transaction::query()
             ->where('status', 'PAID')
             ->whereNotNull('promoter_id')
             ->where('commission_earned', '>', 0)
@@ -137,12 +159,6 @@ class AffiliateController extends Controller
                 'trx_count' => (int) $row->trx_count,
                 'commission' => (float) $row->commission,
             ]);
-
-        return Inertia::render('Affiliate/Report', [
-            'rows' => $rows,
-            'total_commission' => $rows->sum('commission'),
-            'filters' => ['search' => $request->search ?? '', 'event_id' => $request->event_id ?? ''],
-        ]);
     }
 
     // Pencarian event (yang punya komisi affiliate) untuk AsyncSelect (JSON, maks 20).

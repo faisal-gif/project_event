@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import AsyncSelect from 'react-select/async';
-import { Wallet } from 'lucide-react';
+import { Wallet, Download } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
 
 export default function Report({ rows, total_commission, filters }) {
@@ -64,9 +64,17 @@ export default function Report({ rows, total_commission, filters }) {
 
             <div className="py-10">
                 <div className="mx-auto max-w-5xl px-4 lg:px-8">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Wallet className="w-6 h-6 text-primary" />
-                        <h1 className="font-bold text-2xl">Komisi Affiliate</h1>
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                        <div className="flex items-center gap-2">
+                            <Wallet className="w-6 h-6 text-primary" />
+                            <h1 className="font-bold text-2xl">Komisi Affiliate</h1>
+                        </div>
+                        <a
+                            href={route(`${prefix}.affiliates.report.export`, { search: search || undefined, event_id: eventOpt?.value || undefined })}
+                            className="btn btn-success btn-sm text-white gap-1"
+                        >
+                            <Download className="w-4 h-4" /> Export Excel
+                        </a>
                     </div>
 
                     {/* Tab nav — approval/pengajuan hanya untuk admin */}

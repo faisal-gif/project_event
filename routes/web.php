@@ -66,6 +66,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Kelola pengajuan affiliate + laporan komisi
     Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
     Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
+    Route::get('affiliates/report/export', [AffiliateController::class, 'reportExport'])->name('affiliates.report.export');
     Route::get('affiliates/report/search', [AffiliateController::class, 'reportSearch'])->name('affiliates.report.search');
     Route::get('affiliates/report/event-search', [AffiliateController::class, 'reportEventSearch'])->name('affiliates.report.eventSearch');
     Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
@@ -124,6 +125,7 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
 
     // Laporan komisi affiliate (approval/pengajuan hanya admin)
     Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
+    Route::get('affiliates/report/export', [AffiliateController::class, 'reportExport'])->name('affiliates.report.export');
     Route::get('affiliates/report/search', [AffiliateController::class, 'reportSearch'])->name('affiliates.report.search');
     Route::get('affiliates/report/event-search', [AffiliateController::class, 'reportEventSearch'])->name('affiliates.report.eventSearch');
 
