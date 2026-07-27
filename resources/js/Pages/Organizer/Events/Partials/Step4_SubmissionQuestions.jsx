@@ -8,15 +8,15 @@ const Step4_SubmissionQuestions = ({ data, setData, errors }) => {
              <Card className="lg:col-span-12 bg-base-100 p-6 shadow-medium">
                 <div className="flex items-center space-x-2">
                     <input type="checkbox" id="needs_submission" onChange={(e) => setData("needs_submission", e.target.checked)} className="checkbox" checked={data.needs_submission} />
-                    <label htmlFor="needs_submission" className="text-lg font-medium cursor-pointer">Enable Post-Purchase Submissions</label>
+                    <label htmlFor="needs_submission" className="text-lg font-medium cursor-pointer">Aktifkan Submisi Pasca-Pembelian</label>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">Enable this if the event is a competition or requires participants to submit files/data after purchasing a ticket.</p>
+                <p className="text-sm text-gray-500 mt-2">Aktifkan jika event ini adalah kompetisi atau mengharuskan peserta mengunggah/mengisi data setelah membeli tiket.</p>
             </Card>
 
             {data.needs_submission && (
                  <QuestionBuilder
-                    title="Submission Fields"
-                    description="Define the fields that participants need to fill out or upload for their submission."
+                    title="Field Submisi"
+                    description="Tentukan field yang perlu diisi atau diunggah peserta untuk submisi mereka."
                     questions={data.submission_fields}
                     setQuestions={(questions) => setData('submission_fields', questions)}
                     error={errors.submission_fields}

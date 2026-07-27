@@ -96,6 +96,7 @@ export default function AuthenticatedLayout({ children }) {
                                     <li><Link href={route('admin.ticket.scan')}>QR Scanner</Link></li>
                                     <li><Link href={route('admin.transactions.index')}>Transaction</Link></li>
                                     <li><Link href={route('admin.users.index')}>Users</Link></li>
+                                    <li><Link href={route('admin.affiliates.index')}>Pengajuan Affiliate</Link></li>
                                 </>
                             )}
 
@@ -109,6 +110,11 @@ export default function AuthenticatedLayout({ children }) {
                                     <li>
                                         <Link href={route('organizer.events.index')}>
                                             My Events
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('organizer.affiliates.index')}>
+                                            Pengajuan Affiliate
                                         </Link>
                                     </li>
                                 </>

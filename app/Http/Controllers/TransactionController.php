@@ -24,11 +24,8 @@ class TransactionController extends Controller
 {
     public function index()
     {
-        $userId = auth()->user()->id;
-        $transactions = Transaction::with('event')->where('user_id', $userId)->latest()->get();
-        return Inertia::render('Users/Transaction/Index', [
-            'transactions' => $transactions,
-        ]);
+        // Tiket & Transaksi kini digabung di satu halaman (tickets.index).
+        return redirect()->route('tickets.index');
     }
 
     public function create(Request $request, TicketType $ticketType, TripayService $tripay)
@@ -148,12 +145,15 @@ class TransactionController extends Controller
         // ====================================================================
         $totalPrice = $ticketType->price * $validated['quantity'];
 
-        // Ambil ID Promotor dari Session (Diasumsikan kamu sudah set session saat user klik link refferal)
+        // Ambil ID Promotor dari Session (di-set saat user klik link referral)
         $promoterId = session('referral_id');
+        $promoter = $promoterId ? \App\Models\User::find($promoterId) : null;
         $commissionEarned = 0;
 
-        // Cek jika event mengizinkan afiliasi, ada promoter, dan promoter BUKAN pembeli itu sendiri
-        if ($event->is_affiliate_enabled && $promoterId && $promoterId != $user->id) {
+        // Komisi hanya diberikan jika: event mengaktifkan afiliasi, promotor ada,
+        // promotor BUKAN pembeli itu sendiri, dan promotor adalah affiliate yang SUDAH DISETUJUI.
+        if ($event->is_affiliate_enabled && $promoter && $promoter->id != $user->id && $promoter->isApprovedAffiliate()) {
+            $promoterId = $promoter->id;
             if ($event->affiliate_type === 'percentage') {
                 $commissionEarned = ($event->affiliate_reward / 100) * $totalPrice;
             } elseif ($event->affiliate_type === 'fixed') {
@@ -161,7 +161,7 @@ class TransactionController extends Controller
                 $commissionEarned = $event->affiliate_reward * $validated['quantity'];
             }
         } else {
-            // Reset jika ternyata tidak valid
+            // Reset jika promotor tidak valid / tidak berizin
             $promoterId = null;
         }
         // ====================================================================

@@ -26,8 +26,10 @@ function NavBarGuest() {
               Event
             </Link>
           </li>
-          <li><Link className="hover:bg-primary-focus font-inter font-semibold" href={route('tickets.index')}>Tiket</Link></li>
-          <li><Link className="hover:bg-primary-focus font-inter font-semibold" href={route('transactions.index')}>Transaksi</Link></li>
+          <li><Link className="hover:bg-primary-focus font-inter font-semibold" href={route('tickets.index')}>Tiket &amp; Transaksi</Link></li>
+          {user?.role === 'user' && (
+            <li><Link className="hover:bg-primary-focus font-inter font-semibold" href={route('affiliate.me')}>Affiliate</Link></li>
+          )}
         </ul>
       </div>
 
@@ -58,6 +60,11 @@ function NavBarGuest() {
                {user.role === 'judge' && (
                 <Dropdown.Link href={route('judge.dashboard')}>
                   Judge Dashboard
+                </Dropdown.Link>
+              )}
+              {user.role === 'user' && (
+                <Dropdown.Link href={route('affiliate.me')}>
+                  Program Affiliate
                 </Dropdown.Link>
               )}
               <Dropdown.Link href={route('logout')} method="post" as="button">

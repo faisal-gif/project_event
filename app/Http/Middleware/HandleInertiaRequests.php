@@ -38,6 +38,9 @@ class HandleInertiaRequests extends Middleware
                 'message' => $request->session()->get('message'),
                 'status' => $request->session()->get('status'),
                 'checkout_url' => $request->session()->get('checkout_url'),
+                'success' => $request->session()->get('success'),
+                'info' => $request->session()->get('info'),
+                'error' => $request->session()->get('error'),
             ],
         ];
     }

@@ -67,9 +67,9 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
                 {questions.map((q, index) => (
                     <div key={index} className="p-4 border rounded-lg space-y-4 bg-white">
                         <div className="flex justify-between items-center border-b pb-2">
-                            <p className="font-medium text-primary">Question {index + 1}</p>
+                            <p className="font-medium text-primary">Pertanyaan {index + 1}</p>
                             <button type="button" onClick={() => removeQuestion(index)} className="btn btn-sm btn-error btn-ghost">
-                                <Trash2 className="w-4 h-4 mr-1" /> Remove
+                                <Trash2 className="w-4 h-4 mr-1" /> Hapus
                             </button>
                         </div>
                         
@@ -84,14 +84,14 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
                                 />
                             </div>
                             <div>
-                                <InputLabel value="Type" />
+                                <InputLabel value="Tipe" />
                                 <select value={q.type} onChange={(e) => handleQuestionChange(index, 'type', e.target.value)} className="select select-bordered w-full mt-1">
-                                    <option value="text">Text</option>
-                                    <option value="textarea">Textarea</option>
+                                    <option value="text">Teks</option>
+                                    <option value="textarea">Area Teks</option>
                                     <option value="file">File</option>
-                                    <option value="image">Image</option>
-                                    <option value="select">Select (Dropdown)</option>
-                                    <option value="checkbox">Checkbox (Multiple Choice)</option>
+                                    <option value="image">Gambar</option>
+                                    <option value="select">Pilihan (Dropdown)</option>
+                                    <option value="checkbox">Checkbox (Pilihan Ganda)</option>
                                     <option value="url">URL</option>
                                 </select>
                             </div>
@@ -151,7 +151,7 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
                 
                 <div className="pt-2">
                     <button type="button" onClick={addQuestion} className="btn btn-primary w-full sm:w-auto">
-                        <Plus className="w-5 h-5 mr-1" /> Add New Question
+                        <Plus className="w-5 h-5 mr-1" /> Tambah Pertanyaan
                     </button>
                 </div>
                 

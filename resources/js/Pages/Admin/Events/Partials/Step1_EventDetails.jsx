@@ -9,7 +9,7 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 
-const Step1_EventDetails = ({ data, setData, errors, category }) => {
+const Step1_EventDetails = ({ data, setData, errors, category, existingImageUrl = null }) => {
     const module = {
         toolbar: [
             [{ 'header': [1, 2, false] }],
@@ -27,9 +27,9 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
                         <Upload className="w-5 h-5 text-primary" />
-                        <label className="text-lg font-semibold">Event Thumbnail</label>
+                        <label className="text-lg font-semibold">Thumbnail Event</label>
                     </div>
-                    <FileUpload name="thumbnail" onChange={(file) => setData("image", file)} />
+                    <FileUpload name="thumbnail" onChange={(file) => setData("image", file)} initialPreview={existingImageUrl} />
                     <InputError message={errors.image} />
                 </div>
             </Card>
@@ -37,20 +37,20 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
             <Card className="lg:col-span-7 bg-base-100 p-6 shadow-medium">
                 <div className="grid grid-cols-1 gap-6">
                     <div className="space-y-2">
-                        <InputLabel htmlFor="title" value="Title" />
-                        <TextInput id="title" placeholder="Enter event title" value={data.title} onChange={(e) => setData("title", e.target.value)} className="w-full" />
+                        <InputLabel htmlFor="title" value="Judul" required />
+                        <TextInput id="title" placeholder="Masukkan judul event" value={data.title} onChange={(e) => setData("title", e.target.value)} className="w-full" />
                         <InputError message={errors.title} />
                     </div>
                     <div className="space-y-2">
-                        <InputLabel htmlFor="status" value="Event Status" />
+                        <InputLabel htmlFor="status" value="Status Event" />
                         <select
                             id="status"
                             className="select select-bordered w-full"
                             value={data.status}
                             onChange={(e) => setData("status", e.target.value)}
                         >
-                            <option value="valid">Valid (Active & Visible)</option>
-                            <option value="expired">Expired (Draft / Hidden)</option>
+                            <option value="valid">Valid (Aktif & Terlihat)</option>
+                            <option value="expired">Expired (Draf / Tersembunyi)</option>
                         </select>
                         <InputError message={errors.status} />
                     </div>
@@ -58,7 +58,7 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
                         <InputLabel value="Headline" />
                         <div className="flex items-center space-x-2">
                             <input type="checkbox" id="headline" onChange={(e) => setData("is_headline", e.target.checked)} className="checkbox checkbox-sm" checked={data.is_headline} />
-                            <label htmlFor="headline" className="text-sm font-normal cursor-pointer">Set as Headline Event</label>
+                            <label htmlFor="headline" className="text-sm font-normal cursor-pointer">Jadikan Event Headline</label>
                         </div>
                         <InputError message={errors.is_headline} />
                     </div>
@@ -67,11 +67,12 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
 
             <Card className="lg:col-span-12 bg-base-100 p-6 shadow-medium">
                 <div className="max-w-md">
-                    <InputLabel value="Category" />
+                    <InputLabel value="Kategori" required />
                     <Select
                         options={category.map((cat) => ({ value: cat.id, label: cat.name }))}
                         onChange={(selected) => setData('category_id', selected?.value)}
                         className="react-select-container"
+                        placeholder="Pilih kategori..."
                         value={category.find(cat => cat.id === data.category_id) ? { value: data.category_id, label: category.find(cat => cat.id === data.category_id).name } : null}
                     />
                     <InputError message={errors.category_id} />
@@ -82,17 +83,17 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
                         <CalendarIcon className="w-4 h-4 text-primary" />
-                        <label className="font-medium">Event Duration</label>
+                        <label className="font-medium">Durasi Event</label>
                     </div>
                     <div className="space-y-4">
                         <div className="flex flex-col gap-2">
-                            <InputLabel htmlFor="startDate" value="Start Date" />
+                            <InputLabel htmlFor="startDate" value="Tanggal Mulai" required />
                             <TextInput id="startDate" type="datetime-local" value={data.start_date} onChange={(e) => setData("start_date", e.target.value)} />
                             <InputError message={errors.start_date} />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <InputLabel htmlFor="endDate" value="End Date" />
-                            <TextInput id="endDate" type="datetime-local" value={data.end_date} onChange={(e) => setData("end_date", e.target.value)} />
+                            <InputLabel htmlFor="endDate" value="Tanggal Berakhir" required />
+                            <TextInput id="endDate" type="datetime-local" min={data.start_date || undefined} value={data.end_date} onChange={(e) => setData("end_date", e.target.value)} />
                             <InputError message={errors.end_date} />
                         </div>
                     </div>
@@ -103,21 +104,21 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
                         <MapPin className="w-4 h-4 text-primary" />
-                        <label className="font-medium">Location</label>
+                        <label className="font-medium">Lokasi</label>
                     </div>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <InputLabel htmlFor="locationType" value="Location Type" />
+                            <InputLabel htmlFor="locationType" value="Tipe Lokasi" required />
                             <select name="location_type" className='select select-bordered w-full' value={data.location_type} onChange={(e) => setData('location_type', e.target.value)}>
                                 <option value="online">Online</option>
-                                <option value="offline">Offline</option>
+                                <option value="offline">Offline (Tatap Muka)</option>
                                 <option value="hybrid">Hybrid</option>
                             </select>
                             <InputError message={errors.location_type} />
                         </div>
                         <div className="space-y-2">
-                            <InputLabel htmlFor="locationDetail" value="Location Details" />
-                            <textarea id="locationDetail" placeholder="Enter venue details, address, or online platform info" className="textarea textarea-bordered min-h-[80px] w-full" value={data.location_details} onChange={(e) => setData("location_details", e.target.value)} />
+                            <InputLabel htmlFor="locationDetail" value="Detail Lokasi" />
+                            <textarea id="locationDetail" placeholder="Masukkan alamat, nama venue, atau info platform online" className="textarea textarea-bordered min-h-[80px] w-full" value={data.location_details} onChange={(e) => setData("location_details", e.target.value)} />
                             <InputError message={errors.location_details} />
                         </div>
                     </div>
@@ -126,7 +127,7 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
 
             <Card className="bg-base-100 lg:col-span-12 p-6 shadow-medium">
                 <div className="space-y-4">
-                    <InputLabel htmlFor="description" value="Description" />
+                    <InputLabel htmlFor="description" value="Deskripsi" required />
                     <ReactQuill value={data.description} modules={module} onChange={(value) => setData('description', value)} />
                     <InputError message={errors.description} />
                 </div>
@@ -134,7 +135,7 @@ const Step1_EventDetails = ({ data, setData, errors, category }) => {
 
             <Card className="bg-base-100 lg:col-span-12 p-6 shadow-medium">
                 <div className="space-y-4">
-                    <InputLabel htmlFor="requirement" value="Requirements" />
+                    <InputLabel htmlFor="requirement" value="Syarat & Ketentuan" />
                     <ReactQuill value={data.requirements} modules={module} onChange={(value) => setData('requirements', value)} />
                     <InputError message={errors.requirements} />
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Organizer\EventRequest;
 use App\Models\CategoryEvents;
 use App\Models\Event;
 use Illuminate\Http\Request;
@@ -36,31 +37,13 @@ class OrganizerEventController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(EventRequest $request)
     {
-        $eventFields = $request->input('event_fields', []);
-        if (!empty($eventFields)) {
-            foreach ($eventFields as $key => $field) {
-                // Cek jika 'options' ada dan merupakan string
-                if (isset($field['options']) && is_string($field['options'])) {
-                    // Ubah string "M,L,XL" menjadi array ['M', 'L', 'XL']
-                    $eventFields[$key]['options'] = array_map('trim', explode(',', $field['options']));
-                }
-            }
-            // Gabungkan kembali data yang sudah diubah ke dalam request
-            $request->merge(['event_fields' => $eventFields]);
-        }
-
-
-        $data = $this->validateEventData($request);
-
-
-        $slug = Str::slug($request->title);
-        $imagePath = $this->storeImage($request);
+        $data = $request->validated();
 
         $event = Event::create([
-            'slug' => $slug,
-            'image' => $imagePath,
+            'slug' => Str::slug($request->title),
+            'image' => $this->storeImage($request),
             'title' => $data['title'],
             'description' => $data['description'],
             'requirements' => $data['requirements'],
@@ -184,23 +167,9 @@ class OrganizerEventController extends Controller
         return Inertia::render('Organizer/Events/Edit', ['event' => $event, 'category' => $category]);
     }
 
-    public function update(Request $request, Event $event)
+    public function update(EventRequest $request, Event $event)
     {
-
-        $eventFields = $request->input('event_fields', []);
-        if (!empty($eventFields)) {
-            foreach ($eventFields as $key => $field) {
-                // Cek jika 'options' ada dan merupakan string
-                if (isset($field['options']) && is_string($field['options'])) {
-                    // Ubah string "M,L,XL" menjadi array ['M', 'L', 'XL']
-                    $eventFields[$key]['options'] = array_map('trim', explode(',', $field['options']));
-                }
-            }
-            // Gabungkan kembali data yang sudah diubah ke dalam request
-            $request->merge(['event_fields' => $eventFields]);
-        }
-
-        $data = $this->validateEventData($request, $event);
+        $data = $request->validated();
 
         $updateData = [
             'title' => $data['title'],
@@ -232,76 +201,6 @@ class OrganizerEventController extends Controller
         $this->syncRelatedData($event, $data);
 
         return redirect()->route('organizer.events.index')->with('success', 'Event updated successfully.');
-    }
-
-    private function validateEventData(Request $request, Event $event = null)
-    {
-        $imageRule = $event ? 'nullable|image' : 'required|image';
-
-        // 1. Definisikan semua rules Anda
-        $rules = [
-            'image' => $imageRule,
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'requirements' => 'nullable|string',
-            'category_id' => 'required|exists:category_events,id',
-            'location_type' => 'required|in:online,offline,hybrid',
-            'location_details' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'limit_ticket_user' => 'required|integer|min:1',
-            'is_headline' => 'required|boolean',
-            'ticket_types' => 'required|array|min:1',
-            'ticket_types.*.name' => 'required|string|max:255',
-            'ticket_types.*.price' => 'required|numeric|min:0',
-            'ticket_types.*.quota' => 'required|integer|min:1',
-            'ticket_types.*.purchase_date' => 'required|date',
-            'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
-            'ticket_types.*.description' => 'required|string',
-            'need_additional_questions' => 'boolean',
-            'event_fields' => ['nullable', 'array'],
-            'event_fields.*.label' => ['required_with:event_fields', 'string'],
-            'event_fields.*.type' => ['required_with:event_fields', 'string', 'in:text,textarea,select,radio,checkbox,date,file,url'],
-            'event_fields.*.is_required' => ['boolean'],
-            'event_fields.*.options' => [
-                'required_if:event_fields.*.type,select',
-                'required_if:event_fields.*.type,radio',
-                'required_if:event_fields.*.type,checkbox',
-                'nullable',
-                'array'
-            ],
-            'needs_submission' => 'boolean',
-            'submission_fields' => ['nullable', 'array'],
-            'submission_fields.*.label' => ['required_with:submission_fields', 'string'],
-            'submission_fields.*.type' => ['required_with:submission_fields', 'string'],
-            'submission_fields.*.options' => ['nullable', 'string'],
-            'submission_fields.*.is_required' => ['boolean'],
-        ];
-
-        // 2. Definisikan pesan kustom Anda
-        $messages = [
-            'title.required' => 'Judul event tidak boleh kosong.',
-            'title.max' => 'Judul event terlalu panjang, maksimal 255 karakter.',
-            'description.required' => 'Deskripsi event wajib diisi.',
-            'category_id.required' => 'Silakan pilih kategori event.',
-            'category_id.exists' => 'Kategori yang dipilih tidak valid.',
-            'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh sebelum tanggal mulai.',
-            'ticket_types.min' => 'Anda harus menambahkan minimal 1 jenis tiket.',
-
-            // Contoh untuk array (menggunakan wildcard *)
-            'ticket_types.*.name.required' => 'Nama tiket wajib diisi.',
-            'ticket_types.*.price.numeric' => 'Harga tiket harus berupa angka.',
-            'ticket_types.*.quota.min' => 'Kuota tiket minimal adalah 1.',
-            'ticket_types.*.end_purchase_date.after_or_equal' => 'Tanggal akhir penjualan tiket tidak boleh sebelum tanggal mulainya.',
-
-            // Contoh untuk event_fields
-            'event_fields.*.label.required_with' => 'Label pertanyaan tambahan wajib diisi.',
-            'event_fields.*.type.in' => 'Tipe pertanyaan tambahan tidak valid.',
-            'event_fields.*.options.required_if' => 'Opsi jawaban wajib diisi untuk tipe select, radio, atau checkbox.',
-        ];
-
-        // 3. Masukkan $rules dan $messages ke method validate()
-        return $request->validate($rules, $messages);
     }
 
     private function storeImage(Request $request)
@@ -364,121 +263,4 @@ class OrganizerEventController extends Controller
     }
 
 
-    public function validateStep(Request $request)
-    {
-        $step = $request->input('step');
-        $rules = [];
-
-
-        if ($step === 1) {
-            $rules = [
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'category_id' => 'required|exists:category_events,id',
-                'location_type' => 'required|in:online,offline,hybrid',
-                'start_date' => 'required|date',
-                'end_date' => 'required|date|after_or_equal:start_date',
-            ];
-        } elseif ($step === 2) {
-            $rules = [
-                'ticket_types' => 'required|array|min:1',
-                'ticket_types.*.name' => 'required|string|max:255',
-                'ticket_types.*.price' => 'required|numeric|min:0',
-                'ticket_types.*.quota' => 'required|integer|min:1',
-                'ticket_types.*.purchase_date' => 'required|date',
-                'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
-                'ticket_types.*.description' => 'required|string',
-                'limit_ticket_user' => 'required|integer|min:1',
-            ];
-        }
-
-
-        $messages = [
-            // Pesan untuk Step 1
-            'title.required' => 'Judul event tidak boleh kosong.',
-            'description.required' => 'Deskripsi event wajib diisi.',
-            'category_id.required' => 'Silakan pilih kategori.',
-            'start_date.required' => 'Tanggal mulai event wajib diisi',
-            'end_date.required' => 'Tanggal berakhir event wajib diisi',
-            'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh kurang dari tanggal mulai.',
-
-            // Pesan untuk Step 2
-            'ticket_types.min' => 'Anda harus menambahkan minimal 1 jenis tiket.',
-            'ticket_types.*.name.required' => 'Nama tiket wajib diisi.',
-            'ticket_types.*.price.required' => 'Harga tiket wajib diisi.',
-            'ticket_types.*.quota.required' => 'Quota tiket wajib diisi.',
-            'ticket_types.*.purchase_date.required' => 'Tanggal awal pembelian tiket wajib diisi.',
-            'ticket_types.*.end_purchase_date.required' => 'Tanggal akhir pembelian tiket wajib diisi.',
-            'ticket_types.*.description.required' => 'Deskripsi tiket wajib diisi.',
-            'ticket_types.*.price.numeric' => 'Harga tiket harus berupa angka.',
-            'ticket_types.*.quota.min' => 'Kuota tiket minimal adalah 1.',
-
-
-            'limit_ticket_user.min' => 'Batas tiket per pengguna minimal 1.',
-        ];
-
-
-        $validatedData = $request->validate($rules, $messages);
-
-        return response()->json(['success' => true, 'data' => $validatedData]);
-    }
-
-    public function validateStepEdit(Request $request, Event $event)
-    {
-        $step = $request->input('step');
-        $rules = [];
-
-
-        if ($step === 1) {
-            $rules = [
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'category_id' => 'required|exists:category_events,id',
-                'location_type' => 'required|in:online,offline,hybrid',
-                'start_date' => 'required|date',
-                'end_date' => 'required|date|after_or_equal:start_date',
-            ];
-        } elseif ($step === 2) {
-            $rules = [
-                'ticket_types' => 'required|array|min:1',
-                'ticket_types.*.name' => 'required|string|max:255',
-                'ticket_types.*.price' => 'required|numeric|min:0',
-                'ticket_types.*.quota' => 'required|integer|min:1',
-                'ticket_types.*.purchase_date' => 'required|date',
-                'ticket_types.*.end_purchase_date' => 'required|date|after_or_equal:purchase_date',
-                'ticket_types.*.description' => 'required|string',
-                'limit_ticket_user' => 'required|integer|min:1',
-            ];
-        }
-
-
-        $messages = [
-            // Pesan untuk Step 1
-            'title.required' => 'Judul event tidak boleh kosong.',
-            'description.required' => 'Deskripsi event wajib diisi.',
-            'category_id.required' => 'Silakan pilih kategori.',
-            'start_date.required' => 'Tanggal mulai event wajib diisi',
-            'end_date.required' => 'Tanggal berakhir event wajib diisi',
-            'end_date.after_or_equal' => 'Tanggal berakhir tidak boleh kurang dari tanggal mulai.',
-
-            // Pesan untuk Step 2
-            'ticket_types.min' => 'Anda harus menambahkan minimal 1 jenis tiket.',
-            'ticket_types.*.name.required' => 'Nama tiket wajib diisi.',
-            'ticket_types.*.price.required' => 'Harga tiket wajib diisi.',
-            'ticket_types.*.quota.required' => 'Quota tiket wajib diisi.',
-            'ticket_types.*.purchase_date.required' => 'Tanggal awal pembelian tiket wajib diisi.',
-            'ticket_types.*.end_purchase_date.required' => 'Tanggal akhir pembelian tiket wajib diisi.',
-            'ticket_types.*.description.required' => 'Deskripsi tiket wajib diisi.',
-            'ticket_types.*.price.numeric' => 'Harga tiket harus berupa angka.',
-            'ticket_types.*.quota.min' => 'Kuota tiket minimal adalah 1.',
-
-
-            'limit_ticket_user.min' => 'Batas tiket per pengguna minimal 1.',
-        ];
-
-
-        $validatedData = $request->validate($rules, $messages);
-
-        return response()->json(['success' => true, 'data' => $validatedData]);
-    }
 }

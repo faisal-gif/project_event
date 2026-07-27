@@ -5,6 +5,7 @@ import { ChevronsRight, ArrowLeft, Loader } from 'lucide-react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import Stepper from '@/Components/ui/Stepper';
+import EventReview from '@/Components/EventReview';
 import axios from 'axios';
 
 import Step1_EventDetails from './Partials/Step1_EventDetails';
@@ -13,11 +14,22 @@ import Step3_RegistrationQuestions from './Partials/Step3_RegistrationQuestions'
 import Step4_SubmissionQuestions from './Partials/Step4_SubmissionQuestions';
 import Step5_Affiliate from './Partials/Step5_Affiliate';
 
+const steps = [
+    "Detail Event",
+    "Detail Tiket",
+    "Pertanyaan Registrasi",
+    "Pertanyaan Submisi",
+    "Program Afiliasi",
+    "Konfirmasi",
+];
+const REVIEW_STEP = steps.length;
+
 function Edit({ event, category }) {
     const [step, setStep] = useState(1);
+    const [maxStep, setMaxStep] = useState(1);
     const [validating, setValidating] = useState(false);
 
-    const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
+    const { data, setData, processing, errors, setError, clearErrors, isDirty } = useForm({
         // Step 1
         image: null, // Will not be pre-filled, only for new upload
         title: event.title || '',
@@ -44,7 +56,7 @@ function Edit({ event, category }) {
         })),
         // Step 4
         needs_submission: event.needs_submission || false,
-        submission_fields: event.event_submission_fields || [], // Assumes 'submission_fields' is passed
+        submission_fields: event.event_submission_fields || [],
 
         is_affiliate_enabled: event.is_affiliate_enabled || false,
         affiliate_type: event.affiliate_type || 'percentage',
@@ -63,9 +75,26 @@ function Edit({ event, category }) {
         return () => clearErrors();
     }, [step]);
 
+    // Warn before losing unsaved edits on refresh/close.
+    useEffect(() => {
+        const warn = (e) => {
+            if (isDirty && !processing) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', warn);
+        return () => window.removeEventListener('beforeunload', warn);
+    }, [isDirty, processing]);
+
+    const scrollToFirstError = () => {
+        requestAnimationFrame(() => {
+            document.querySelector('.text-red-600')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-
         router.post(route('admin.events.update', event.id), {
             _method: 'patch',
             ...data,
@@ -76,17 +105,18 @@ function Edit({ event, category }) {
         setValidating(true);
         clearErrors(...stepFields[step]);
 
-        const url = route('admin.events.validateStep.edit', { event: event.id });
-
         try {
-            const response = await axios.post(url, { step, ...data });
-            setStep(prev => prev + 1);
+            await axios.post(route('admin.events.validateStep.edit', { event: event.id }), { step, ...data });
+            const target = step + 1;
+            setStep(target);
+            setMaxStep((m) => Math.max(m, target));
         } catch (error) {
             if (error.response && error.response.status === 422) {
                 const validationErrors = error.response.data.errors;
-                Object.keys(validationErrors).forEach(key => {
+                Object.keys(validationErrors).forEach((key) => {
                     setError(key, validationErrors[key][0]);
                 });
+                scrollToFirstError();
             }
         } finally {
             setValidating(false);
@@ -95,16 +125,13 @@ function Edit({ event, category }) {
 
     const prevStep = () => {
         clearErrors();
-        setStep(prev => prev - 1);
-    }
+        setStep((prev) => prev - 1);
+    };
 
-    const steps = [
-        "Event Details",
-        "Ticket Details",
-        "Registration Questions",
-        "Submission Questions",
-         "Affiliate Program"
-    ];
+    const goToStep = (target) => {
+        clearErrors();
+        setStep(target);
+    };
 
     return (
         <AuthenticatedLayout>
@@ -112,30 +139,31 @@ function Edit({ event, category }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <Stepper steps={steps} currentStep={step} />
+                    <Stepper steps={steps} currentStep={step} maxStep={maxStep} onStepClick={goToStep} />
 
                     <form onSubmit={handleSubmit} className="p-4" noValidate>
-                        {step === 1 && <Step1_EventDetails data={data} setData={setData} errors={errors} category={category} />}
+                        {step === 1 && <Step1_EventDetails data={data} setData={setData} errors={errors} category={category} existingImageUrl={event.image ? `/storage/${event.image}` : null} />}
                         {step === 2 && <Step2_TicketDetails data={data} setData={setData} errors={errors} />}
                         {step === 3 && <Step3_RegistrationQuestions data={data} setData={setData} errors={errors} />}
                         {step === 4 && <Step4_SubmissionQuestions data={data} setData={setData} errors={errors} />}
                         {step === 5 && <Step5_Affiliate data={data} setData={setData} errors={errors} />}
+                        {step === REVIEW_STEP && <EventReview data={data} category={category} onEdit={goToStep} existingImageUrl={event.image ? `/storage/${event.image}` : null} />}
 
                         <div className="flex justify-between mt-8">
                             <div>
                                 {step > 1 && (
-                                    <SecondaryButton onClick={prevStep} disabled={validating || processing}><ArrowLeft className="mr-2" /> Back</SecondaryButton>
+                                    <SecondaryButton onClick={prevStep} disabled={validating || processing}><ArrowLeft className="mr-2" /> Kembali</SecondaryButton>
                                 )}
                             </div>
                             <div>
-                                {step < 5 && (
+                                {step < REVIEW_STEP && (
                                     <PrimaryButton type="button" onClick={nextStep} disabled={validating || processing}>
-                                        {validating ? <><Loader className="animate-spin mr-2" /> Validating...</> : <>Next <ChevronsRight className="ml-2" /></>}
+                                        {validating ? <><Loader className="animate-spin mr-2" /> Memeriksa...</> : <>Lanjut <ChevronsRight className="ml-2" /></>}
                                     </PrimaryButton>
                                 )}
-                                {step === 5 && (
+                                {step === REVIEW_STEP && (
                                     <PrimaryButton type="submit" disabled={validating || processing}>
-                                        {processing ? 'Updating...' : 'Update Event'}
+                                        {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                                     </PrimaryButton>
                                 )}
                             </div>

@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Home, Calendar, User, Ticket, Receipt } from 'lucide-react';
+import { Home, Calendar, User, Ticket, Share2 } from 'lucide-react';
 import React from 'react';
 
 const BottomNav = () => {
@@ -32,12 +32,14 @@ const BottomNav = () => {
             </Link>
             <Link href={route('tickets.index')} className={getLinkClass(route('tickets.index'))}>
                 <Ticket size={24} />
-                <span className="dock-label">Tiket</span>
+                <span className="dock-label">Aktivitas</span>
             </Link>
-            <Link href={route('transactions.index')} className={getLinkClass(route('transactions.index'))}>
-                <Receipt size={24} />
-                <span className="dock-label">Transaksi</span>
-            </Link>
+            {user?.role === 'user' && (
+                <Link href={route('affiliate.me')} className={getLinkClass(route('affiliate.me'))}>
+                    <Share2 size={24} />
+                    <span className="dock-label">Affiliate</span>
+                </Link>
+            )}
             {/* <Link href={handleUserClick()} className={getLinkClass('/login')}>
                 <User size={24} />
                 <span className="btm-nav-label">Akun</span>

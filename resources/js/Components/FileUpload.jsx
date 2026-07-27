@@ -2,10 +2,10 @@
 import { useState, useRef } from "react"
 import { Upload, Image, X } from "lucide-react"
 
-export const FileUpload = ({ name = "thumbnail", onChange }) => {
+export const FileUpload = ({ name = "thumbnail", onChange, initialPreview = null }) => {
   const [dragActive, setDragActive] = useState(false)
   const [file, setFile] = useState(null)
-  const [preview, setPreview] = useState(null)
+  const [preview, setPreview] = useState(initialPreview) // e.g. existing thumbnail when editing
   const inputRef = useRef(null)
 
   const handleDrag = (e) => {

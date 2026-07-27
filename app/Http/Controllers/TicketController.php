@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Submission;
 use App\Models\SubmissionCustomFields;
 use App\Models\Ticket;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -20,10 +21,14 @@ class TicketController extends Controller
     public function index()
     {
         $userId = auth()->user()->id;
-        $tickets = Ticket::with(['event', 'transaction'])->where('user_id', $userId)->latest()->get();
 
-        return Inertia::render('Users/Tickets/Index', [
-            'tickets' => $tickets
+        // Halaman gabungan: Tiket & Transaksi milik user.
+        $tickets = Ticket::with(['event', 'transaction'])->where('user_id', $userId)->latest()->get();
+        $transactions = Transaction::with('event')->where('user_id', $userId)->latest()->get();
+
+        return Inertia::render('Users/Activity/Index', [
+            'tickets' => $tickets,
+            'transactions' => $transactions,
         ]);
     }
 

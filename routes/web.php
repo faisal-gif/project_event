@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\CategoryEventsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
@@ -43,6 +45,10 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Affiliate (sisi user): halaman status + pengajuan
+    Route::get('/affiliate', [AffiliateController::class, 'me'])->name('affiliate.me');
+    Route::post('/affiliate/apply', [AffiliateController::class, 'apply'])->name('affiliate.apply');
 });
 
 
@@ -52,10 +58,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     })->middleware(['auth', 'verified']);
 
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
-    Route::resource('events', EventController::class);
+    Route::resource('events', AdminEventController::class);
     Route::get('events/participant/{id}', [ParticipantController::class, 'show'])->name('participant.show');
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
+
+    // Kelola pengajuan affiliate
+    Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
+    Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
+    Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
+
     Route::resource('category', CategoryEventsController::class);
     Route::resource('users', UserController::class);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
@@ -102,6 +114,12 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
     Route::get('events/participant/{id}', [OrganizerParticipantController::class, 'show'])->name('participant.show');
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
+
+    // Kelola pengajuan affiliate
+    Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
+    Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
+    Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
+
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
     Route::get('/events/{event}/export-participants', [OrganizerParticipantController::class, 'exportExcel'])->name('events.export');

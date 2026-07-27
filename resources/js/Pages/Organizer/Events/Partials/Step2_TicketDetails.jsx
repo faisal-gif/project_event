@@ -15,7 +15,7 @@ function Step2_TicketDetails({ data, setData, errors }) {
         updatedTicketTypes[index][name] = value;
         setData('ticket_types', updatedTicketTypes);
     };
-    
+
 
     const addTicketType = () => {
         setData('ticket_types', [...data.ticket_types, { name: '', price: '', quota: '', purchase_date: '', end_purchase_date: '', description: '' }]);
@@ -29,40 +29,41 @@ function Step2_TicketDetails({ data, setData, errors }) {
     return (
         <div className="space-y-6">
             {data.ticket_types.map((ticket, index) => (
-                <Card key={index} className="bg-base-100 p-6 shadow-medium relative">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Ticket className="w-5 h-5 text-primary" />
-                        <label className="text-lg font-semibold">Ticket Type #{index + 1}</label>
-                    </div>
+                <Card key={index} className="bg-base-100 p-4 sm:p-6 shadow-medium">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div className="flex items-center gap-2">
+                            <Ticket className="w-5 h-5 text-primary" />
+                            <label className="text-lg font-semibold">Jenis Tiket #{index + 1}</label>
+                        </div>
 
-                    {data.ticket_types.length > 1 && (
-                        <div className="absolute top-4 right-4">
+                        {data.ticket_types.length > 1 && (
                             <DangerButton
                                 type="button"
                                 onClick={() => removeTicketType(index)}
+                                className="w-full sm:w-auto justify-center"
                             >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Remove
+                                Hapus
                             </DangerButton>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="flex flex-col gap-2 col-span-2">
-                            <InputLabel htmlFor={`ticket_name_${index}`} value="Ticket Name" />
+                        <div className="flex flex-col gap-2 md:col-span-2">
+                            <InputLabel htmlFor={`ticket_name_${index}`} value="Nama Tiket" required />
                             <TextInput
                                 id={`ticket_name_${index}`}
                                 name="name"
                                 value={ticket.name}
                                 onChange={(e) => handleTicketChange(index, e)}
                                 className="mt-1 block w-full"
-                                placeholder="e.g., VIP, Regular"
+                                placeholder="cth. VIP, Reguler"
                             />
                             <InputError message={errors[`ticket_types.${index}.name`]} className="mt-2" />
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <InputLabel htmlFor={`price_${index}`} value="Price" />
+                            <InputLabel htmlFor={`price_${index}`} value="Harga" required />
                             <TextInput
                                 id={`price_${index}`}
                                 name="price"
@@ -70,13 +71,13 @@ function Step2_TicketDetails({ data, setData, errors }) {
                                 value={ticket.price}
                                 onChange={(e) => handleTicketChange(index, e)}
                                 className="mt-1 block w-full"
-                                placeholder="0 for free ticket"
+                                placeholder="Isi 0 untuk tiket gratis"
                             />
                             <InputError message={errors[`ticket_types.${index}.price`]} className="mt-2" />
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <InputLabel htmlFor={`quota_${index}`} value="Quota" />
+                            <InputLabel htmlFor={`quota_${index}`} value="Kuota" required />
                             <TextInput
                                 id={`quota_${index}`}
                                 name="quota"
@@ -84,13 +85,13 @@ function Step2_TicketDetails({ data, setData, errors }) {
                                 value={ticket.quota}
                                 onChange={(e) => handleTicketChange(index, e)}
                                 className="mt-1 block w-full"
-                                placeholder="Number of tickets"
+                                placeholder="Jumlah tiket"
                             />
                             <InputError message={errors[`ticket_types.${index}.quota`]} className="mt-2" />
                         </div>
 
-                        <div className="flex flex-col gap-2 col-span-2">
-                            <InputLabel htmlFor={`purchase_date_${index}`} value="Purchase Date" />
+                        <div className="flex flex-col gap-2 md:col-span-2">
+                            <InputLabel htmlFor={`purchase_date_${index}`} value="Mulai Pembelian" required />
                             <TextInput
                                 id={`purchase_date_${index}`}
                                 name="purchase_date"
@@ -99,23 +100,24 @@ function Step2_TicketDetails({ data, setData, errors }) {
                                 onChange={(e) => handleTicketChange(index, e)} />
                             <InputError message={errors[`ticket_types.${index}.purchase_date`]} />
                         </div>
-                        <div className="flex flex-col gap-2 col-span-2">
-                            <InputLabel htmlFor={`end_purchase_date_${index}`} value="Purchase End Date" />
+                        <div className="flex flex-col gap-2 md:col-span-2">
+                            <InputLabel htmlFor={`end_purchase_date_${index}`} value="Akhir Pembelian" required />
                             <TextInput
                                 id={`end_purchase_date_${index}`}
                                 name="end_purchase_date"
                                 type="datetime-local"
+                                min={ticket.purchase_date || undefined}
                                 value={ticket.end_purchase_date}
                                 onChange={(e) => handleTicketChange(index, e)} />
                             <InputError message={errors[`ticket_types.${index}.end_purchase_date`]} />
                         </div>
 
-                        <div className="flex flex-col gap-2 col-span-4">
-                            <InputLabel htmlFor={`description_${index}`} value="Description" />
+                        <div className="flex flex-col gap-2 md:col-span-4">
+                            <InputLabel htmlFor={`description_${index}`} value="Deskripsi" required />
                             <textarea
                                 id={`description_${index}`}
                                 name="description"
-                                placeholder="Isi deskripsi dari tiket"
+                                placeholder="Isi deskripsi tiket"
                                 className="textarea textarea-bordered min-h-[80px] w-full"
                                 value={ticket.description} onChange={(e) => handleTicketChange(index, e)} />
                             <InputError message={errors[`ticket_types.${index}.description`]} />
@@ -126,13 +128,13 @@ function Step2_TicketDetails({ data, setData, errors }) {
 
             <div>
                 <PrimaryButton type="button" onClick={addTicketType}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Another Ticket Type
+                    <Plus className="mr-2 h-4 w-4" /> Tambah Jenis Tiket
                 </PrimaryButton>
             </div>
 
             <Card className="bg-base-100 p-6 shadow-medium">
                 <div className="max-w-xs">
-                    <InputLabel htmlFor="limit_ticket_user">Max Tickets Per User</InputLabel>
+                    <InputLabel htmlFor="limit_ticket_user" required>Maks. Tiket per Pengguna</InputLabel>
                     <TextInput
                         id="limit_ticket_user"
                         name="limit_ticket_user"
@@ -142,7 +144,7 @@ function Step2_TicketDetails({ data, setData, errors }) {
                         className="mt-1 block w-full"
                         min="1"
                     />
-                    <p className="mt-2 text-sm text-gray-600">The maximum number of tickets a single user can buy in one transaction.</p>
+                    <p className="mt-2 text-sm text-gray-600">Jumlah maksimum tiket yang dapat dibeli satu pengguna dalam satu transaksi.</p>
                     <InputError message={errors.limit_ticket_user} className="mt-2" />
                 </div>
             </Card>

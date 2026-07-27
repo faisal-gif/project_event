@@ -32,21 +32,21 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
                 {questions.map((q, index) => (
                     <div key={index} className="p-4 border rounded-lg space-y-3">
                         <div className="flex justify-between items-center">
-                            <p className="font-medium">Question {index + 1}</p>
-                            <button type="button" onClick={() => removeQuestion(index)} className="btn btn-sm btn-error btn-outline">Remove</button>
+                            <p className="font-medium">Pertanyaan {index + 1}</p>
+                            <button type="button" onClick={() => removeQuestion(index)} className="btn btn-sm btn-error btn-outline">Hapus</button>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <InputLabel value="Label" />
+                                <InputLabel value="Label Pertanyaan" />
                                 <TextInput value={q.label} onChange={(e) => handleQuestionChange(index, 'label', e.target.value)} className="w-full" />
                             </div>
                             <div>
-                                <InputLabel value="Type" />
+                                <InputLabel value="Tipe" />
                                 <select value={q.type} onChange={(e) => handleQuestionChange(index, 'type', e.target.value)} className="select select-bordered w-full">
-                                    <option value="text">Text</option>
-                                    <option value="textarea">Textarea</option>
+                                    <option value="text">Teks</option>
+                                    <option value="textarea">Area Teks</option>
                                     <option value="file">File</option>
-                                    <option value="select">Select</option>
+                                    <option value="select">Pilihan (Select)</option>
                                     <option value="checkbox">Checkbox</option>
                                     <option value="url">URL</option>
                                 </select>
@@ -54,17 +54,17 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
                         </div>
                         {(q.type === 'select' || q.type === 'checkbox') && (
                             <div>
-                                <InputLabel value="Options (comma-separated)" />
+                                <InputLabel value="Opsi (pisahkan dengan koma)" />
                                 <TextInput value={q.options} onChange={(e) => handleQuestionChange(index, 'options', e.target.value)} className="w-full" />
                             </div>
                         )}
                         <div className="flex items-center gap-2">
                             <input type="checkbox" checked={q.is_required} onChange={(e) => handleQuestionChange(index, 'is_required', e.target.checked)} className="checkbox checkbox-sm" />
-                            <label>Required</label>
+                            <label>Wajib diisi</label>
                         </div>
                     </div>
                 ))}
-                <button type="button" onClick={addQuestion} className="btn btn-soft btn-primary">Add Question</button>
+                <button type="button" onClick={addQuestion} className="btn btn-soft btn-primary">Tambah Pertanyaan</button>
                 <InputError message={error} />
             </div>
         </Card>

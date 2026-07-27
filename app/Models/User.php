@@ -22,7 +22,11 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'role'
+        'role',
+        'affiliate_status',
+        'affiliate_requested_at',
+        'affiliate_reviewed_by',
+        'affiliate_reviewed_at',
     ];
 
     /**
@@ -61,6 +65,17 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'event_judges', 'user_id', 'event_id');
     }
 
+    // Transaksi yang berhasil dipromosikan user ini (sebagai affiliate/promotor).
+    public function promotedTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'promoter_id');
+    }
+
+    public function isApprovedAffiliate(): bool
+    {
+        return $this->affiliate_status === 'approved';
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -71,6 +86,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'affiliate_requested_at' => 'datetime',
+            'affiliate_reviewed_at' => 'datetime',
         ];
     }
 }
