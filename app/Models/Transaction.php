@@ -16,6 +16,12 @@ class Transaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Affiliate/promotor yang menghasilkan transaksi ini.
+    public function promoter()
+    {
+        return $this->belongsTo(User::class, 'promoter_id');
+    }
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);

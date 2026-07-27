@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
+use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -14,16 +17,50 @@ class AffiliateController extends Controller
     public function me()
     {
         $user = Auth::user();
+        $approved = $user->isApprovedAffiliate();
+
+        // Komisi yang sudah didapat, dikelompokkan per event.
+        $perEvent = collect();
+        // Event yang mengaktifkan afiliasi + link referral siap pakai per event.
+        $availableEvents = collect();
+
+        if ($approved) {
+            $perEvent = $user->promotedTransactions()
+                ->where('status', 'PAID')
+                ->selectRaw('event_id, SUM(commission_earned) as commission, SUM(quantity) as tickets, COUNT(*) as trx_count')
+                ->groupBy('event_id')
+                ->with('event:id,title')
+                ->get()
+                ->map(fn ($row) => [
+                    'event' => $row->event?->title ?? 'Event dihapus',
+                    'commission' => (float) $row->commission,
+                    'tickets' => (int) $row->tickets,
+                    'count' => (int) $row->trx_count,
+                ]);
+
+            $availableEvents = Event::where('is_affiliate_enabled', true)
+                ->select('id', 'slug', 'title', 'affiliate_type', 'affiliate_reward')
+                ->latest()
+                ->get()
+                ->map(fn ($e) => [
+                    'title' => $e->title,
+                    'type' => $e->affiliate_type,
+                    'reward' => (float) $e->affiliate_reward,
+                    'link' => route('events.guest.detail', ['event' => $e->id, 'slug' => $e->slug]) . '?ref=' . $user->id,
+                ]);
+        }
 
         return Inertia::render('Affiliate/Me', [
             'affiliate' => [
                 'status' => $user->affiliate_status,
                 'requested_at' => $user->affiliate_requested_at,
                 'reviewed_at' => $user->affiliate_reviewed_at,
-                'ref_code' => $user->isApprovedAffiliate() ? $user->id : null,
-                'total_commission' => $user->isApprovedAffiliate()
+                'ref_code' => $approved ? $user->id : null,
+                'total_commission' => $approved
                     ? $user->promotedTransactions()->where('status', 'PAID')->sum('commission_earned')
                     : 0,
+                'per_event' => $perEvent,
+                'available_events' => $availableEvents,
             ],
         ]);
     }
@@ -65,6 +102,46 @@ class AffiliateController extends Controller
             ->withQueryString();
 
         return Inertia::render('Affiliate/Applications', ['applications' => $applications]);
+    }
+
+    /**
+     * Laporan komisi affiliate per event + per user (admin & organizer).
+     * Organizer hanya melihat event miliknya.
+     */
+    public function report(Request $request)
+    {
+        $user = Auth::user();
+
+        $rows = Transaction::query()
+            ->where('status', 'PAID')
+            ->whereNotNull('promoter_id')
+            ->where('commission_earned', '>', 0)
+            ->when($user->role === 'organizer', fn ($q) => $q->whereHas('event', fn ($e) => $e->where('created_by', $user->id)))
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($qq) use ($search) {
+                    $qq->whereHas('event', fn ($e) => $e->where('title', 'like', "%{$search}%"))
+                        ->orWhereHas('promoter', fn ($p) => $p->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+                });
+            })
+            ->selectRaw('event_id, promoter_id, SUM(commission_earned) as commission, SUM(quantity) as tickets, COUNT(*) as trx_count')
+            ->groupBy('event_id', 'promoter_id')
+            ->with(['event:id,title', 'promoter:id,name,email'])
+            ->orderByDesc('commission')
+            ->get()
+            ->map(fn ($row) => [
+                'event' => $row->event?->title ?? 'Event dihapus',
+                'affiliate' => $row->promoter?->name ?? 'User dihapus',
+                'affiliate_email' => $row->promoter?->email,
+                'tickets' => (int) $row->tickets,
+                'trx_count' => (int) $row->trx_count,
+                'commission' => (float) $row->commission,
+            ]);
+
+        return Inertia::render('Affiliate/Report', [
+            'rows' => $rows,
+            'total_commission' => $rows->sum('commission'),
+            'filters' => ['search' => $request->search ?? ''],
+        ]);
     }
 
     public function approve(User $user)

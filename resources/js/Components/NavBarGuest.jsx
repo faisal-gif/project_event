@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react'
 import React from 'react'
 import Dropdown from './Dropdown'
-import { User } from 'lucide-react'
+import { User, HelpCircle } from 'lucide-react'
 import ApplicationLogoWhite from './ApplicationLogoWhite';
 
 function NavBarGuest() {
@@ -34,6 +34,16 @@ function NavBarGuest() {
       </div>
 
       <div className="navbar-end">
+        {user?.role === 'user' && (
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('open-tutorial'))}
+            className="btn btn-ghost btn-circle"
+            title="Panduan penggunaan"
+          >
+            <HelpCircle size={20} />
+          </button>
+        )}
         {user ? (
           <Dropdown>
 

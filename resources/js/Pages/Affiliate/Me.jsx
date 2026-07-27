@@ -4,14 +4,31 @@ import { useState } from 'react';
 import Card from '@/Components/ui/Card';
 import PrimaryButton from '@/Components/PrimaryButton';
 import FlashAlert from '@/Components/FlashAlert';
+import AffiliateTutorial from '@/Components/AffiliateTutorial';
 import { formatRupiah } from '@/Utils/formatter';
-import { CheckCircle2, Clock, XCircle, Share2, Copy } from 'lucide-react';
+import { CheckCircle2, Clock, XCircle, Share2, Copy, HelpCircle } from 'lucide-react';
 
 const STATUS = {
     pending: { label: 'Menunggu Persetujuan', cls: 'text-amber-600', Icon: Clock },
     approved: { label: 'Disetujui', cls: 'text-green-600', Icon: CheckCircle2 },
     rejected: { label: 'Ditolak', cls: 'text-red-600', Icon: XCircle },
 };
+
+const rewardLabel = (ev) => (ev.type === 'percentage' ? `${ev.reward}%` : formatRupiah(ev.reward));
+
+function CopyLink({ url }) {
+    const [ok, setOk] = useState(false);
+    const copy = () => {
+        navigator.clipboard.writeText(url);
+        setOk(true);
+        setTimeout(() => setOk(false), 1500);
+    };
+    return (
+        <button type="button" onClick={copy} className="btn btn-xs btn-outline shrink-0">
+            <Copy className="w-3.5 h-3.5 mr-1" /> {ok ? 'Tersalin' : 'Salin link'}
+        </button>
+    );
+}
 
 export default function Me({ affiliate }) {
     const { post, processing } = useForm();
@@ -33,12 +50,23 @@ export default function Me({ affiliate }) {
 
             <div className="py-12">
                 <div className="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                    <AffiliateTutorial />
                     <FlashAlert />
 
                     <Card className="bg-base-100 p-6 shadow-medium">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Share2 className="w-5 h-5 text-primary" />
-                            <h2 className="text-lg font-semibold">Program Affiliate</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <Share2 className="w-5 h-5 text-primary" />
+                                <h2 className="text-lg font-semibold">Program Affiliate</h2>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => window.dispatchEvent(new Event('open-affiliate-tutorial'))}
+                                className="btn btn-ghost btn-sm gap-1"
+                                title="Buka panduan"
+                            >
+                                <HelpCircle className="w-4 h-4" /> Panduan
+                            </button>
                         </div>
 
                         {!status && (
@@ -77,9 +105,35 @@ export default function Me({ affiliate }) {
                     {status === 'approved' && (
                         <>
                             <Card className="bg-base-100 p-6 shadow-medium">
+                                <h3 className="font-semibold mb-1">Total Komisi (transaksi Paid)</h3>
+                                <p className="text-2xl font-bold text-primary">{formatRupiah(affiliate.total_commission)}</p>
+                            </Card>
+
+                            {/* Rincian komisi yang sudah didapat, per event */}
+                            {affiliate.per_event?.length > 0 && (
+                                <Card className="bg-base-100 p-6 shadow-medium">
+                                    <h3 className="font-semibold mb-3">Komisi per Event</h3>
+                                    <div className="divide-y divide-base-200">
+                                        {affiliate.per_event.map((row, i) => (
+                                            <div key={i} className="flex items-center justify-between py-3 gap-3">
+                                                <div className="min-w-0">
+                                                    <p className="font-medium truncate">{row.event}</p>
+                                                    <p className="text-xs text-gray-500">{row.tickets} tiket terjual · {row.count} transaksi</p>
+                                                </div>
+                                                <div className="text-right shrink-0">
+                                                    <p className="font-semibold text-primary">{formatRupiah(row.commission)}</p>
+                                                    <p className="text-xs text-gray-500">komisi</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Card>
+                            )}
+
+                            <Card className="bg-base-100 p-6 shadow-medium">
                                 <h3 className="font-semibold mb-2">Kode Referral Anda</h3>
                                 <p className="text-sm text-gray-600 mb-3">
-                                    Tambahkan <code className="px-1 bg-gray-100 rounded">?ref={affiliate.ref_code}</code> di akhir link event mana pun yang mengaktifkan afiliasi. Setiap tiket yang terjual lewat link itu memberi Anda komisi.
+                                    Tambahkan <code className="px-1 bg-gray-100 rounded">?ref={affiliate.ref_code}</code> di akhir link event mana pun yang mengaktifkan afiliasi. Atau langsung salin link per event di bawah.
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <code className="flex-1 px-3 py-2 bg-gray-100 rounded text-sm">?ref={affiliate.ref_code}</code>
@@ -89,9 +143,29 @@ export default function Me({ affiliate }) {
                                 </div>
                             </Card>
 
+                            {/* Event ber-afiliasi + komisi & link referral per event */}
                             <Card className="bg-base-100 p-6 shadow-medium">
-                                <h3 className="font-semibold mb-1">Total Komisi (transaksi Paid)</h3>
-                                <p className="text-2xl font-bold text-primary">{formatRupiah(affiliate.total_commission)}</p>
+                                <h3 className="font-semibold mb-1">Event yang Bisa Dipromosikan</h3>
+                                <p className="text-sm text-gray-500 mb-4">Bagikan link di bawah. Besaran komisi mengikuti pengaturan tiap event.</p>
+
+                                {(!affiliate.available_events || affiliate.available_events.length === 0) ? (
+                                    <p className="text-sm text-gray-400">Belum ada event yang mengaktifkan program afiliasi.</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {affiliate.available_events.map((ev, i) => (
+                                            <div key={i} className="border border-base-200 rounded-xl p-3">
+                                                <div className="flex items-center justify-between gap-2 mb-2">
+                                                    <p className="font-medium truncate">{ev.title}</p>
+                                                    <span className="badge badge-primary badge-outline shrink-0">Komisi {rewardLabel(ev)}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <code className="flex-1 px-2 py-1.5 bg-gray-100 rounded text-xs truncate">{ev.link}</code>
+                                                    <CopyLink url={ev.link} />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </Card>
                         </>
                     )}

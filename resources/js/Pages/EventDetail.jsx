@@ -1,11 +1,10 @@
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import React, { useState } from 'react';
-// Hapus sweetalert2 dari import karena kita tidak memakainya lagi
-import { Ticket, Calendar, MapPin, Minus, Plus, Tag, Share2, Copy, Check } from 'lucide-react'; // Tambahkan Check
+import React, { useState, useEffect } from 'react';
+import { Ticket, Calendar, MapPin, Minus, Plus, Tag, Share2, Copy, Check } from 'lucide-react';
 import Card from '@/Components/ui/Card';
 import Seo from '@/Components/Seo';
-import { formatCompact } from '@/Utils/formatter';
+import { formatCompact, formatRupiah } from '@/Utils/formatter';
 
 function EventDetail({ event, seo }) {
     const { auth } = usePage().props;
@@ -13,9 +12,12 @@ function EventDetail({ event, seo }) {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
-    // State untuk melacak status copy link
-    const [copiedStandard, setCopiedStandard] = useState(false);
-    const [copiedAffiliate, setCopiedAffiliate] = useState(false);
+    // State salin link share
+    const [copied, setCopied] = useState(false);
+    const [canNativeShare, setCanNativeShare] = useState(false);
+    useEffect(() => {
+        setCanNativeShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+    }, []);
 
     const formatDateRange = (start, end) => {
         // ... (Fungsi tetap sama seperti sebelumnya)
@@ -86,21 +88,32 @@ function EventDetail({ event, seo }) {
         });
     };
 
-    // --- LOGIKA COPY LINK (DIUBAH) ---
+    // --- LOGIKA SHARE ---
     const currentUrl = typeof window !== 'undefined' ? window.location.href.split('?')[0] : '';
-    const standardLink = currentUrl;
-    const affiliateLink = auth?.user ? `${currentUrl}?ref=${auth.user.id}` : null;
+    // Link afiliasi hanya untuk affiliate yang SUDAH DISETUJUI + event mengaktifkan afiliasi.
+    const isAffiliate = !!event.is_affiliate_enabled && auth?.user?.affiliate_status === 'approved';
+    const shareUrl = isAffiliate ? `${currentUrl}?ref=${auth.user.id}` : currentUrl;
+    const shareText = `Yuk ikutan "${event.title}" di TIMES Events!`;
+    const commissionLabel = event.affiliate_type === 'percentage'
+        ? `${event.affiliate_reward}%`
+        : formatRupiah(event.affiliate_reward);
 
-    const handleCopy = (link, type) => {
-        navigator.clipboard.writeText(link);
+    const socials = [
+        { name: 'WhatsApp', cls: 'bg-[#25D366]', href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}` },
+        { name: 'Facebook', cls: 'bg-[#1877F2]', href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
+        { name: 'Telegram', cls: 'bg-[#229ED9]', href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}` },
+        { name: 'X', cls: 'bg-black', href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}` },
+    ];
 
-        // Ubah state berdasarkan tombol mana yang diklik
-        if (type === 'standard') {
-            setCopiedStandard(true);
-            setTimeout(() => setCopiedStandard(false), 2000); // Kembalikan setelah 2 detik
-        } else {
-            setCopiedAffiliate(true);
-            setTimeout(() => setCopiedAffiliate(false), 2000);
+    const copyShare = () => {
+        navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const nativeShare = () => {
+        if (navigator.share) {
+            navigator.share({ title: event.title, text: shareText, url: shareUrl }).catch(() => {});
         }
     };
     // ---------------------------------
@@ -328,63 +341,57 @@ function EventDetail({ event, seo }) {
             {/* MODAL SHARE */}
             <dialog id="share_modal" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
-                    <h3 className="font-bold text-xl mb-4">Bagikan Event Ini</h3>
+                    <h3 className="font-bold text-xl mb-1">Bagikan Event</h3>
+                    <p className="text-sm text-gray-500 mb-4 truncate">{event.title}</p>
 
-                    {/* Input Link Reguler */}
-                    <div className="form-control w-full mb-4">
-                        <label className="label">
-                            <span className="label-text font-semibold">Link Event</span>
-                        </label>
-                        <div className="join w-full">
-                            <input
-                                type="text"
-                                readOnly
-                                value={standardLink}
-                                className="input input-bordered join-item w-full bg-base-200 text-sm md:text-base"
-                            />
-                            <button
-                                onClick={() => handleCopy(standardLink, 'standard')}
-                                className={`btn join-item w-24 ${copiedStandard ? 'btn-success text-white' : 'btn-primary'}`}
-                                title={copiedStandard ? "Tersalin!" : "Salin Link"}
-                            >
-                                {copiedStandard ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                            </button>
+                    {isAffiliate && (
+                        <div className="alert alert-success text-sm mb-4">
+                            <Share2 className="w-4 h-4 shrink-0" />
+                            <span>Link ini sudah termasuk kode afiliasi Anda — dapatkan komisi <b>{commissionLabel}</b> tiap tiket terjual.</span>
                         </div>
+                    )}
+
+                    {/* Tombol share sosial */}
+                    <div className="grid grid-cols-4 gap-2 mb-4">
+                        {socials.map((s) => (
+                            <a
+                                key={s.name}
+                                href={s.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex items-center justify-center py-2.5 rounded-lg text-white text-xs font-semibold ${s.cls}`}
+                            >
+                                {s.name}
+                            </a>
+                        ))}
                     </div>
 
-                    {/* Input Link Afiliasi (Hanya Muncul Jika Fitur Aktif & User Login) */}
-                    {!!event.is_affiliate_enabled && auth?.user && (
-                        <div className="form-control w-full mb-2">
-                            <label className="label">
-                                <span className="label-text font-semibold">Link Afiliasi Anda</span>
-                                <span className="label-text-alt text-success font-bold">Dapatkan Komisi!</span>
-                            </label>
-                            <div className="join w-full">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={affiliateLink}
-                                    className="input input-bordered input-success join-item w-full bg-base-200 text-sm md:text-base"
-                                />
-                                <button
-                                    onClick={() => handleCopy(affiliateLink, 'affiliate')}
-                                    className={`btn join-item w-24 text-white ${copiedAffiliate ? 'bg-green-700 hover:bg-green-800' : 'btn-success'}`}
-                                    title={copiedAffiliate ? "Tersalin!" : "Salin Link Afiliasi"}
-                                >
-                                    {copiedAffiliate ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
-                                </button>
-                            </div>
-                            <label className="label pt-1">
-                                <span className="label-text-alt text-gray-500">
-                                    Bagikan link ini dan dapatkan komisi dari setiap tiket yang terjual.
-                                </span>
-                            </label>
-                        </div>
+                    {/* Salin link */}
+                    <label className="text-sm font-semibold">{isAffiliate ? 'Link Afiliasi Anda' : 'Link Event'}</label>
+                    <div className="join w-full mt-1 mb-2">
+                        <input
+                            type="text"
+                            readOnly
+                            value={shareUrl}
+                            className="input input-bordered join-item w-full bg-base-200 text-sm"
+                        />
+                        <button
+                            onClick={copyShare}
+                            className={`btn join-item ${copied ? 'btn-success text-white' : 'btn-primary'}`}
+                        >
+                            {copied ? <><Check className="h-4 w-4 mr-1" /> Tersalin</> : <><Copy className="h-4 w-4 mr-1" /> Salin</>}
+                        </button>
+                    </div>
+
+                    {canNativeShare && (
+                        <button onClick={nativeShare} className="btn btn-outline w-full">
+                            <Share2 className="h-4 w-4 mr-1" /> Bagikan lewat aplikasi lain
+                        </button>
                     )}
 
                     <div className="modal-action">
                         <form method="dialog">
-                            <button className="btn">Tutup</button>
+                            <button className="btn btn-ghost">Tutup</button>
                         </form>
                     </div>
                 </div>

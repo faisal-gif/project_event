@@ -44,6 +44,11 @@ export default function Applications({ applications }) {
                 <div className="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     <FlashAlert />
 
+                    <div className="tabs tabs-boxed bg-base-200 w-fit">
+                        <Link href={route(`${prefix}.affiliates.index`)} className="tab tab-active">Pengajuan</Link>
+                        <Link href={route(`${prefix}.affiliates.report`)} className="tab">Komisi</Link>
+                    </div>
+
                     <Card className="bg-base-100 p-4 sm:p-6 shadow-medium">
                         <div className="flex items-center gap-2 mb-4">
                             <Users className="w-5 h-5 text-primary" />

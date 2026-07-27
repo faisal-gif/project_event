@@ -2,12 +2,14 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import NavBarGuest from '@/Components/NavBarGuest';
 import { Link } from '@inertiajs/react';
 import BottomNav from '@/Components/BottomNav';
+import UserTutorial from '@/Components/UserTutorial';
 import { Locate, Mail, MapPin, Phone } from 'lucide-react';
 
 export default function GuestLayout({ children }) {
     return (
         <div className="min-h-screen bg-base-100">
             <NavBarGuest />
+            <UserTutorial />
             {children}
 
             <footer

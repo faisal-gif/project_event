@@ -63,8 +63,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
 
-    // Kelola pengajuan affiliate
+    // Kelola pengajuan affiliate + laporan komisi
     Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
+    Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
     Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
     Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
 
@@ -115,8 +116,9 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
 
-    // Kelola pengajuan affiliate
+    // Kelola pengajuan affiliate + laporan komisi
     Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
+    Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
     Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
     Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
 
