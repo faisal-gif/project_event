@@ -5,7 +5,7 @@ import InputError from '@/Components/InputError';
 import DangerButton from '@/Components/DangerButton';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Card from '@/Components/ui/Card';
-import { Plus, Trash2, Ticket } from 'lucide-react';
+import { Plus, Trash2, Ticket, ArrowUp, ArrowDown } from 'lucide-react';
 
 function Step2_TicketDetails({ data, setData, errors }) {
 
@@ -26,6 +26,14 @@ function Step2_TicketDetails({ data, setData, errors }) {
         setData('ticket_types', updatedTicketTypes);
     };
 
+    const moveTicket = (index, dir) => {
+        const target = index + dir;
+        if (target < 0 || target >= data.ticket_types.length) return;
+        const arr = [...data.ticket_types];
+        [arr[index], arr[target]] = [arr[target], arr[index]];
+        setData('ticket_types', arr);
+    };
+
     return (
         <div className="space-y-6">
             {data.ticket_types.map((ticket, index) => (
@@ -37,14 +45,22 @@ function Step2_TicketDetails({ data, setData, errors }) {
                         </div>
 
                         {data.ticket_types.length > 1 && (
-                            <DangerButton
-                                type="button"
-                                onClick={() => removeTicketType(index)}
-                                className="w-full sm:w-auto justify-center"
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Hapus
-                            </DangerButton>
+                            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                <button type="button" onClick={() => moveTicket(index, -1)} disabled={index === 0} className="btn btn-sm btn-ghost btn-square" title="Naikkan">
+                                    <ArrowUp className="h-4 w-4" />
+                                </button>
+                                <button type="button" onClick={() => moveTicket(index, 1)} disabled={index === data.ticket_types.length - 1} className="btn btn-sm btn-ghost btn-square" title="Turunkan">
+                                    <ArrowDown className="h-4 w-4" />
+                                </button>
+                                <DangerButton
+                                    type="button"
+                                    onClick={() => removeTicketType(index)}
+                                    className="justify-center"
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Hapus
+                                </DangerButton>
+                            </div>
                         )}
                     </div>
 

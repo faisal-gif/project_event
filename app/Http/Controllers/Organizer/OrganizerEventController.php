@@ -219,8 +219,9 @@ class OrganizerEventController extends Controller
         // Sync Ticket Types
         $event->ticketTypes()->delete();
         if (!empty($data['ticket_types'])) {
-            foreach ($data['ticket_types'] as $ticketType) {
+            foreach ($data['ticket_types'] as $index => $ticketType) {
                 $event->ticketTypes()->create([
+                    'sort_order' => $index,
                     'name' => $ticketType['name'],
                     'price' => $ticketType['price'],
                     'quota' => $ticketType['quota'],

@@ -214,7 +214,7 @@ class EventController extends Controller
         if (!empty($data['ticket_types'])) {
             $keepTicketIds = [];
 
-            foreach ($data['ticket_types'] as $ticketData) {
+            foreach ($data['ticket_types'] as $index => $ticketData) {
                 $submissionRules = !empty($ticketData['submission_rules']) ? $ticketData['submission_rules'] : null;
 
                 // MENCARI TIKET: Berdasarkan ID, atau jika tidak ada, cari berdasarkan Nama Tiket
@@ -228,6 +228,7 @@ class EventController extends Controller
                 $ticket = $event->ticketTypes()->updateOrCreate(
                     $match,
                     [
+                        'sort_order' => $index,
                         'name' => $ticketData['name'],
                         'price' => $ticketData['price'],
                         'quota' => $ticketData['quota'],

@@ -55,7 +55,7 @@ class Event extends Model
 
     public function ticketTypes()
     {
-        return $this->hasMany(TicketType::class);
+        return $this->hasMany(TicketType::class)->orderBy('sort_order');
     }
 
     public function judges()
