@@ -116,11 +116,8 @@ Route::middleware(['auth', 'organizer'])->prefix('organizer')->name('organizer.'
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');
 
-    // Kelola pengajuan affiliate + laporan komisi
-    Route::get('affiliates', [AffiliateController::class, 'index'])->name('affiliates.index');
+    // Laporan komisi affiliate (approval/pengajuan hanya admin)
     Route::get('affiliates/report', [AffiliateController::class, 'report'])->name('affiliates.report');
-    Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
-    Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
 
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');

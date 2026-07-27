@@ -113,11 +113,6 @@ export default function AuthenticatedLayout({ children }) {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('organizer.affiliates.index')}>
-                                            Pengajuan Affiliate
-                                        </Link>
-                                    </li>
-                                    <li>
                                         <Link href={route('organizer.affiliates.report')}>
                                             Komisi Affiliate
                                         </Link>

@@ -33,11 +33,13 @@ export default function Report({ rows, total_commission, filters }) {
                         <h1 className="font-bold text-2xl">Komisi Affiliate</h1>
                     </div>
 
-                    {/* Tab nav */}
-                    <div className="tabs tabs-boxed bg-base-200 w-fit mb-6">
-                        <Link href={route(`${prefix}.affiliates.index`)} className="tab">Pengajuan</Link>
-                        <Link href={route(`${prefix}.affiliates.report`)} className="tab tab-active">Komisi</Link>
-                    </div>
+                    {/* Tab nav — approval/pengajuan hanya untuk admin */}
+                    {prefix === 'admin' && (
+                        <div className="tabs tabs-boxed bg-base-200 w-fit mb-6">
+                            <Link href={route('admin.affiliates.index')} className="tab">Pengajuan</Link>
+                            <Link href={route('admin.affiliates.report')} className="tab tab-active">Komisi</Link>
+                        </div>
+                    )}
 
                     {/* Ringkasan total */}
                     <div className="card bg-primary/10 border border-primary/20 mb-4">
