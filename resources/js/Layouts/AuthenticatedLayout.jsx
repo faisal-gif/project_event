@@ -84,6 +84,11 @@ export default function AuthenticatedLayout({ children }) {
                             {user.role === 'admin' && (
                                 <>
                                     <li>
+                                        <Link href={route('admin.dashboard')}>
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
                                         <Link href={route('admin.category.index')}>
                                             Category
                                         </Link>
