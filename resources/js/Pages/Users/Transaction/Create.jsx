@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import GuestLayout from "@/Layouts/GuestLayout";
 import MySwal from "sweetalert2";
+import axios from "axios";
 import InputError from "@/Components/InputError";
 
 const RenderField = ({ field, value, onChange, error }) => {
@@ -170,7 +171,13 @@ const Create = ({ ticketType, event, channel, quantity }) => {
         pekerjaan: '',
         field_responses: {},
         terms: false,
+        voucher_code: '',
     });
+
+    const [voucherInput, setVoucherInput] = useState('');
+    const [appliedVoucher, setAppliedVoucher] = useState(null); // { code, discount }
+    const [voucherError, setVoucherError] = useState('');
+    const [voucherLoading, setVoucherLoading] = useState(false);
 
     if (!event || !ticketType) {
         return (
@@ -229,11 +236,41 @@ const Create = ({ ticketType, event, channel, quantity }) => {
     };
 
     const totalPrice = ticketType.price * data.quantity;
+    const discount = appliedVoucher?.discount || 0;
+    const discountedTotal = Math.max(0, totalPrice - discount);
     const selectedChannel = channel.find((ch) => ch.code == data.paymentMethod);
     const adminFee =
         (selectedChannel?.fee_customer?.flat ?? 0) +
-        ((totalPrice * (selectedChannel?.fee_customer?.percent ?? 0)) / 100);
-    const finalPrice = totalPrice + adminFee;
+        ((discountedTotal * (selectedChannel?.fee_customer?.percent ?? 0)) / 100);
+    const finalPrice = discountedTotal + adminFee;
+
+    const applyVoucher = async () => {
+        if (!voucherInput.trim()) return;
+        setVoucherError('');
+        setVoucherLoading(true);
+        try {
+            const res = await axios.post(route('voucher.validate'), {
+                code: voucherInput.trim(),
+                ticket_type_id: ticketType.id,
+                quantity: data.quantity,
+            });
+            setAppliedVoucher(res.data);
+            setData('voucher_code', res.data.code);
+        } catch (err) {
+            setAppliedVoucher(null);
+            setData('voucher_code', '');
+            setVoucherError(err.response?.data?.message || 'Gagal memvalidasi voucher.');
+        } finally {
+            setVoucherLoading(false);
+        }
+    };
+
+    const removeVoucher = () => {
+        setAppliedVoucher(null);
+        setVoucherInput('');
+        setData('voucher_code', '');
+        setVoucherError('');
+    };
 
     const handlePayment = (e) => {
         e.preventDefault();
@@ -374,11 +411,42 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                         {ticketType.name}
                                     </div>
                                 </div>
+                                {ticketType.price > 0 && (
+                                    <div className="mb-4">
+                                        <label className="label-text font-medium text-sm">Kode Voucher</label>
+                                        {appliedVoucher ? (
+                                            <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2 mt-1">
+                                                <span className="text-sm font-mono font-semibold text-green-700">{appliedVoucher.code}</span>
+                                                <button type="button" onClick={removeVoucher} className="text-xs text-red-500 hover:underline">Hapus</button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-2 mt-1">
+                                                <input
+                                                    type="text"
+                                                    value={voucherInput}
+                                                    onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
+                                                    placeholder="Masukkan kode"
+                                                    className="input input-bordered input-sm w-full uppercase"
+                                                />
+                                                <button type="button" onClick={applyVoucher} disabled={voucherLoading} className="btn btn-sm btn-outline btn-primary">
+                                                    {voucherLoading ? '...' : 'Terapkan'}
+                                                </button>
+                                            </div>
+                                        )}
+                                        {voucherError && <p className="text-xs text-error mt-1">{voucherError}</p>}
+                                    </div>
+                                )}
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between font-medium">
                                         <span className="text-gray-600">Harga Tiket ({data.quantity}x)</span>
                                         <span>{formatPrice(totalPrice)}</span>
                                     </div>
+                                    {discount > 0 && (
+                                        <div className="flex justify-between text-sm text-green-600">
+                                            <span>Diskon Voucher</span>
+                                            <span>-{formatPrice(discount)}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-500">Biaya Layanan</span>
                                         <span className="font-medium text-gray-700">{formatPrice(adminFee)}</span>

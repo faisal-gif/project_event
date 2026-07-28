@@ -10,6 +10,7 @@ use App\Models\EventFieldResponse;
 use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Transaction;
+use App\Models\Voucher;
 use App\Services\TicketService;
 use App\Services\TripayService;
 use Illuminate\Http\Request;
@@ -26,6 +27,42 @@ class TransactionController extends Controller
     {
         // Tiket & Transaksi kini digabung di satu halaman (tickets.index).
         return redirect()->route('tickets.index');
+    }
+
+    // Validasi kode voucher untuk pratinjau diskon di checkout (AJAX, JSON).
+    public function validateVoucher(Request $request)
+    {
+        $data = $request->validate([
+            'code' => 'required|string',
+            'ticket_type_id' => 'required|exists:ticket_types,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $ticketType = TicketType::with('event')->findOrFail($data['ticket_type_id']);
+        if ($ticketType->price <= 0) {
+            return response()->json(['message' => 'Tiket gratis tidak memerlukan voucher.'], 422);
+        }
+
+        $gross = (int) round($ticketType->price) * $data['quantity'];
+        $voucher = Voucher::whereRaw('UPPER(code) = ?', [strtoupper(trim($data['code']))])->first();
+
+        if (!$voucher) {
+            return response()->json(['message' => 'Kode voucher tidak ditemukan.'], 422);
+        }
+        if ($voucher->quota <= 0) {
+            return response()->json(['message' => 'Kuota voucher sudah habis.'], 422);
+        }
+        if ($voucher->valid_until && $voucher->valid_until->isPast()) {
+            return response()->json(['message' => 'Voucher sudah kadaluarsa.'], 422);
+        }
+        if (!$voucher->appliesToEvent($ticketType->event->id)) {
+            return response()->json(['message' => 'Voucher tidak berlaku untuk event ini.'], 422);
+        }
+
+        return response()->json([
+            'code' => $voucher->code,
+            'discount' => $voucher->computeDiscount($gross),
+        ]);
     }
 
     public function create(Request $request, TicketType $ticketType, TripayService $tripay)
@@ -166,8 +203,28 @@ class TransactionController extends Controller
         }
         // ====================================================================
 
+        // ====================================================================
+        // 6b. VOUCHER (hanya untuk tiket berbayar)
+        // ====================================================================
+        $voucher = null;
+        $discount = 0;
+        if (!empty($request->voucher_code) && $ticketType->price > 0) {
+            $gross = (int) round($ticketType->price) * $validated['quantity'];
+            $voucher = Voucher::whereRaw('UPPER(code) = ?', [strtoupper(trim($request->voucher_code))])->first();
+
+            if (!$voucher
+                || $voucher->quota <= 0
+                || ($voucher->valid_until && $voucher->valid_until->isPast())
+                || !$voucher->appliesToEvent($ticketType->event->id)) {
+                return back()->with('error', 'Kode voucher tidak valid atau tidak berlaku untuk pembelian ini.');
+            }
+
+            $discount = $voucher->computeDiscount($gross);
+        }
+        // ====================================================================
+
         try {
-            $trx = DB::transaction(function () use ($ticketType, $user, $validated, $tripay, $ticketServices, $structuredResponses, $promoterId, $commissionEarned) {
+            $trx = DB::transaction(function () use ($ticketType, $user, $validated, $tripay, $ticketServices, $structuredResponses, $promoterId, $commissionEarned, $voucher, $discount) {
 
                 $detailPendaftar = DetailPendaftar::create([
                     'nama' => $validated['name'],
@@ -208,7 +265,7 @@ class TransactionController extends Controller
                  
                 } else {
                     // TRANSAKSI BERBAYAR (Tripay)
-                    $result = $tripay->createTransaction($ticketType, $user, $validated);
+                    $result = $tripay->createTransaction($ticketType, $user, $validated, $discount);
 
                     if (!isset($result['success']) || !$result['success']) {
                         throw new \Exception('Gagal membuat transaksi: ' . ($result['message'] ?? 'Kesalahan tidak diketahui'));
@@ -232,7 +289,16 @@ class TransactionController extends Controller
                         // Kolom Afiliasi
                         'promoter_id'         => $promoterId,
                         'commission_earned'   => $commissionEarned,
+
+                        // Voucher
+                        'voucher_id'          => $voucher?->id,
+                        'discount_amount'     => $discount,
                     ]);
+
+                    // Kurangi kuota voucher (reservasi saat transaksi dibuat).
+                    if ($voucher) {
+                        $voucher->decrement('quota');
+                    }
                 }
                 return $transaction;
             });

@@ -99,6 +99,7 @@ export default function AuthenticatedLayout({ children }) {
                                         </Link>
                                     </li>
                                     <li><Link href={route('admin.transactions.index')}>Transaction</Link></li>
+                                    <li><Link href={route('admin.vouchers.index')}>Voucher</Link></li>
                                     <li><Link href={route('admin.users.index')}>Users</Link></li>
                                     <li><Link href={route('admin.affiliates.index')}>Pengajuan Affiliate</Link></li>
                                     <li><Link href={route('admin.affiliates.report')}>Komisi Affiliate</Link></li>

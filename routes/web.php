@@ -18,6 +18,7 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TripayCallbackController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -37,6 +38,7 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
 
     Route::resource('tickets', TicketController::class);
     Route::post('tickets/additional/{ticket}', [TicketController::class, 'additonal'])->name('ticket.additional');
+    Route::post('voucher/validate', [TransactionController::class, 'validateVoucher'])->name('voucher.validate');
     Route::get('checkout/{ticket_type}', [TransactionController::class, 'create'])->name('transactions.checkout');
     Route::get('transactions/', [TransactionController::class, 'index'])->name('transactions.index');
     Route::post('transactions/{ticket_type}', [TransactionController::class, 'store'])->name('transactions.store');
@@ -74,6 +76,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('transactions/search', [TransactionController::class, 'adminSearch'])->name('transactions.search');
     Route::get('transactions/event-search', [TransactionController::class, 'adminEventSearch'])->name('transactions.eventSearch');
+
+    // Voucher (admin)
+    Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+    Route::post('vouchers', [VoucherController::class, 'store'])->name('vouchers.store');
+    Route::put('vouchers/{voucher}', [VoucherController::class, 'update'])->name('vouchers.update');
+    Route::delete('vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
 
     Route::resource('category', CategoryEventsController::class);
     Route::get('users/search', [UserController::class, 'search'])->name('users.search');
