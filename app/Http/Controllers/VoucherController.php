@@ -24,6 +24,16 @@ class VoucherController extends Controller
         ]);
     }
 
+    // Auto-generate kode voucher unik (8 karakter, huruf besar + angka).
+    public function generateCode()
+    {
+        do {
+            $code = strtoupper(Str::random(8));
+        } while (Voucher::where('code', $code)->exists());
+
+        return response()->json(['code' => $code]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

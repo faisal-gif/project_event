@@ -10,7 +10,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import FlashAlert from '@/Components/FlashAlert';
 import { formatRupiah, formatDateLong } from '@/Utils/formatter';
-import { Plus, Pencil, Trash2, TicketPercent } from 'lucide-react';
+import axios from 'axios';
+import { Plus, Pencil, Trash2, TicketPercent, Wand2 } from 'lucide-react';
 
 const emptyForm = { code: '', event_id: '', type: 'fixed', value: '', max_discount: '', quota: '', valid_until: '' };
 
@@ -64,6 +65,15 @@ export default function Index({ vouchers, events }) {
     const destroy = (v) => {
         if (confirm(`Hapus voucher ${v.code}?`)) {
             router.delete(route('admin.vouchers.destroy', v.id), { preserveScroll: true });
+        }
+    };
+
+    const generateCode = async () => {
+        try {
+            const res = await axios.get(route('admin.vouchers.generate'));
+            setData('code', res.data.code);
+        } catch {
+            /* abaikan */
         }
     };
 
@@ -135,8 +145,13 @@ export default function Index({ vouchers, events }) {
 
                     <div>
                         <InputLabel htmlFor="code" value="Kode Voucher" required />
-                        <TextInput id="code" className="mt-1 w-full uppercase" value={data.code}
-                            onChange={(e) => setData('code', e.target.value.toUpperCase())} placeholder="cth. DISKON10" />
+                        <div className="flex gap-2 mt-1">
+                            <TextInput id="code" className="w-full uppercase" value={data.code}
+                                onChange={(e) => setData('code', e.target.value.toUpperCase())} placeholder="cth. DISKON10" />
+                            <button type="button" onClick={generateCode} className="btn btn-outline btn-primary" title="Buat kode otomatis">
+                                <Wand2 className="w-4 h-4" /> Generate
+                            </button>
+                        </div>
                         <InputError message={errors.code} className="mt-1" />
                     </div>
 

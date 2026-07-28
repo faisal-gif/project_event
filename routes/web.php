@@ -79,6 +79,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Voucher (admin)
     Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+    Route::get('vouchers/generate-code', [VoucherController::class, 'generateCode'])->name('vouchers.generate');
     Route::post('vouchers', [VoucherController::class, 'store'])->name('vouchers.store');
     Route::put('vouchers/{voucher}', [VoucherController::class, 'update'])->name('vouchers.update');
     Route::delete('vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
