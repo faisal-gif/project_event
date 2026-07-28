@@ -258,7 +258,7 @@ function EventDetail({ event, seo }) {
                                                         </div>
 
                                                         <div className='flex gap-2 items-center'>
-                                                            <p className="font-bold text-primary text-lg">Rp. {formatCompact(ticketType.price)}</p>
+                                                            <p className="font-bold text-primary text-lg">Rp. {formatRupiah(ticketType.price)}</p>
                                                             <input
                                                                 type="radio"
                                                                 name="ticket-type"
