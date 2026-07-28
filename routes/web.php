@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryEventsController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\AffiliateController;
-use App\Http\Controllers\CategoryEventsController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Judge\JudgeDashboardController;
@@ -15,10 +18,9 @@ use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\TicketController;
-use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
+use App\Http\Controllers\User\TransactionController;
 use App\Http\Controllers\TripayCallbackController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,7 +33,7 @@ Route::post('/auth/register/complete', [SocialiteController::class, 'processComp
 
 
 Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
+    Route::get('/dashboard', [UserDashboardController::class, 'user'])->name('user.dashboard');
 
     Route::get('events', [EventController::class, 'userIndex'])->name('events.user.index');
     Route::get('/events/{event}/{slug}', [EventController::class, 'userShow'])->name('events.users.show');
@@ -59,7 +61,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return Inertia::render('Dashboard');
     })->middleware(['auth', 'verified']);
 
-    Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'admin'])->name('dashboard');
     Route::resource('events', AdminEventController::class);
     Route::get('events/participant/{id}', [ParticipantController::class, 'show'])->name('participant.show');
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
@@ -74,8 +76,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
     Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
 
-    Route::get('transactions/search', [TransactionController::class, 'adminSearch'])->name('transactions.search');
-    Route::get('transactions/event-search', [TransactionController::class, 'adminEventSearch'])->name('transactions.eventSearch');
+    Route::get('transactions/search', [AdminTransactionController::class, 'search'])->name('transactions.search');
+    Route::get('transactions/event-search', [AdminTransactionController::class, 'eventSearch'])->name('transactions.eventSearch');
 
     // Voucher (admin)
     Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
@@ -84,12 +86,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('vouchers/{voucher}', [VoucherController::class, 'update'])->name('vouchers.update');
     Route::delete('vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
 
-    Route::resource('category', CategoryEventsController::class);
-    Route::get('users/search', [UserController::class, 'search'])->name('users.search');
-    Route::resource('users', UserController::class);
+    Route::resource('category', CategoryEventsController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::get('users/search', [AdminUserController::class, 'search'])->name('users.search');
+    Route::resource('users', AdminUserController::class)->except(['show']);
     Route::get('/qr/scan', [TicketController::class, 'scan'])->name('ticket.scan');
     Route::get('/qr/validate', [TicketController::class, 'validateQr'])->name('ticket.validate');
-    Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('transactions.index');
+    Route::get('transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
 });
 
 
