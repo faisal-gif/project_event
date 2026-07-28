@@ -235,8 +235,12 @@ class TransactionController extends Controller
                     'terms_and_condition' => $validated['terms'],
                 ]);
 
-                if ($ticketType->price == 0) {
-                    // TRANSAKSI GRATIS
+                // Harga bersih setelah voucher. Jika 0 (voucher menutup penuh), perlakukan sebagai GRATIS.
+                $gross = (int) round($ticketType->price) * $validated['quantity'];
+                $net = max(0, $gross - $discount);
+
+                if ($ticketType->price == 0 || $net <= 0) {
+                    // TRANSAKSI GRATIS (asli gratis, atau gratis karena voucher)
                     $transaction = Transaction::create([
                         'user_id'             => $user->id,
                         'event_id'            => $ticketType->event->id,
@@ -255,14 +259,22 @@ class TransactionController extends Controller
                         // Kolom Afiliasi
                         'promoter_id'         => $promoterId,
                         'commission_earned'   => $commissionEarned,
+
+                        // Voucher
+                        'voucher_id'          => $voucher?->id,
+                        'discount_amount'     => $discount,
                     ]);
+
+                    if ($voucher) {
+                        $voucher->decrement('quota');
+                    }
 
                     $ticketServices->issueTicket($transaction);
 
 
                     $emailData =  $transaction->load('user', 'event');
                     $email =  Mail::to($emailData->user->email)->send(new PaymentSuccessfulMail($emailData));
-                 
+
                 } else {
                     // TRANSAKSI BERBAYAR (Tripay)
                     $result = $tripay->createTransaction($ticketType, $user, $validated, $discount);

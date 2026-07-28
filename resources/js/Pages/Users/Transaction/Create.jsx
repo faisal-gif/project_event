@@ -238,11 +238,13 @@ const Create = ({ ticketType, event, channel, quantity }) => {
     const totalPrice = ticketType.price * data.quantity;
     const discount = appliedVoucher?.discount || 0;
     const discountedTotal = Math.max(0, totalPrice - discount);
+    // Jika voucher menutup penuh harga, transaksi jadi gratis (tanpa biaya layanan).
+    const isFree = discountedTotal <= 0;
     const selectedChannel = channel.find((ch) => ch.code == data.paymentMethod);
-    const adminFee =
+    const adminFee = isFree ? 0 :
         (selectedChannel?.fee_customer?.flat ?? 0) +
         ((discountedTotal * (selectedChannel?.fee_customer?.percent ?? 0)) / 100);
-    const finalPrice = discountedTotal + adminFee;
+    const finalPrice = isFree ? 0 : discountedTotal + adminFee;
 
     const applyVoucher = async () => {
         if (!voucherInput.trim()) return;
@@ -370,7 +372,7 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                             </div>
                         </div>
 
-                        <div className="card bg-base-100 shadow-xl border border-base-200">
+                        <div className={`card bg-base-100 shadow-xl border border-base-200 ${isFree ? 'hidden' : ''}`}>
                             <div className="card-body p-6 md:p-8">
                                 <h3 className="text-xl font-bold mb-6">Metode Pembayaran</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -447,18 +449,20 @@ const Create = ({ ticketType, event, channel, quantity }) => {
                                             <span>-{formatPrice(discount)}</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Biaya Layanan</span>
-                                        <span className="font-medium text-gray-700">{formatPrice(adminFee)}</span>
-                                    </div>
+                                    {!isFree && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-500">Biaya Layanan</span>
+                                            <span className="font-medium text-gray-700">{formatPrice(adminFee)}</span>
+                                        </div>
+                                    )}
                                     <div className="divider my-2"></div>
                                     <div className="flex justify-between text-lg font-bold">
                                         <span>Total</span>
-                                        <span className="text-primary">{formatPrice(finalPrice)}</span>
+                                        <span className="text-primary">{isFree ? 'Gratis' : formatPrice(finalPrice)}</span>
                                     </div>
                                 </div>
                                 <button onClick={handlePayment} className="btn btn-primary w-full btn-lg" disabled={processing || !data.terms}>
-                                    {processing ? 'Memproses...' : 'Bayar Sekarang'}
+                                    {processing ? 'Memproses...' : (isFree ? 'Ambil Tiket Gratis' : 'Bayar Sekarang')}
                                 </button>
                                 <div className="text-center mt-6">
                                     <Link href={route('events.guest.detail', { event: event.id, slug: event.slug })} className="text-sm font-medium text-gray-500 hover:text-primary transition-colors flex items-center justify-center gap-2">
