@@ -10,7 +10,7 @@ export function formatRupiah(number) {
     return new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
-        minimumFractionDigits: 1,
+        minimumFractionDigits: 0,
     }).format(number);
 }
 
@@ -20,6 +20,17 @@ export function formatCompact(number) {
     return new Intl.NumberFormat("en-US", {
         notation: "compact",
         maximumFractionDigits: 1,
+    }).format(number);
+}
+
+// Format Rupiah Compact: 1500000 → Rp1,5 jt
+export function formatRupiahCompact(number) {
+    if (!number) return "Rp0";
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        notation: "compact",
+        maximumFractionDigits: 1, // Membatasi angka desimal (opsional, sesuaikan kebutuhan)
     }).format(number);
 }
 

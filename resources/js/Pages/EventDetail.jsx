@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Ticket, Calendar, MapPin, Minus, Plus, Tag, Share2, Copy, Check } from 'lucide-react';
 import Card from '@/Components/ui/Card';
 import Seo from '@/Components/Seo';
-import { formatCompact, formatRupiah } from '@/Utils/formatter';
+import { formatCompact, formatRupiah, formatRupiahCompact } from '@/Utils/formatter';
 
 function EventDetail({ event, seo }) {
     const { auth } = usePage().props;
@@ -258,7 +258,7 @@ function EventDetail({ event, seo }) {
                                                         </div>
 
                                                         <div className='flex gap-2 items-center'>
-                                                            <p className="font-bold text-primary text-lg">{formatRupiah(ticketType.price)}</p>
+                                                            <p className="font-bold text-primary text-lg">{formatRupiahCompact(ticketType.price)}</p>
                                                             <input
                                                                 type="radio"
                                                                 name="ticket-type"
