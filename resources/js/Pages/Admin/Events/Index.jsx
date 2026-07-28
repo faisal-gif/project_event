@@ -90,7 +90,8 @@ export default function Index({ events, filters }) {
                         </select>
                     </div>
 
-                    <div className="card bg-base-100 border border-base-200 shadow-sm">
+                    {/* Desktop: tabel */}
+                    <div className="card bg-base-100 border border-base-200 shadow-sm hidden md:block">
                         <div className="overflow-x-auto">
                             <table className="table">
                                 <thead>
@@ -133,6 +134,37 @@ export default function Index({ events, filters }) {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    {/* Mobile: card */}
+                    <div className="md:hidden space-y-3">
+                        {events.data.length === 0 && (
+                            <div className="text-center text-gray-400 py-8">Tidak ada event yang cocok.</div>
+                        )}
+                        {events.data.map((event) => (
+                            <div key={event.id} className="card bg-base-100 border border-base-200 shadow-sm">
+                                <div className="card-body p-4 gap-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <p className="font-semibold leading-snug">{event.title}</p>
+                                        <span className={`badge capitalize shrink-0 ${STATUS_BADGE[event.status] || 'badge-neutral'}`}>{event.status}</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-500">
+                                        <span>Creator: <span className="text-gray-700">{event.creator?.name}</span></span>
+                                        <span>Kategori: <span className="text-gray-700">{event.category?.name}</span></span>
+                                        <span>Harga: <span className="text-gray-700">{formatPriceRange(event.price_range)}</span></span>
+                                        <span>Kuota: <span className="text-gray-700">{event.total_quota}</span></span>
+                                    </div>
+                                    <div className="flex gap-2 mt-1">
+                                        <Link className="btn btn-sm btn-primary btn-outline flex-1" href={route('admin.events.show', event)}>
+                                            <Eye className="w-4 h-4 mr-1" /> Detail
+                                        </Link>
+                                        <Link className="btn btn-sm btn-warning btn-outline flex-1" href={route('admin.events.edit', event)}>
+                                            <Pencil className="w-4 h-4 mr-1" /> Edit
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     <Pagination links={events.links} />
