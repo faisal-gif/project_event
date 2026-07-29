@@ -122,11 +122,19 @@ class AffiliateController extends Controller
     }
 
     // Export laporan komisi (mengikuti filter yang sama) ke Excel.
+    // Pakai Excel::raw + response biasa (bukan BinaryFileResponse) agar tidak
+    // memanggil ignore_user_abort() yang di-disable di sebagian server.
     public function reportExport(Request $request)
     {
         $rows = $this->commissionRows($request);
+        $filename = 'komisi-affiliate-' . now()->format('Ymd-His') . '.xlsx';
 
-        return Excel::download(new AffiliateCommissionExport($rows), 'komisi-affiliate-' . now()->format('Ymd-His') . '.xlsx');
+        $content = Excel::raw(new AffiliateCommissionExport($rows), \Maatwebsite\Excel\Excel::XLSX);
+
+        return response($content, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     // Query agregasi komisi per event + per user (dipakai report & export).
