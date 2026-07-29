@@ -298,7 +298,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                         <div className='px-2 md:px-0 space-y-6'>
                             
                             {/* --- WIDGET SUMMARY TRANSAKSI --- */}
-                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-1/2 border border-base-200 bg-base-100">
+                            <div className="stats stats-vertical lg:stats-horizontal shadow w-full md:w-2/3 border border-base-200 bg-base-100">
                                 <div className="stat">
                                     <div className="stat-title text-sm font-semibold">Total Seluruh Transaksi</div>
                                     <div className="stat-value">{summary?.total_transactions || 0}</div>
@@ -306,6 +306,10 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                 <div className="stat">
                                     <div className="stat-title text-sm">Transaksi Paid</div>
                                     <div className="stat-value text-success">{summary?.paid_transactions || 0}</div>
+                                </div>
+                                <div className="stat">
+                                    <div className="stat-title text-sm">Total Pendapatan (Paid)</div>
+                                    <div className="stat-value text-primary text-2xl">{formatRupiah(summary?.total_revenue || 0)}</div>
                                 </div>
                             </div>
 
