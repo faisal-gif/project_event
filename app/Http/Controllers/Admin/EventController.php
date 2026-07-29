@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EventRequest;
+use App\Exports\ParticipantsExport;
+use App\Exports\TransactionsExport;
 use App\Models\CategoryEvents;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
@@ -152,6 +155,28 @@ class EventController extends Controller
                 'search_transaction' => $request->search_transaction ?? '',
                 'search_ticket' => $request->search_ticket ?? '',
             ]
+        ]);
+    }
+
+    // Export transaksi event ke Excel (response biasa, hindari BinaryFileResponse).
+    public function exportTransactions(Event $event)
+    {
+        $content = Excel::raw(new TransactionsExport($event->id), \Maatwebsite\Excel\Excel::XLSX);
+
+        return response($content, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="transaksi-' . $event->slug . '.xlsx"',
+        ]);
+    }
+
+    // Export peserta event ke Excel.
+    public function exportParticipants(Event $event)
+    {
+        $content = Excel::raw(new ParticipantsExport($event->id), \Maatwebsite\Excel\Excel::XLSX);
+
+        return response($content, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="peserta-' . $event->slug . '.xlsx"',
         ]);
     }
 

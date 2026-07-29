@@ -63,6 +63,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/dashboard', [AdminDashboardController::class, 'admin'])->name('dashboard');
     Route::resource('events', AdminEventController::class);
+    Route::get('events/{event}/export-transactions', [AdminEventController::class, 'exportTransactions'])->name('events.export.transactions');
+    Route::get('events/{event}/export-participants', [AdminEventController::class, 'exportParticipants'])->name('events.export.participants');
     Route::get('events/participant/{id}', [ParticipantController::class, 'show'])->name('participant.show');
     Route::post('events/validate-step', [EventController::class, 'validateStep'])->name('events.validateStep');
     Route::post('events/{event}/validate-step', [EventController::class, 'validateStepEdit'])->name('events.validateStep.edit');

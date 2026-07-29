@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '@/Components/ui/Card';
 import Modal from '@/Components/Modal';
 import QrCode from '@/Components/QrCode';
-import { QrCodeIcon, Search } from 'lucide-react';
+import { QrCodeIcon, Search, Download } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
 
 // Helper functions
@@ -253,6 +253,9 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                             <button onClick={() => setScannerModalOpen(true)} className="btn btn-sm btn-primary shrink-0">
                                                 <QrCodeIcon size={16} className="mr-1" /> Scan QR
                                             </button>
+                                            <a href={route('admin.events.export.participants', event.id)} className="btn btn-sm btn-success text-white shrink-0">
+                                                <Download size={16} className="mr-1" /> Export
+                                            </a>
                                         </div>
                                     </div>
 
@@ -320,17 +323,22 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                 <div className="card-body">
                                     <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
                                         <h2 className="card-title">Riwayat Transaksi</h2>
-                                        <div className="relative w-full sm:w-64">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Search className="h-4 w-4 text-gray-400" />
+                                        <div className="flex gap-2 w-full sm:w-auto">
+                                            <div className="relative w-full sm:w-64">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <Search className="h-4 w-4 text-gray-400" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Cari Invoice / Nama..."
+                                                    className="input input-sm input-bordered w-full pl-10"
+                                                    value={searchTransaction}
+                                                    onChange={(e) => setSearchTransaction(e.target.value)}
+                                                />
                                             </div>
-                                            <input
-                                                type="text"
-                                                placeholder="Cari Invoice / Nama..."
-                                                className="input input-sm input-bordered w-full pl-10"
-                                                value={searchTransaction}
-                                                onChange={(e) => setSearchTransaction(e.target.value)}
-                                            />
+                                            <a href={route('admin.events.export.transactions', event.id)} className="btn btn-sm btn-success text-white shrink-0">
+                                                <Download size={16} className="mr-1" /> Export
+                                            </a>
                                         </div>
                                     </div>
 
