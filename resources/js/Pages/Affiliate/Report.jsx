@@ -71,6 +71,7 @@ export default function Report({ rows, total_commission, filters }) {
                         </div>
                         <a
                             href={route(`${prefix}.affiliates.report.export`, { search: search || undefined, event_id: eventOpt?.value || undefined })}
+                            target='_blank'
                             className="btn btn-success btn-sm text-white gap-1"
                         >
                             <Download className="w-4 h-4" /> Export Excel
