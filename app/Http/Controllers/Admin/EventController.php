@@ -115,7 +115,7 @@ class EventController extends Controller
         $totalTransactions = $event->transaction()->count();
         $paidTransactions = $event->transaction()->where('status', 'PAID')->count();
         // Total pendapatan yang sudah terbayar (PAID)
-        $totalRevenue = (float) $event->transaction()->where('status', 'PAID')->sum('subtotal');
+        $totalRevenue = (float) $event->transaction()->where('status', 'PAID')->sum('amount');
 
         // B. Ringkasan Tiket (Total & Per Tipe Tiket)
         $totalTickets = $event->tickets()->count();
