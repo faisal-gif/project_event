@@ -16,6 +16,14 @@ function Step2_TicketDetails({ data, setData, errors }) {
         setData('ticket_types', updatedTicketTypes);
     };
 
+    // Harga: simpan angka murni, tampilkan dengan pemisah ribuan.
+    const handlePriceChange = (index, rawValue) => {
+        const digits = rawValue.replace(/\D/g, '');
+        const updated = [...data.ticket_types];
+        updated[index].price = digits;
+        setData('ticket_types', updated);
+    };
+
 
     const addTicketType = () => {
         setData('ticket_types', [...data.ticket_types, { name: '', price: '', quota: '', purchase_date: '', end_purchase_date: '', description: '' }]);
@@ -80,15 +88,19 @@ function Step2_TicketDetails({ data, setData, errors }) {
 
                         <div className="flex flex-col gap-2">
                             <InputLabel htmlFor={`price_${index}`} value="Harga" required />
-                            <TextInput
-                                id={`price_${index}`}
-                                name="price"
-                                type="number"
-                                value={ticket.price}
-                                onChange={(e) => handleTicketChange(index, e)}
-                                className="mt-1 block w-full"
-                                placeholder="Isi 0 untuk tiket gratis"
-                            />
+                            <div className="relative mt-1">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">Rp</span>
+                                <TextInput
+                                    id={`price_${index}`}
+                                    name="price"
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={ticket.price === '' || ticket.price == null ? '' : Number(ticket.price).toLocaleString('id-ID')}
+                                    onChange={(e) => handlePriceChange(index, e.target.value)}
+                                    className="block w-full pl-9"
+                                    placeholder="0 untuk tiket gratis"
+                                />
+                            </div>
                             <InputError message={errors[`ticket_types.${index}.price`]} className="mt-2" />
                         </div>
 
