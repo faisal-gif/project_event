@@ -120,16 +120,18 @@ class EventController extends Controller
         // B. Ringkasan Tiket (Total & Per Tipe Tiket)
         $totalTickets = $event->tickets()->count();
 
-        // Menghitung jumlah tiket dikelompokkan berdasarkan tipe
-        $ticketsByType = $event->tickets()
-            ->select('ticket_type_id', \DB::raw('count(*) as total'))
+        // Per tipe tiket: jumlah terjual + total amount (dari transaksi PAID)
+        $ticketsByType = $event->transaction()
+            ->where('status', 'PAID')
+            ->selectRaw('ticket_type_id, SUM(quantity) as sold, SUM(amount) as amount')
             ->groupBy('ticket_type_id')
-            ->with('ticket_type:id,name') // Pastikan relasi ticket_type dimuat
+            ->with('ticketType:id,name')
             ->get()
-            ->map(function ($ticket) {
+            ->map(function ($t) {
                 return [
-                    'name' => $ticket->ticket_type ? $ticket->ticket_type->name : 'Tidak Diketahui',
-                    'total' => $ticket->total,
+                    'name' => $t->ticketType?->name ?? 'Tidak Diketahui',
+                    'sold' => (int) $t->sold,
+                    'amount' => (float) $t->amount,
                 ];
             });
 

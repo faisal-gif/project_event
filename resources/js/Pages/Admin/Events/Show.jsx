@@ -225,7 +225,10 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                 {summary?.tickets_by_type?.map((type, index) => (
                                     <div key={index} className="stat">
                                         <div className="stat-title text-sm">{type.name}</div>
-                                        <div className="stat-value text-primary">{type.total}</div>
+                                        <div className="stat-value text-primary text-2xl">
+                                            {type.sold} <span className="text-sm font-normal text-base-content/70">terjual</span>
+                                        </div>
+                                        <div className="stat-desc text-success">{formatRupiah(type.amount)}</div>
                                     </div>
                                 ))}
                             </div>
