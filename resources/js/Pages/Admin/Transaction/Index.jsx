@@ -146,14 +146,14 @@ export default function Index({ transactions, filters }) {
                                 </thead>
                                 <tbody>
                                     {transactions.data.length === 0 && (
-                                        <tr><td colSpan={6} className="text-center text-gray-400 py-8">Tidak ada transaksi yang cocok.</td></tr>
+                                        <tr><td colSpan={6} className="text-center text-base-content/50 py-8">Tidak ada transaksi yang cocok.</td></tr>
                                     )}
                                     {transactions.data.map((trx) => (
                                         <tr key={trx.id} className="hover">
                                             <td className="font-mono text-xs">{trx.reference}</td>
                                             <td>
                                                 <div className="font-medium">{trx.user?.name}</div>
-                                                <div className="text-xs text-gray-500">{trx.user?.email}</div>
+                                                <div className="text-xs text-base-content/60">{trx.user?.email}</div>
                                             </td>
                                             <td className="max-w-[200px] truncate">{trx.event?.title}</td>
                                             <td className="text-right font-semibold">{formatRupiah(trx.amount)}</td>

@@ -32,16 +32,16 @@ export default function Index({ categories }) {
                                 </thead>
                                 <tbody>
                                     {categories.length === 0 && (
-                                        <tr><td colSpan={5} className="text-center text-gray-400 py-8">Belum ada kategori.</td></tr>
+                                        <tr><td colSpan={5} className="text-center text-base-content/50 py-8">Belum ada kategori.</td></tr>
                                     )}
                                     {categories.map((category, index) => (
                                         <tr key={category.id} className="hover">
-                                            <td className="text-gray-400">{index + 1}</td>
+                                            <td className="text-base-content/50">{index + 1}</td>
                                             <td className="font-medium">
                                                 {category.name}
-                                                {category.icon && <span className="ml-2 text-xs text-gray-400 font-mono">({category.icon})</span>}
+                                                {category.icon && <span className="ml-2 text-xs text-base-content/50 font-mono">({category.icon})</span>}
                                             </td>
-                                            <td className="text-sm text-gray-500">{category.slug}</td>
+                                            <td className="text-sm text-base-content/60">{category.slug}</td>
                                             <td>
                                                 <div className="flex justify-end">
                                                     <Link className="btn btn-sm btn-warning btn-outline" href={route('admin.category.edit', category)}>

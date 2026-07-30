@@ -262,7 +262,7 @@ function Show({ event }) {
                                                         <img
                                                             src={'/storage/' + response.field_value}
                                                             alt={response.field_name}
-                                                            className="max-w-[200px] h-auto rounded-lg border border-gray-200 shadow-sm"
+                                                            className="max-w-[200px] h-auto rounded-lg border border-base-300 shadow-sm"
                                                         />
                                                     </div>
                                                 ) : response.field_type == 'file' ? (

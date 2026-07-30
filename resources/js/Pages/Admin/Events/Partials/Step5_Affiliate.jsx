@@ -21,12 +21,12 @@ const Step5_Affiliate = ({ data, setData, errors }) => {
                         <Share2 className="w-5 h-5 text-primary"/> Aktifkan Program Afiliasi (Komisi)
                     </label>
                 </div>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-base-content/60 mb-6">
                     Beri komisi kepada user lain yang berhasil menjualkan tiket event Anda melalui link referral mereka.
                 </p>
 
                 {data.is_affiliate_enabled && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-base-200 rounded-lg border border-base-300">
                         <div>
                             <InputLabel value="Tipe Komisi" />
                             <select 
@@ -41,7 +41,7 @@ const Step5_Affiliate = ({ data, setData, errors }) => {
                         <div>
                             <InputLabel value="Besaran Komisi" />
                             <div className="flex items-center gap-2 mt-1">
-                                {data.affiliate_type === 'fixed' && <span className="text-gray-500 font-medium font-mono">Rp</span>}
+                                {data.affiliate_type === 'fixed' && <span className="text-base-content/60 font-medium font-mono">Rp</span>}
                                 <TextInput 
                                     type="number" 
                                     min="1" 
@@ -50,7 +50,7 @@ const Step5_Affiliate = ({ data, setData, errors }) => {
                                     placeholder={data.affiliate_type === 'percentage' ? "Contoh: 10" : "Contoh: 15000"} 
                                     className="w-full" 
                                 />
-                                {data.affiliate_type === 'percentage' && <span className="text-gray-500 font-medium font-mono">%</span>}
+                                {data.affiliate_type === 'percentage' && <span className="text-base-content/60 font-medium font-mono">%</span>}
                             </div>
                             <InputError message={errors.affiliate_reward} className="mt-2" />
                         </div>

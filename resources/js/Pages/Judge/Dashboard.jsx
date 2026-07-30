@@ -9,12 +9,12 @@ function Dashboard({ events_count }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl px-6 md:px-8">
-                    <div className="w-96 overflow-hidden bg-white shadow-sm rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <h3 className="text-lg font-medium leading-6 text-gray-900">
+                    <div className="w-96 overflow-hidden bg-base-100 shadow-sm rounded-lg">
+                        <div className="p-6 text-base-content">
+                            <h3 className="text-lg font-medium leading-6 text-base-content">
                                 Total Events
                             </h3>
-                            <p className="mt-1 text-3xl font-semibold text-gray-700">
+                            <p className="mt-1 text-3xl font-semibold text-base-content/80">
                                 {events_count}
                             </p>
                         </div>

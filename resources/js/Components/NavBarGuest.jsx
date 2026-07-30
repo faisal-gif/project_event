@@ -3,6 +3,7 @@ import React from 'react'
 import Dropdown from './Dropdown'
 import { User, HelpCircle } from 'lucide-react'
 import ApplicationLogoWhite from './ApplicationLogoWhite';
+import ThemeToggle from './ThemeToggle';
 
 function NavBarGuest() {
   const user = usePage().props.auth.user;
@@ -34,6 +35,7 @@ function NavBarGuest() {
       </div>
 
       <div className="navbar-end">
+        <ThemeToggle />
         {user?.role === 'user' && (
           <button
             type="button"

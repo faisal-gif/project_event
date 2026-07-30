@@ -89,7 +89,7 @@ export default function Report({ rows, total_commission, filters }) {
                     {/* Ringkasan total */}
                     <div className="card bg-primary/10 border border-primary/20 mb-4">
                         <div className="card-body py-4">
-                            <p className="text-sm text-gray-600">Total Komisi Terbayar</p>
+                            <p className="text-sm text-base-content/70">Total Komisi Terbayar</p>
                             <p className="text-2xl font-bold text-primary">{formatRupiah(total_commission)}</p>
                         </div>
                     </div>
@@ -138,14 +138,14 @@ export default function Report({ rows, total_commission, filters }) {
                                 </thead>
                                 <tbody>
                                     {rows.length === 0 && (
-                                        <tr><td colSpan={5} className="text-center text-gray-400 py-8">Belum ada komisi affiliate.</td></tr>
+                                        <tr><td colSpan={5} className="text-center text-base-content/50 py-8">Belum ada komisi affiliate.</td></tr>
                                     )}
                                     {rows.map((row, i) => (
                                         <tr key={i} className="hover">
                                             <td className="font-medium max-w-[220px] truncate">{row.event}</td>
                                             <td>
                                                 <div className="font-medium">{row.affiliate}</div>
-                                                <div className="text-xs text-gray-500">{row.affiliate_email}</div>
+                                                <div className="text-xs text-base-content/60">{row.affiliate_email}</div>
                                             </td>
                                             <td className="text-right">{row.tickets}</td>
                                             <td className="text-right">{row.trx_count}</td>

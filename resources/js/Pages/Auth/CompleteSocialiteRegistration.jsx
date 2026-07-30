@@ -32,7 +32,7 @@ export default function CompleteSocialiteRegistration({ name, email }) {
                         id="name"
                         name="name"
                         value={name}
-                        className="mt-1 input-bordered w-full input-sm bg-gray-100"
+                        className="mt-1 input-bordered w-full input-sm bg-base-200"
                         autoComplete="name"
                         disabled
                     />
@@ -46,7 +46,7 @@ export default function CompleteSocialiteRegistration({ name, email }) {
                         type="email"
                         name="email"
                         value={email}
-                        className="mt-1 input-bordered w-full input-sm bg-gray-100"
+                        className="mt-1 input-bordered w-full input-sm bg-base-200"
                         autoComplete="username"
                         disabled
                     />

@@ -112,12 +112,12 @@ export default function Index({ vouchers, events }) {
                                 </thead>
                                 <tbody>
                                     {vouchers.data.length === 0 && (
-                                        <tr><td colSpan={6} className="text-center text-gray-400 py-8">Belum ada voucher.</td></tr>
+                                        <tr><td colSpan={6} className="text-center text-base-content/50 py-8">Belum ada voucher.</td></tr>
                                     )}
                                     {vouchers.data.map((v) => (
                                         <tr key={v.id} className="hover">
                                             <td className="font-mono font-semibold">{v.code}</td>
-                                            <td className="text-sm">{v.event?.title ?? <span className="text-gray-400">Semua event</span>}</td>
+                                            <td className="text-sm">{v.event?.title ?? <span className="text-base-content/50">Semua event</span>}</td>
                                             <td className="text-sm">{discountLabel(v)}</td>
                                             <td className="text-right">{v.quota}</td>
                                             <td className="text-sm">{v.valid_until ? formatDateLong(v.valid_until) : '-'}</td>

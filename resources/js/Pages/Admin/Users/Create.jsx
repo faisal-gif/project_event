@@ -35,7 +35,7 @@ export default function Create({ events }) {
 
             <div className="py-10">
                 <div className="mx-auto max-w-2xl px-4 lg:px-8">
-                    <Link href={route('admin.users.index')} className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary mb-4">
+                    <Link href={route('admin.users.index')} className="inline-flex items-center gap-1 text-sm text-base-content/60 hover:text-primary mb-4">
                         <ArrowLeft className="w-4 h-4" /> Kembali ke daftar user
                     </Link>
 
@@ -105,7 +105,7 @@ export default function Create({ events }) {
                                 <div>
                                     <InputLabel value="Tugaskan ke Event" required />
                                     <div className="max-h-48 p-3 overflow-y-auto bg-base-200 rounded-lg mt-1 space-y-2">
-                                        {events.length === 0 && <p className="text-sm text-gray-500">Belum ada event.</p>}
+                                        {events.length === 0 && <p className="text-sm text-base-content/60">Belum ada event.</p>}
                                         {events.map((event) => (
                                             <label key={event.id} htmlFor={`event-${event.id}`} className="flex items-center gap-2 cursor-pointer">
                                                 <input

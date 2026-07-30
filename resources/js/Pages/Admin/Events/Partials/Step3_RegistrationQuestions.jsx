@@ -10,7 +10,7 @@ const Step3_RegistrationQuestions = ({ data, setData, errors }) => {
                     <input type="checkbox" id="need_additional_questions" onChange={(e) => setData("need_additional_questions", e.target.checked)} className="checkbox" checked={data.need_additional_questions} />
                     <label htmlFor="need_additional_questions" className="text-lg font-medium cursor-pointer">Aktifkan Pertanyaan Tambahan untuk Registrasi</label>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">Jika diaktifkan, peserta wajib menjawab pertanyaan ini sebelum menyelesaikan pembelian tiket.</p>
+                <p className="text-sm text-base-content/60 mt-2">Jika diaktifkan, peserta wajib menjawab pertanyaan ini sebelum menyelesaikan pembelian tiket.</p>
             </Card>
 
             {data.need_additional_questions && (

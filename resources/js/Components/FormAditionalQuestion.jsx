@@ -77,7 +77,7 @@ function FormAditionalQuestion({ ticket, fields }) {
     };
 
     const renderField = (field) => {
-        const commonClass = "border-0 bg-secondary/50 focus:bg-white w-full";
+        const commonClass = "border-0 bg-secondary/50 focus:bg-base-100 w-full";
         const value = data[field.name];
 
         switch (field.type) {
@@ -126,7 +126,7 @@ function FormAditionalQuestion({ ticket, fields }) {
                             required={field.is_required && !isFileUploaded}
                         />
 
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-base-content/60">
                             Hanya bisa mengirim max {field.type === 'file' ? '5MB' : '2MB'}
                         </p>
                         

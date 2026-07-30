@@ -235,7 +235,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                     <div>
                                                         <span className="font-semibold">{ticketType.name}</span>
                                                         <p className="text-xs">{ticketType.description}</p>
-                                                        <div className="text-sm text-gray-500">
+                                                        <div className="text-sm text-base-content/60">
                                                             Quota: {ticketType.quota}
                                                         </div>
                                                         <div className="text-xs">
@@ -318,7 +318,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                             <div className="flex gap-2 w-full sm:w-auto">
                                                 <div className="relative w-full sm:w-56">
                                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                        <Search className="h-4 w-4 text-gray-400" />
+                                                        <Search className="h-4 w-4 text-base-content/50" />
                                                     </div>
                                                     <input
                                                         type="text"
@@ -368,7 +368,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                                                 <div className="font-semibold text-sm">
                                                                     {ticket.user?.username || ticket.user?.name}
                                                                 </div>
-                                                                <div className="text-xs text-gray-500">
+                                                                <div className="text-xs text-base-content/60">
                                                                     {ticket.user?.email}
                                                                 </div>
                                                             </td>
@@ -422,7 +422,7 @@ function Show({ event, tickets, transactions, filters, summary }) {
                                         <h2 className="card-title">Riwayat Transaksi</h2>
                                         <div className="relative w-full sm:w-64">
                                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Search className="h-4 w-4 text-gray-400" />
+                                                <Search className="h-4 w-4 text-base-content/50" />
                                             </div>
                                             <input
                                                 type="text"

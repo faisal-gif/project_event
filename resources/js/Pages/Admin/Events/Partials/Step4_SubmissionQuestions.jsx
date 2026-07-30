@@ -32,7 +32,7 @@ const Step4_SubmissionQuestions = ({ data, setData, errors }) => {
                     <input type="checkbox" id="needs_submission" onChange={(e) => setData("needs_submission", e.target.checked)} className="checkbox" checked={data.needs_submission} />
                     <label htmlFor="needs_submission" className="text-lg font-medium cursor-pointer">Aktifkan Submisi Pasca-Pembelian</label>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">Aktifkan jika event ini adalah kompetisi atau mengharuskan peserta mengunggah/mengisi data setelah membeli tiket.</p>
+                <p className="text-sm text-base-content/60 mt-2">Aktifkan jika event ini adalah kompetisi atau mengharuskan peserta mengunggah/mengisi data setelah membeli tiket.</p>
             </Card>
 
             {data.needs_submission && (
@@ -51,13 +51,13 @@ const Step4_SubmissionQuestions = ({ data, setData, errors }) => {
                     {optionsFields.length > 0 && (
                         <Card className="lg:col-span-12 bg-base-100 p-6 shadow-medium mt-4 border-l-4 border-primary">
                             <h3 className="text-lg font-semibold mb-2">Aturan Limit Pilihan</h3>
-                            <p className="text-sm text-gray-500 mb-6">
+                            <p className="text-sm text-base-content/60 mb-6">
                                 Atur batas maksimal opsi yang bisa dipilih user untuk setiap pertanyaan <b>Checkbox/Select</b> berdasarkan tipe tiket mereka. Kosongkan jika tidak ada batasan.
                             </p>
 
                             <div className="space-y-6">
                                 {data.ticket_types.map((ticket, tIndex) => (
-                                    <div key={tIndex} className="bg-gray-50 p-4 rounded-lg border">
+                                    <div key={tIndex} className="bg-base-200 p-4 rounded-lg border">
                                         <h4 className="text-base font-bold text-primary mb-4 border-b pb-2">
                                             Tiket: {ticket.name || `Tiket ${tIndex + 1}`}
                                         </h4>
@@ -69,7 +69,7 @@ const Step4_SubmissionQuestions = ({ data, setData, errors }) => {
                                                 const fieldName = field.name || `field_${fIndex}`; 
                                                 
                                                 return (
-                                                    <div key={fieldName} className="flex items-center justify-between bg-white p-3 rounded border">
+                                                    <div key={fieldName} className="flex items-center justify-between bg-base-100 p-3 rounded border">
                                                         <span className="text-sm font-medium">{field.label || 'Pertanyaan Tanpa Label'}</span>
                                                         <div className="flex items-center gap-2">
                                                             <TextInput
@@ -80,7 +80,7 @@ const Step4_SubmissionQuestions = ({ data, setData, errors }) => {
                                                                 onChange={(e) => handleRuleChange(tIndex, fieldName, e.target.value)}
                                                                 className="w-20 text-center"
                                                             />
-                                                            <span className="text-xs text-gray-500">opsi</span>
+                                                            <span className="text-xs text-base-content/60">opsi</span>
                                                         </div>
                                                     </div>
                                                 );

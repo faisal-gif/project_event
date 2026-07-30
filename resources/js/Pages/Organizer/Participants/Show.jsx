@@ -60,7 +60,7 @@ function ShowParticipant({ ticket }) {
                                 <span className="hidden sm:inline">Kembali ke Participants</span>
                                 <span className="sm:hidden">Kembali</span>
                             </Link>
-                            <h2 className="text-xl sm:text-2xl font-bold leading-tight text-gray-800">
+                            <h2 className="text-xl sm:text-2xl font-bold leading-tight text-base-content">
                                 Profil Peserta
                             </h2>
                         </div>
@@ -79,7 +79,7 @@ function ShowParticipant({ ticket }) {
                                         
                                         {/* Menampilkan Gambar QR Code dari Database */}
                                         {ticket.qr_image ? (
-                                            <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 w-fit">
+                                            <div className="bg-base-100 p-2 rounded-xl shadow-sm border border-gray-100 w-fit">
                                                 <a href={`/storage/${ticket.qr_image}`} target="_blank" rel="noopener noreferrer">
                                                     <img 
                                                         src={`/storage/${ticket.qr_image}`} 
@@ -89,26 +89,26 @@ function ShowParticipant({ ticket }) {
                                                 </a>
                                             </div>
                                         ) : (
-                                            <div className="w-[150px] h-[150px] bg-gray-100 flex items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-400 text-sm text-center p-4">
+                                            <div className="w-[150px] h-[150px] bg-base-200 flex items-center justify-center rounded-xl border border-dashed border-base-300 text-base-content/50 text-sm text-center p-4">
                                                 QR Code tidak tersedia
                                             </div>
                                         )}
 
                                         <div className="space-y-3 text-sm w-full">
                                             <div>
-                                                <p className="text-gray-500 font-semibold text-xs">KODE TIKET</p>
+                                                <p className="text-base-content/60 font-semibold text-xs">KODE TIKET</p>
                                                 <p className="font-mono text-lg font-bold">{ticket.ticket_code}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-500 font-semibold text-xs">EVENT</p>
+                                                <p className="text-base-content/60 font-semibold text-xs">EVENT</p>
                                                 <p className="font-medium">{ticket.event?.title}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-500 font-semibold text-xs">KATEGORI TIKET</p>
+                                                <p className="text-base-content/60 font-semibold text-xs">KATEGORI TIKET</p>
                                                 <p className="font-medium">{ticket.ticket_type?.name}</p>
                                             </div>
                                             <div>
-                                                <p className="text-gray-500 font-semibold text-xs mb-1">STATUS</p>
+                                                <p className="text-base-content/60 font-semibold text-xs mb-1">STATUS</p>
                                                 <select
                                                     className={`select select-bordered select-sm w-full ${
                                                         ticket.status === 'used' ? 'select-success text-success' : 'select-warning text-warning'
@@ -131,15 +131,15 @@ function ShowParticipant({ ticket }) {
                                     <h3 className="card-title text-lg border-b pb-2 mb-3">Data Personal</h3>
                                     <div className="space-y-3 text-sm">
                                         <div>
-                                            <p className="text-gray-500 font-semibold text-xs">NAMA LENGKAP</p>
+                                            <p className="text-base-content/60 font-semibold text-xs">NAMA LENGKAP</p>
                                             <p className="font-medium">{ticket.detail_pendaftar?.nama || ticket.user?.name}</p>
                                         </div>
                                         <div className="break-all">
-                                            <p className="text-gray-500 font-semibold text-xs">EMAIL</p>
+                                            <p className="text-base-content/60 font-semibold text-xs">EMAIL</p>
                                             <p className="font-medium">{ticket.detail_pendaftar?.email || ticket.user?.email}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-500 font-semibold text-xs">NOMOR HP</p>
+                                            <p className="text-base-content/60 font-semibold text-xs">NOMOR HP</p>
                                             <p className="font-medium">{ticket.detail_pendaftar?.no_hp || '-'}</p>
                                         </div>
                                     </div>
@@ -159,17 +159,17 @@ function ShowParticipant({ ticket }) {
                                         <div className="space-y-3 sm:space-y-4">
                                             {ticket.event_field_responses.map(response => (
                                                 <div key={response.id} className="bg-base-200 p-3 sm:p-4 rounded-lg break-words">
-                                                    <p className="text-xs sm:text-sm font-semibold capitalize mb-1 sm:mb-2 text-gray-700">
+                                                    <p className="text-xs sm:text-sm font-semibold capitalize mb-1 sm:mb-2 text-base-content/80">
                                                         {response.field_name.replace(/_/g, ' ')}
                                                     </p>
-                                                    <div className="text-sm sm:text-base text-gray-900">
+                                                    <div className="text-sm sm:text-base text-base-content">
                                                         {RenderFieldValue(response.field_type, response.field_value, response.field_name)}
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-gray-500 text-sm italic">Tidak ada data jawaban tambahan.</p>
+                                        <p className="text-base-content/60 text-sm italic">Tidak ada data jawaban tambahan.</p>
                                     )}
                                 </div>
                             </Card>
@@ -187,14 +187,14 @@ function ShowParticipant({ ticket }) {
                                                         <p className="text-xs sm:text-sm font-semibold capitalize mb-1 sm:mb-2 text-primary">
                                                             {response.field_name.replace(/_/g, ' ')}
                                                         </p>
-                                                        <div className="text-sm sm:text-base text-gray-900">
+                                                        <div className="text-sm sm:text-base text-base-content">
                                                             {RenderFieldValue(response.field_type, response.field_value, response.field_name)}
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <p className="text-gray-500 text-sm italic">Peserta belum mengunggah dokumen submission.</p>
+                                            <p className="text-base-content/60 text-sm italic">Peserta belum mengunggah dokumen submission.</p>
                                         )}
                                     </div>
                                 </Card>
@@ -219,7 +219,7 @@ const RenderFieldValue = (type, value, name) => {
                     <img
                         src={'/storage/' + value}
                         alt={name}
-                        className="w-full sm:max-w-[250px] h-auto rounded-lg border border-gray-300 shadow-sm hover:opacity-90 transition"
+                        className="w-full sm:max-w-[250px] h-auto rounded-lg border border-base-300 shadow-sm hover:opacity-90 transition"
                     />
                 </a>
             </div>

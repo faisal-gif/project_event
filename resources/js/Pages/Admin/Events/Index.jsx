@@ -108,11 +108,11 @@ export default function Index({ events, filters }) {
                                 </thead>
                                 <tbody>
                                     {events.data.length === 0 && (
-                                        <tr><td colSpan={8} className="text-center text-gray-400 py-8">Tidak ada event yang cocok.</td></tr>
+                                        <tr><td colSpan={8} className="text-center text-base-content/50 py-8">Tidak ada event yang cocok.</td></tr>
                                     )}
                                     {events.data.map((event, index) => (
                                         <tr key={event.id} className="hover">
-                                            <td className="text-gray-400">{events.from + index}</td>
+                                            <td className="text-base-content/50">{events.from + index}</td>
                                             <td className="font-medium max-w-[220px] truncate">{event.title}</td>
                                             <td className="text-sm">{event.creator?.name}</td>
                                             <td className="text-sm">{event.category?.name}</td>
@@ -139,7 +139,7 @@ export default function Index({ events, filters }) {
                     {/* Mobile: card */}
                     <div className="md:hidden space-y-3">
                         {events.data.length === 0 && (
-                            <div className="text-center text-gray-400 py-8">Tidak ada event yang cocok.</div>
+                            <div className="text-center text-base-content/50 py-8">Tidak ada event yang cocok.</div>
                         )}
                         {events.data.map((event) => (
                             <div key={event.id} className="card bg-base-100 border border-base-200 shadow-sm">
@@ -148,11 +148,11 @@ export default function Index({ events, filters }) {
                                         <p className="font-semibold leading-snug">{event.title}</p>
                                         <span className={`badge capitalize shrink-0 ${STATUS_BADGE[event.status] || 'badge-neutral'}`}>{event.status}</span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-500">
-                                        <span>Creator: <span className="text-gray-700">{event.creator?.name}</span></span>
-                                        <span>Kategori: <span className="text-gray-700">{event.category?.name}</span></span>
-                                        <span>Harga: <span className="text-gray-700">{formatPriceRange(event.price_range)}</span></span>
-                                        <span>Kuota: <span className="text-gray-700">{event.total_quota}</span></span>
+                                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-base-content/60">
+                                        <span>Creator: <span className="text-base-content/80">{event.creator?.name}</span></span>
+                                        <span>Kategori: <span className="text-base-content/80">{event.category?.name}</span></span>
+                                        <span>Harga: <span className="text-base-content/80">{formatPriceRange(event.price_range)}</span></span>
+                                        <span>Kuota: <span className="text-base-content/80">{event.total_quota}</span></span>
                                     </div>
                                     <div className="flex gap-2 mt-1">
                                         <Link className="btn btn-sm btn-primary btn-outline flex-1" href={route('admin.events.show', event)}>

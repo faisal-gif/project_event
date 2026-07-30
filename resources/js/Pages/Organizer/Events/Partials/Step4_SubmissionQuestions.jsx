@@ -10,7 +10,7 @@ const Step4_SubmissionQuestions = ({ data, setData, errors }) => {
                     <input type="checkbox" id="needs_submission" onChange={(e) => setData("needs_submission", e.target.checked)} className="checkbox" checked={data.needs_submission} />
                     <label htmlFor="needs_submission" className="text-lg font-medium cursor-pointer">Aktifkan Submisi Pasca-Pembelian</label>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">Aktifkan jika event ini adalah kompetisi atau mengharuskan peserta mengunggah/mengisi data setelah membeli tiket.</p>
+                <p className="text-sm text-base-content/60 mt-2">Aktifkan jika event ini adalah kompetisi atau mengharuskan peserta mengunggah/mengisi data setelah membeli tiket.</p>
             </Card>
 
             {data.needs_submission && (

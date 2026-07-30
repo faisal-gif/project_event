@@ -11,13 +11,13 @@ function Kpi({ icon: Icon, label, value, sub, color = 'text-primary', bg = 'bg-p
         <div className="card bg-base-100 border border-base-200 shadow-sm">
             <div className="card-body p-5">
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{label}</span>
+                    <span className="text-sm text-base-content/60">{label}</span>
                     <div className={`w-9 h-9 rounded-full ${bg} ${color} flex items-center justify-center`}>
                         <Icon className="w-5 h-5" />
                     </div>
                 </div>
                 <p className="text-2xl font-bold mt-1">{value}</p>
-                {sub && <p className="text-xs text-gray-500">{sub}</p>}
+                {sub && <p className="text-xs text-base-content/60">{sub}</p>}
             </div>
         </div>
     );
@@ -29,7 +29,7 @@ function Bar({ label, value, total, cls }) {
         <div>
             <div className="flex justify-between text-sm mb-1">
                 <span>{label}</span>
-                <span className="font-medium">{value} <span className="text-gray-400">({pct}%)</span></span>
+                <span className="font-medium">{value} <span className="text-base-content/50">({pct}%)</span></span>
             </div>
             <div className="w-full h-2 rounded-full bg-base-200 overflow-hidden">
                 <div className={`h-full ${cls}`} style={{ width: `${pct}%` }} />
@@ -78,15 +78,15 @@ export default function Dashboard({ stats, transactions, events, users_by_role, 
                                 <div className="grid grid-cols-3 gap-3 text-center mb-4">
                                     <div className="rounded-lg bg-base-200 p-3">
                                         <p className="text-xl font-bold text-success">{events.valid}</p>
-                                        <p className="text-xs text-gray-500">Aktif</p>
+                                        <p className="text-xs text-base-content/60">Aktif</p>
                                     </div>
                                     <div className="rounded-lg bg-base-200 p-3">
-                                        <p className="text-xl font-bold text-gray-500">{events.expired}</p>
-                                        <p className="text-xs text-gray-500">Expired</p>
+                                        <p className="text-xl font-bold text-base-content/60">{events.expired}</p>
+                                        <p className="text-xs text-base-content/60">Expired</p>
                                     </div>
                                     <div className="rounded-lg bg-base-200 p-3">
                                         <p className="text-xl font-bold text-primary">{events.upcoming}</p>
-                                        <p className="text-xs text-gray-500">Mendatang</p>
+                                        <p className="text-xs text-base-content/60">Mendatang</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
@@ -116,7 +116,7 @@ export default function Dashboard({ stats, transactions, events, users_by_role, 
                                         </thead>
                                         <tbody>
                                             {recent_transactions.length === 0 && (
-                                                <tr><td colSpan={4} className="text-center text-gray-400 py-4">Belum ada transaksi.</td></tr>
+                                                <tr><td colSpan={4} className="text-center text-base-content/50 py-4">Belum ada transaksi.</td></tr>
                                             )}
                                             {recent_transactions.map((t, i) => (
                                                 <tr key={i}>
@@ -137,13 +137,13 @@ export default function Dashboard({ stats, transactions, events, users_by_role, 
                             <div className="card-body p-5">
                                 <h3 className="font-semibold mb-3 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" /> Top Event</h3>
                                 <div className="space-y-3">
-                                    {top_events.length === 0 && <p className="text-sm text-gray-400">Belum ada penjualan.</p>}
+                                    {top_events.length === 0 && <p className="text-sm text-base-content/50">Belum ada penjualan.</p>}
                                     {top_events.map((e, i) => (
                                         <div key={i} className="flex items-center gap-3">
                                             <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
                                             <div className="min-w-0 flex-1">
                                                 <p className="text-sm font-medium truncate">{e.event}</p>
-                                                <p className="text-xs text-gray-500">{e.tickets} tiket • {formatRupiah(e.revenue)}</p>
+                                                <p className="text-xs text-base-content/60">{e.tickets} tiket • {formatRupiah(e.revenue)}</p>
                                             </div>
                                         </div>
                                     ))}

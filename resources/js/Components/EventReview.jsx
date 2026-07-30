@@ -8,8 +8,8 @@ const locationLabels = { online: 'Online', offline: 'Offline (Tatap Muka)', hybr
 
 const Row = ({ label, children }) => (
     <div className="flex flex-col sm:flex-row sm:gap-4 py-1.5">
-        <span className="text-sm text-gray-500 sm:w-40 shrink-0">{label}</span>
-        <span className="text-sm font-medium text-gray-800 break-words">{children || '-'}</span>
+        <span className="text-sm text-base-content/60 sm:w-40 shrink-0">{label}</span>
+        <span className="text-sm font-medium text-base-content break-words">{children || '-'}</span>
     </div>
 );
 
@@ -26,7 +26,7 @@ const SectionHeader = ({ title, onEdit }) => (
 
 const Flag = ({ on }) => on
     ? <span className="inline-flex items-center gap-1 text-green-600"><CheckCircle2 className="w-4 h-4" /> Aktif</span>
-    : <span className="inline-flex items-center gap-1 text-gray-400"><XCircle className="w-4 h-4" /> Nonaktif</span>;
+    : <span className="inline-flex items-center gap-1 text-base-content/50"><XCircle className="w-4 h-4" /> Nonaktif</span>;
 
 const EventReview = ({ data, category, onEdit, existingImageUrl = null }) => {
     const objectUrl = useMemo(
@@ -40,7 +40,7 @@ const EventReview = ({ data, category, onEdit, existingImageUrl = null }) => {
 
     return (
         <div className="space-y-6">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-base-content/60">
                 Periksa kembali detail event Anda. Klik <b>Ubah</b> untuk memperbaiki bagian tertentu, lalu tekan <b>Buat Event</b> bila sudah benar.
             </p>
 
@@ -51,7 +51,7 @@ const EventReview = ({ data, category, onEdit, existingImageUrl = null }) => {
                     <div className="md:col-span-1">
                         {imageUrl
                             ? <img src={imageUrl} alt="Thumbnail" className="w-full aspect-[3/4] object-cover rounded-lg border" />
-                            : <div className="w-full aspect-[3/4] rounded-lg border border-dashed flex items-center justify-center text-sm text-gray-400">Tanpa thumbnail</div>}
+                            : <div className="w-full aspect-[3/4] rounded-lg border border-dashed flex items-center justify-center text-sm text-base-content/50">Tanpa thumbnail</div>}
                     </div>
                     <div className="md:col-span-2 divide-y divide-gray-100">
                         <Row label="Judul">{data.title}</Row>
@@ -68,13 +68,13 @@ const EventReview = ({ data, category, onEdit, existingImageUrl = null }) => {
                 </div>
                 {data.description && (
                     <div className="mt-4">
-                        <p className="text-sm text-gray-500 mb-1">Deskripsi</p>
+                        <p className="text-sm text-base-content/60 mb-1">Deskripsi</p>
                         <div className="prose prose-sm max-w-none border rounded-lg p-3" dangerouslySetInnerHTML={{ __html: data.description }} />
                     </div>
                 )}
                 {data.requirements && (
                     <div className="mt-4">
-                        <p className="text-sm text-gray-500 mb-1">Syarat & Ketentuan</p>
+                        <p className="text-sm text-base-content/60 mb-1">Syarat & Ketentuan</p>
                         <div className="prose prose-sm max-w-none border rounded-lg p-3" dangerouslySetInnerHTML={{ __html: data.requirements }} />
                     </div>
                 )}
@@ -87,7 +87,7 @@ const EventReview = ({ data, category, onEdit, existingImageUrl = null }) => {
                     {data.ticket_types?.map((t, i) => (
                         <div key={i} className="border rounded-lg p-4">
                             <p className="font-semibold">{t.name || `Tiket #${i + 1}`} — {Number(t.price) > 0 ? formatRupiah(t.price) : 'Gratis'}</p>
-                            <p className="text-sm text-gray-600">Kuota: {t.quota || '-'} • Pembelian: {t.purchase_date ? formatDateLong(t.purchase_date) : '-'} s/d {t.end_purchase_date ? formatDateLong(t.end_purchase_date) : '-'}</p>
+                            <p className="text-sm text-base-content/70">Kuota: {t.quota || '-'} • Pembelian: {t.purchase_date ? formatDateLong(t.purchase_date) : '-'} s/d {t.end_purchase_date ? formatDateLong(t.end_purchase_date) : '-'}</p>
                         </div>
                     ))}
                 </div>

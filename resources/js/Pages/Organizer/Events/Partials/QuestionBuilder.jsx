@@ -28,7 +28,7 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
         <Card className="lg:col-span-12 bg-base-100 p-6 shadow-medium">
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2"><FileText /> {title}</h3>
-                <p className="text-sm text-gray-500">{description}</p>
+                <p className="text-sm text-base-content/60">{description}</p>
                 {questions.map((q, index) => (
                     <div key={index} className="p-4 border rounded-lg space-y-3">
                         <div className="flex justify-between items-center">

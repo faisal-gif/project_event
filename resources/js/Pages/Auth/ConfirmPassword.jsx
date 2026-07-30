@@ -32,7 +32,7 @@ export default function ConfirmPassword() {
                 <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
             </div>
 
-            <div className="mb-4 text-sm text-gray-600">
+            <div className="mb-4 text-sm text-base-content/70">
                 This is a secure area of the application. Please confirm your
                 password before continuing.
             </div>

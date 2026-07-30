@@ -9,22 +9,22 @@ export default function Dashboard({ tickets_count, transactions_count, participa
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                            <div className="p-6 text-gray-900">
-                                <h3 className="text-lg font-medium leading-6 text-gray-900">
+                        <div className="overflow-hidden bg-base-100 shadow-sm sm:rounded-lg">
+                            <div className="p-6 text-base-content">
+                                <h3 className="text-lg font-medium leading-6 text-base-content">
                                     Total Tickets
                                 </h3>
-                                <p className="mt-1 text-3xl font-semibold text-gray-700">
+                                <p className="mt-1 text-3xl font-semibold text-base-content/80">
                                     {tickets_count}
                                 </p>
                             </div>
                         </div>
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                            <div className="p-6 text-gray-900">
-                                <h3 className="text-lg font-medium leading-6 text-gray-900">
+                        <div className="overflow-hidden bg-base-100 shadow-sm sm:rounded-lg">
+                            <div className="p-6 text-base-content">
+                                <h3 className="text-lg font-medium leading-6 text-base-content">
                                     Total Transactions
                                 </h3>
-                                <p className="mt-1 text-3xl font-semibold text-gray-700">
+                                <p className="mt-1 text-3xl font-semibold text-base-content/80">
                                     {transactions_count}
                                 </p>
                             </div>
@@ -32,17 +32,17 @@ export default function Dashboard({ tickets_count, transactions_count, participa
                     </div>
 
                     <div className="mt-8">
-                        <h3 className="text-lg font-medium leading-6 text-gray-900">
+                        <h3 className="text-lg font-medium leading-6 text-base-content">
                             Events You've Joined
                         </h3>
                         <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3">
                             {participated_events.map((event) => (
-                                <div key={event.id} className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                                    <div className="p-6 text-gray-900">
-                                        <h4 className="text-base font-medium leading-6 text-gray-900">
+                                <div key={event.id} className="overflow-hidden bg-base-100 shadow-sm sm:rounded-lg">
+                                    <div className="p-6 text-base-content">
+                                        <h4 className="text-base font-medium leading-6 text-base-content">
                                             {event.title}
                                         </h4>
-                                        <p className="mt-1 text-sm text-gray-500">
+                                        <p className="mt-1 text-sm text-base-content/60">
                                             {new Date(event.start_date).toLocaleDateString()}
                                         </p>
                                         <Link href={route('events.guest.detail', { event: event.id, slug: event.slug })} className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
@@ -55,17 +55,17 @@ export default function Dashboard({ tickets_count, transactions_count, participa
                     </div>
 
                     <div className="mt-8">
-                        <h3 className="text-lg font-medium leading-6 text-gray-900">
+                        <h3 className="text-lg font-medium leading-6 text-base-content">
                             Recommended Events
                         </h3>
                         <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2 lg:grid-cols-3">
                             {recommended_events.map((event) => (
-                                <div key={event.id} className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                                    <div className="p-6 text-gray-900">
-                                        <h4 className="text-base font-medium leading-6 text-gray-900">
+                                <div key={event.id} className="overflow-hidden bg-base-100 shadow-sm sm:rounded-lg">
+                                    <div className="p-6 text-base-content">
+                                        <h4 className="text-base font-medium leading-6 text-base-content">
                                             {event.title}
                                         </h4>
-                                        <p className="mt-1 text-sm text-gray-500">
+                                        <p className="mt-1 text-sm text-base-content/60">
                                             {new Date(event.start_date).toLocaleDateString()}
                                         </p>
                                         <Link href={route('events.guest.detail', { event: event.id, slug: event.slug })} className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500">

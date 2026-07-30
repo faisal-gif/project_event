@@ -13,7 +13,7 @@ export default function GuestLayout({ children }) {
             {children}
 
             <footer
-                className="relative bg-white before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-gradient-to-r before:from-[#b41d1d] before:to-[#3f154f]"
+                className="relative bg-base-100 before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-gradient-to-r before:from-[#b41d1d] before:to-[#3f154f]"
                 aria-labelledby="footer-heading"
             >
                 <h2 id="footer-heading" className="sr-only">

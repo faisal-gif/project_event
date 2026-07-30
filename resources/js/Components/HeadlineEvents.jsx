@@ -51,7 +51,7 @@ function HeadlineEvents({ listHeadline = [] }) {
                     <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
                         Event <span className="text-primary">Pilihan</span> Untukmu
                     </h2>
-                    <p className="text-gray-500">Jangan lewatkan momen seru minggu ini</p>
+                    <p className="text-base-content/60">Jangan lewatkan momen seru minggu ini</p>
                 </div>
 
                 <Carousel

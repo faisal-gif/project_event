@@ -68,12 +68,12 @@ export default function Applications({ applications }) {
                                 </thead>
                                 <tbody>
                                     {applications.data.length === 0 && (
-                                        <tr><td colSpan={5} className="text-center text-gray-400 py-6">Belum ada pengajuan.</td></tr>
+                                        <tr><td colSpan={5} className="text-center text-base-content/50 py-6">Belum ada pengajuan.</td></tr>
                                     )}
                                     {applications.data.map((u) => (
                                         <tr key={u.id}>
                                             <td className="font-medium">{u.name}</td>
-                                            <td className="text-sm text-gray-600">{u.email}</td>
+                                            <td className="text-sm text-base-content/70">{u.email}</td>
                                             <td><span className={`badge ${BADGE[u.affiliate_status]}`}>{u.affiliate_status}</span></td>
                                             <td className="text-sm">{u.affiliate_requested_at ? formatDateLong(u.affiliate_requested_at) : '-'}</td>
                                             <td>

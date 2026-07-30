@@ -91,7 +91,7 @@ function Step2_TicketDetails({ data, setData, errors }) {
                         <div className="flex flex-col gap-2">
                             <InputLabel htmlFor={`price_${index}`} value="Harga" required />
                             <div className="relative mt-1">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">Rp</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60 text-sm pointer-events-none">Rp</span>
                                 <TextInput
                                     id={`price_${index}`}
                                     name="price"
@@ -179,7 +179,7 @@ function Step2_TicketDetails({ data, setData, errors }) {
                         className="mt-1 block w-full"
                         min="1"
                     />
-                    <p className="mt-2 text-sm text-gray-600">Jumlah maksimum tiket yang dapat dibeli satu pengguna dalam satu transaksi.</p>
+                    <p className="mt-2 text-sm text-base-content/70">Jumlah maksimum tiket yang dapat dibeli satu pengguna dalam satu transaksi.</p>
                     <InputError message={errors.limit_ticket_user} className="mt-2" />
                 </div>
             </Card>

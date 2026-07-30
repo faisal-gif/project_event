@@ -85,12 +85,12 @@ export default function Login({ status, canResetPassword }) {
                         <Checkbox
                             name="remember"
                             checked={data.remember}
-                            className='checkbox checkbox-sm bg-white'
+                            className='checkbox checkbox-sm bg-base-100'
                             onChange={(e) =>
                                 setData('remember', e.target.checked)
                             }
                         />
-                        <span className="ms-2 text-sm lg:text-gray-600 text-white">
+                        <span className="ms-2 text-sm lg:text-base-content/70 text-white">
                             Remember me
                         </span>
                     </label>

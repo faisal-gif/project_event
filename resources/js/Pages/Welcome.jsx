@@ -22,7 +22,7 @@ export default function Welcome({ listEvents, headlines, populars, categories })
                 <meta property="og:title" content="Home" />
                 <meta property="og:description" content="TIMES Event" />
             </Head>
-            <div className="bg-gray-50 text-gray-800 ">
+            <div className="bg-base-200 text-base-content ">
                 <GuestLayout>
                     <div className='flex flex-col lg:flex-row max-w-7xl mx-auto'>
                         <HeroSection events={filteredEvents} headline={headlines} />

@@ -62,10 +62,10 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
         <Card className="lg:col-span-12 bg-base-100 p-6 shadow-medium">
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2"><FileText /> {title}</h3>
-                <p className="text-sm text-gray-500">{description}</p>
+                <p className="text-sm text-base-content/60">{description}</p>
                 
                 {questions.map((q, index) => (
-                    <div key={index} className="p-4 border rounded-lg space-y-4 bg-white">
+                    <div key={index} className="p-4 border rounded-lg space-y-4 bg-base-100">
                         <div className="flex justify-between items-center border-b pb-2">
                             <p className="font-medium text-primary">Pertanyaan {index + 1}</p>
                             <button type="button" onClick={() => removeQuestion(index)} className="btn btn-sm btn-error btn-ghost">
@@ -99,7 +99,7 @@ const QuestionBuilder = ({ title, description, questions, setQuestions, error })
 
                         {/* RENDER DYNAMIC OPTIONS JIKA TIPE SELECT / CHECKBOX */}
                         {(q.type === 'select' || q.type === 'checkbox') && (
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-2">
+                            <div className="bg-base-200 p-4 rounded-lg border border-base-300 mt-2">
                                 <InputLabel value="Pilihan Jawaban (Options)" className="mb-2 font-semibold" />
                                 
                                 <div className="space-y-2">

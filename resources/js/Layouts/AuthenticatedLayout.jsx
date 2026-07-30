@@ -1,5 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Link, usePage } from '@inertiajs/react';
 import { User } from 'lucide-react';
 import { useState } from 'react';
@@ -12,7 +13,7 @@ export default function AuthenticatedLayout({ children }) {
             <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content flex flex-col">
 
-                <div className="navbar bg-gradient-to-br from-blue-50 to-green-50 shadow-sm ">
+                <div className="navbar bg-base-100 border-b border-base-200 shadow-sm ">
                     <div className="hidden md:flex-none">
                         <button className="btn btn-square btn-ghost">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block h-5 w-5 stroke-current"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg>
@@ -36,6 +37,7 @@ export default function AuthenticatedLayout({ children }) {
                         </label>
                     </div>
                     <div className="flex-none">
+                        <ThemeToggle />
                         <Dropdown>
                             <Dropdown.Trigger>
                                 <button className="btn btn-ghost flex items-center gap-2">

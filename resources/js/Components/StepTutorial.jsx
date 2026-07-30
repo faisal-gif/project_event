@@ -37,7 +37,7 @@ export default function StepTutorial({ steps, storageKey, autoOpen = false, even
                     <Icon className="w-8 h-8" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-                <p className="text-sm text-gray-600">{step.desc}</p>
+                <p className="text-sm text-base-content/70">{step.desc}</p>
 
                 <div className="flex justify-center gap-1.5 my-5">
                     {steps.map((_, idx) => (

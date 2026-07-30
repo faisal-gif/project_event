@@ -83,7 +83,7 @@ export default function Me({ affiliate }) {
 
                         {!status && (
                             <div className="space-y-4">
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-base-content/70">
                                     Jadi affiliate untuk mendapat komisi dari setiap tiket yang terjual lewat link referral Anda.
                                     Ajukan diri Anda, lalu tunggu persetujuan admin atau penyelenggara.
                                 </p>
@@ -101,12 +101,12 @@ export default function Me({ affiliate }) {
                         )}
 
                         {status === 'pending' && (
-                            <p className="text-sm text-gray-600">Pengajuan Anda sedang ditinjau. Kami akan memberi tahu bila sudah disetujui.</p>
+                            <p className="text-sm text-base-content/70">Pengajuan Anda sedang ditinjau. Kami akan memberi tahu bila sudah disetujui.</p>
                         )}
 
                         {status === 'rejected' && (
                             <div className="space-y-4">
-                                <p className="text-sm text-gray-600">Pengajuan Anda sebelumnya ditolak. Anda dapat mengajukan kembali.</p>
+                                <p className="text-sm text-base-content/70">Pengajuan Anda sebelumnya ditolak. Anda dapat mengajukan kembali.</p>
                                 <PrimaryButton type="button" onClick={apply} disabled={processing}>
                                     {processing ? 'Mengirim...' : 'Ajukan Ulang'}
                                 </PrimaryButton>
@@ -130,11 +130,11 @@ export default function Me({ affiliate }) {
                                             <div key={i} className="flex items-center justify-between py-3 gap-3">
                                                 <div className="min-w-0">
                                                     <p className="font-medium truncate">{row.event}</p>
-                                                    <p className="text-xs text-gray-500">{row.tickets} tiket terjual · {row.count} transaksi</p>
+                                                    <p className="text-xs text-base-content/60">{row.tickets} tiket terjual · {row.count} transaksi</p>
                                                 </div>
                                                 <div className="text-right shrink-0">
                                                     <p className="font-semibold text-primary">{formatRupiah(row.commission)}</p>
-                                                    <p className="text-xs text-gray-500">komisi</p>
+                                                    <p className="text-xs text-base-content/60">komisi</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -144,11 +144,11 @@ export default function Me({ affiliate }) {
 
                             <Card className="bg-base-100 p-6 shadow-medium">
                                 <h3 className="font-semibold mb-2">Kode Referral Anda</h3>
-                                <p className="text-sm text-gray-600 mb-3">
-                                    Tambahkan <code className="px-1 bg-gray-100 rounded">?ref={affiliate.ref_code}</code> di akhir link event mana pun yang mengaktifkan afiliasi. Atau langsung salin link per event di bawah.
+                                <p className="text-sm text-base-content/70 mb-3">
+                                    Tambahkan <code className="px-1 bg-base-200 rounded">?ref={affiliate.ref_code}</code> di akhir link event mana pun yang mengaktifkan afiliasi. Atau langsung salin link per event di bawah.
                                 </p>
                                 <div className="flex items-center gap-2">
-                                    <code className="flex-1 px-3 py-2 bg-gray-100 rounded text-sm">?ref={affiliate.ref_code}</code>
+                                    <code className="flex-1 px-3 py-2 bg-base-200 rounded text-sm">?ref={affiliate.ref_code}</code>
                                     <button type="button" onClick={copyRef} className="btn btn-sm btn-outline">
                                         <Copy className="w-4 h-4 mr-1" /> {copied ? 'Tersalin' : 'Salin'}
                                     </button>
@@ -158,10 +158,10 @@ export default function Me({ affiliate }) {
                             {/* Event ber-afiliasi + komisi & link referral per event */}
                             <Card className="bg-base-100 p-6 shadow-medium">
                                 <h3 className="font-semibold mb-1">Event yang Bisa Dipromosikan</h3>
-                                <p className="text-sm text-gray-500 mb-4">Bagikan link di bawah. Besaran komisi mengikuti pengaturan tiap event.</p>
+                                <p className="text-sm text-base-content/60 mb-4">Bagikan link di bawah. Besaran komisi mengikuti pengaturan tiap event.</p>
 
                                 {(!affiliate.available_events || affiliate.available_events.length === 0) ? (
-                                    <p className="text-sm text-gray-400">Belum ada event yang mengaktifkan program afiliasi.</p>
+                                    <p className="text-sm text-base-content/50">Belum ada event yang mengaktifkan program afiliasi.</p>
                                 ) : (
                                     <div className="space-y-3">
                                         {affiliate.available_events.map((ev, i) => (
@@ -171,7 +171,7 @@ export default function Me({ affiliate }) {
                                                     <span className="badge badge-primary badge-outline shrink-0">Komisi {rewardLabel(ev)}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <code className="flex-1 px-2 py-1.5 bg-gray-100 rounded text-xs truncate">{ev.link}</code>
+                                                    <code className="flex-1 px-2 py-1.5 bg-base-200 rounded text-xs truncate">{ev.link}</code>
                                                     <CopyLink url={ev.link} />
                                                 </div>
                                             </div>

@@ -28,14 +28,14 @@ export default function Index({ tickets = [], transactions = [] }) {
 
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold">Tiket & Transaksi</h1>
-                <p className="text-sm text-gray-500 mt-1 mb-6">Semua tiket dan riwayat transaksi Anda dalam satu tempat.</p>
+                <p className="text-sm text-base-content/60 mt-1 mb-6">Semua tiket dan riwayat transaksi Anda dalam satu tempat.</p>
 
                 {/* Tabs */}
                 <div role="tablist" className="inline-flex p-1 rounded-full bg-base-200 mb-6">
                     <button
                         role="tab"
                         onClick={() => setTab('tickets')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition ${tab === 'tickets' ? 'bg-base-100 shadow text-primary' : 'text-gray-500'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition ${tab === 'tickets' ? 'bg-base-100 shadow text-primary' : 'text-base-content/60'}`}
                     >
                         <Ticket className="w-4 h-4" /> Tiket
                         <span className="badge badge-sm">{tickets.length}</span>
@@ -43,7 +43,7 @@ export default function Index({ tickets = [], transactions = [] }) {
                     <button
                         role="tab"
                         onClick={() => setTab('transactions')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition ${tab === 'transactions' ? 'bg-base-100 shadow text-primary' : 'text-gray-500'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition ${tab === 'transactions' ? 'bg-base-100 shadow text-primary' : 'text-base-content/60'}`}
                     >
                         <Receipt className="w-4 h-4" /> Transaksi
                         <span className="badge badge-sm">{transactions.length}</span>
@@ -54,7 +54,7 @@ export default function Index({ tickets = [], transactions = [] }) {
                 {tab === 'tickets' && (
                     <div className="space-y-3">
                         {tickets.length === 0 && (
-                            <div className="text-center py-16 text-gray-400">
+                            <div className="text-center py-16 text-base-content/50">
                                 <Ticket className="w-10 h-10 mx-auto mb-3" />
                                 <p>Anda belum memiliki tiket.</p>
                             </div>
@@ -74,14 +74,14 @@ export default function Index({ tickets = [], transactions = [] }) {
                                         <span className="badge badge-sm badge-outline badge-primary capitalize">{t.event?.location_type}</span>
                                     </div>
                                     <p className="font-semibold truncate">{t.event?.title}</p>
-                                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                                    <div className="flex items-center gap-1.5 text-xs text-base-content/60 mt-1">
                                         <Calendar className="w-3.5 h-3.5" />
                                         <span className="truncate">{formatDateLong(t.event?.start_date)}</span>
                                     </div>
                                 </div>
                                 <div className="text-right shrink-0">
                                     <p className="font-semibold text-primary">{formatRupiah(t.transaction?.subtotal)}</p>
-                                    <p className="text-xs text-gray-500 flex items-center gap-1 justify-end mt-0.5">
+                                    <p className="text-xs text-base-content/60 flex items-center gap-1 justify-end mt-0.5">
                                         <QrCode className="w-3.5 h-3.5" /> {t.quantity} tiket
                                     </p>
                                 </div>
@@ -95,7 +95,7 @@ export default function Index({ tickets = [], transactions = [] }) {
                 {tab === 'transactions' && (
                     <div className="space-y-3">
                         {transactions.length === 0 && (
-                            <div className="text-center py-16 text-gray-400">
+                            <div className="text-center py-16 text-base-content/50">
                                 <Receipt className="w-10 h-10 mx-auto mb-3" />
                                 <p>Belum ada transaksi.</p>
                             </div>
@@ -111,8 +111,8 @@ export default function Index({ tickets = [], transactions = [] }) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-semibold truncate">{trx.event?.title}</p>
-                                    <p className="text-xs text-gray-400 font-mono truncate">{trx.reference}</p>
-                                    <div className="text-xs text-gray-500 mt-1 truncate">
+                                    <p className="text-xs text-base-content/50 font-mono truncate">{trx.reference}</p>
+                                    <div className="text-xs text-base-content/60 mt-1 truncate">
                                         {trx.payment_method || 'Belum pilih pembayaran'} · {trx.quantity} tiket · {formatDateLong(trx.created_at)}
                                     </div>
                                 </div>

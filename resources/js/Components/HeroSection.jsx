@@ -53,7 +53,7 @@ function HeroSection({ events, headline }) {
                             <h1 className="text-4xl font-bold text-center">
                                 Event
                             </h1>
-                            <p className="text-lg text-center text-gray-500">
+                            <p className="text-lg text-center text-base-content/60">
                                 Tidak ada event yang tersedia.
                             </p>
                         </div>

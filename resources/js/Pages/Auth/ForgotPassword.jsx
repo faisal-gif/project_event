@@ -29,7 +29,7 @@ export default function ForgotPassword({ status }) {
                 <ApplicationLogo className="h-full w-52 my-8 mx-auto" />
             </div>
 
-            <div className="mb-4 text-sm text-white md:text-gray-600">
+            <div className="mb-4 text-sm text-white md:text-base-content/70">
                 Forgot your password? No problem. Just let us know your email
                 address and we will email you a password reset link that will
                 allow you to choose a new one.

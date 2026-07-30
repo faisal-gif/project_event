@@ -120,7 +120,7 @@ export default function UserManagement({ users, filters }) {
                                 </thead>
                                 <tbody>
                                     {users.data.length === 0 && (
-                                        <tr><td colSpan={4} className="text-center text-gray-400 py-8">Tidak ada user yang cocok.</td></tr>
+                                        <tr><td colSpan={4} className="text-center text-base-content/50 py-8">Tidak ada user yang cocok.</td></tr>
                                     )}
                                     {users.data.map((user) => (
                                         <tr key={user.id} className="hover">
@@ -132,7 +132,7 @@ export default function UserManagement({ users, filters }) {
                                                     <span className="font-medium">{user.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="text-sm text-gray-600">{user.email}</td>
+                                            <td className="text-sm text-base-content/70">{user.email}</td>
                                             <td>
                                                 <span className={`badge badge-outline capitalize ${ROLE_BADGE[user.role] || 'badge-ghost'}`}>
                                                     {user.role}

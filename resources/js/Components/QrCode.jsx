@@ -99,7 +99,7 @@ export default function QrCode({ startScan, onScanSuccess, onCancel }) {
     <div className="flex flex-col items-center justify-center">
       <div
         id={scannerId}
-        className="relative w-full max-w-sm border border-gray-300 rounded-lg overflow-hidden bg-black"
+        className="relative w-full max-w-sm border border-base-300 rounded-lg overflow-hidden bg-black"
         style={{ height: 400 }}
       >
         {/* Loading Overlay */}

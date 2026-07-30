@@ -241,7 +241,7 @@ function EventDetail({ event, seo }) {
                                                     <div className="card-body flex-row justify-between items-center">
                                                         <div>
                                                             <h3 className="card-title text-xl">{ticketType.name}</h3>
-                                                            <p className='text-sm text-gray-500 mb-2 whitespace-pre-line'>{ticketType.description}</p>
+                                                            <p className='text-sm text-base-content/60 mb-2 whitespace-pre-line'>{ticketType.description}</p>
                                                             {ticketType.purchase_date && ticketType.end_purchase_date && (
                                                                 <div className="flex items-start">
                                                                     <span className="flex-1 text-xs mt-1">
@@ -250,7 +250,7 @@ function EventDetail({ event, seo }) {
                                                                     </span>
                                                                 </div>
                                                             )}
-                                                            {/* <p className="text-xs text-gray-500 mt-1">Sisa kuota: {ticketType.remaining_quota}</p> */}
+                                                            {/* <p className="text-xs text-base-content/60 mt-1">Sisa kuota: {ticketType.remaining_quota}</p> */}
 
                                                             {isSoldOut && <span className="badge badge-error badge-sm mt-2">Habis</span>}
                                                             {!isSoldOut && isBeforePurchase && <span className="badge badge-outline badge-warning badge-sm mt-2">Belum dibuka</span>}
@@ -319,7 +319,7 @@ function EventDetail({ event, seo }) {
                                     ) : (
                                         <>
                                             <div className="text-center py-8">
-                                                <p className="text-gray-500">Pilih salah satu tiket untuk melanjutkan.</p>
+                                                <p className="text-base-content/60">Pilih salah satu tiket untuk melanjutkan.</p>
                                             </div>
                                             <div className="divider"></div>
                                             <div className="flex justify-between items-center font-bold text-xl">
@@ -342,7 +342,7 @@ function EventDetail({ event, seo }) {
             <dialog id="share_modal" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
                     <h3 className="font-bold text-xl mb-1">Bagikan Event</h3>
-                    <p className="text-sm text-gray-500 mb-4 truncate">{event.title}</p>
+                    <p className="text-sm text-base-content/60 mb-4 truncate">{event.title}</p>
 
                     {isAffiliate && (
                         <div className="alert alert-success text-sm mb-4">
