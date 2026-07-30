@@ -4,10 +4,21 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
 import Autoplay from 'embla-carousel-autoplay';
 import { ArrowRight, Calendar } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 function WidgetHorizontal({ events }) {
 
+    // Widget dalam iframe: ikuti mode gelap sistem/induk secara live
+    // (kecuali dipaksa lewat ?theme=dark/light dari situs induk).
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('theme')) return;
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const apply = () => document.documentElement.setAttribute('data-theme', mq.matches ? 'times-dark' : 'times');
+        apply();
+        mq.addEventListener?.('change', apply);
+        return () => mq.removeEventListener?.('change', apply);
+    }, []);
 
     const formatPrice = (price) => {
         if (price == 0) {

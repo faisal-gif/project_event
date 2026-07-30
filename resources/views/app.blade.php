@@ -3,11 +3,24 @@
 
 <head>
     <script>
-        // Terapkan tema tersimpan sebelum render (anti-flash).
+        // Terapkan tema sebelum render (anti-flash).
+        // - ?theme=dark : paksa (mis. iframe embed eksplisit dari situs induk)
+        // - halaman widget : ikuti mode gelap sistem/induk (prefers-color-scheme)
+        // - halaman biasa : pakai pilihan toggle yang tersimpan
         (function () {
             try {
-                var t = localStorage.getItem('theme');
-                document.documentElement.setAttribute('data-theme', t === 'times-dark' ? 'times-dark' : 'times');
+                var params = new URLSearchParams(location.search);
+                var forced = params.get('theme');
+                var isWidget = location.pathname.indexOf('/widget') !== -1;
+                var t;
+                if (forced) {
+                    t = forced;
+                } else if (isWidget) {
+                    t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'times-dark' : 'times';
+                } else {
+                    t = localStorage.getItem('theme');
+                }
+                document.documentElement.setAttribute('data-theme', (t === 'times-dark' || t === 'dark') ? 'times-dark' : 'times');
             } catch (e) {}
         })();
     </script>
