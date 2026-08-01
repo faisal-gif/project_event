@@ -2,7 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import React from 'react';
 import Card from '@/Components/ui/Card';
-import { ArrowLeft, Download, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Download, Image as ImageIcon, Share2 } from 'lucide-react';
+import { formatRupiah } from '@/Utils/formatter';
 import Swal from 'sweetalert2';
 
 // Helper function untuk status
@@ -124,6 +125,31 @@ function ShowParticipant({ ticket }) {
                                     </div>
                                 </div>
                             </Card>
+
+                            {/* Card Affiliate: hanya jika dibeli lewat referral */}
+                            {ticket.transaction?.promoter && (
+                                <Card className="bg-base-100 shadow-xl border-l-4 border-primary">
+                                    <div className="card-body p-4 sm:p-6">
+                                        <h3 className="card-title text-lg border-b pb-2 mb-3 flex items-center gap-2">
+                                            <Share2 className="w-4 h-4 text-primary" /> Dibeli via Affiliate
+                                        </h3>
+                                        <div className="space-y-3 text-sm">
+                                            <div>
+                                                <p className="text-base-content/60">Affiliate</p>
+                                                <p className="font-medium">{ticket.transaction.promoter.name}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-base-content/60">Email</p>
+                                                <p className="font-medium">{ticket.transaction.promoter.email}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-base-content/60">Komisi transaksi ini</p>
+                                                <p className="font-semibold text-primary">{formatRupiah(ticket.transaction.commission_earned)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card>
+                            )}
 
                             {/* Card 2: Detail Pendaftar */}
                             <Card className="bg-base-100 shadow-xl">

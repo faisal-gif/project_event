@@ -18,7 +18,8 @@ class ParticipantController extends Controller
             'event', // Untuk link kembali ke event
             'detail_pendaftar',
             'event_field_responses',
-            'submission.submission_custom_fields'
+            'submission.submission_custom_fields',
+            'transaction.promoter:id,name,email',
         ]);
 
         return Inertia::render('Admin/Participants/Show', [

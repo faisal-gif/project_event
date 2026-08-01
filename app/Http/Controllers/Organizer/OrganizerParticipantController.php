@@ -26,7 +26,8 @@ class OrganizerParticipantController extends Controller
             'event',
             'detail_pendaftar',
             'event_field_responses',
-            'submission.submission_custom_fields'
+            'submission.submission_custom_fields',
+            'transaction.promoter:id,name,email',
         ]);
 
         return Inertia::render('Organizer/Participants/Show', [
