@@ -11,11 +11,13 @@ use App\Models\EventFieldResponse;
 use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Voucher;
 use App\Services\TicketService;
 use App\Services\TripayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -91,7 +93,7 @@ class TransactionController extends Controller
     public function store(Request $request, TicketType $ticketType, TripayService $tripay, TicketService $ticketServices)
     {
         $event = $ticketType->event->load('eventFields');
-        $user = auth()->user();
+        $actor = auth()->user(); // yang mengoperasikan checkout (pembeli sendiri, affiliator, atau guest/null)
 
         // 1. Aturan Validasi Utama
         $mainRules = [
@@ -156,6 +158,25 @@ class TransactionController extends Controller
             return back()->with('error', 'Maaf, sisa kuota tiket tidak mencukupi.');
         }
 
+        // Tentukan PEMBELI (pemilik tiket) dari email form:
+        // - Email form == email sendiri  -> beli untuk diri sendiri (pakai akun sendiri).
+        // - Affiliator memesankan untuk email lain -> akun (dibuat/ditemukan) milik email itu,
+        //   supaya tiket & e-tiket jatuh ke pembeli, bukan ke affiliator.
+        //   Email sama = akun sama (hanya menambah transaksi, tidak memberi akses login).
+        if ($actor && strtolower($actor->email) === strtolower($validated['email'])) {
+            $user = $actor;
+        } else {
+            $user = User::firstOrCreate(
+                ['email' => $validated['email']],
+                [
+                    'name' => $validated['name'],
+                    'phone' => $validated['phone'],
+                    'role' => 'user',
+                    'password' => Hash::make(Str::random(16)),
+                ]
+            );
+        }
+
         // 5. Proses Upload dan Strukturisasi JSON (Agar Modal Frontend Tidak Error)
         $rawResponses = $validated['field_responses'] ?? [];
         if ($request->hasFile('field_responses')) {
@@ -183,14 +204,20 @@ class TransactionController extends Controller
         // ====================================================================
         $totalPrice = $ticketType->price * $validated['quantity'];
 
-        // Ambil ID Promotor dari Session (di-set saat user klik link referral)
+        // Ambil ID Promotor dari Session (di-set saat user klik link referral).
         $promoterId = session('referral_id');
+        // Affiliator approved yang login otomatis jadi promotor (untuk pembeli lain
+        // maupun pembeliannya sendiri), tanpa perlu klik link referralnya sendiri.
+        if (!$promoterId && $actor && $actor->isApprovedAffiliate()) {
+            $promoterId = $actor->id;
+        }
         $promoter = $promoterId ? \App\Models\User::find($promoterId) : null;
         $commissionEarned = 0;
 
-        // Komisi hanya diberikan jika: event mengaktifkan afiliasi, promotor ada,
-        // promotor BUKAN pembeli itu sendiri, dan promotor adalah affiliate yang SUDAH DISETUJUI.
-        if ($event->is_affiliate_enabled && $promoter && $promoter->id != $user->id && $promoter->isApprovedAffiliate()) {
+        // Komisi diberikan jika: event mengaktifkan afiliasi, promotor ada, dan promotor
+        // adalah affiliate yang SUDAH DISETUJUI. Self-purchase exclusion sengaja dilepas —
+        // affiliate boleh dapat komisi atas pembeliannya sendiri (keputusan bisnis).
+        if ($event->is_affiliate_enabled && $promoter && $promoter->isApprovedAffiliate()) {
             $promoterId = $promoter->id;
             if ($event->affiliate_type === 'percentage') {
                 $commissionEarned = ($event->affiliate_reward / 100) * $totalPrice;
