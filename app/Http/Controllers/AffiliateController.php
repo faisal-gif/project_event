@@ -163,11 +163,15 @@ class AffiliateController extends Controller
     public function pay(Request $request, Event $event, User $user)
     {
         $validated = $request->validate([
+            'transaction_ids' => ['required', 'array', 'min:1'],
+            'transaction_ids.*' => ['integer'],
             'proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
             'note' => ['nullable', 'string', 'max:500'],
         ]);
 
         $payout = DB::transaction(function () use ($request, $event, $user, $validated) {
+            // Hanya transaksi terpilih yang benar-benar milik event+promoter ini & belum
+            // dibayar (ID dari client tidak dipercaya — difilter ulang di server).
             // Lock supaya dua admin tidak dobel-bayar komisi yang sama.
             $txns = Transaction::query()
                 ->where('status', 'PAID')
@@ -175,6 +179,7 @@ class AffiliateController extends Controller
                 ->where('promoter_id', $user->id)
                 ->where('commission_earned', '>', 0)
                 ->whereNull('payout_id')
+                ->whereIn('id', $validated['transaction_ids'])
                 ->lockForUpdate()
                 ->get();
 
@@ -262,6 +267,7 @@ class AffiliateController extends Controller
                 'unpaid' => (float) $group->whereNull('payout_id')->sum('commission_earned'),
                 // Rincian tiap transaksi di dalam grup ini (dipakai drill-down index & export).
                 'details' => $group->map(fn ($t) => [
+                    'id' => $t->id,
                     'buyer' => $t->user?->name ?? 'Tamu',
                     'ticket_type' => $t->ticketType?->name ?? '-',
                     'price' => (float) ($t->ticketType?->price ?? ($t->quantity ? $t->subtotal / $t->quantity : 0)),

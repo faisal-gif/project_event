@@ -51,26 +51,43 @@ export default function Report({ rows, total_commission, filters }) {
             return next;
         });
 
-    // Modal pembayaran komisi (admin).
+    // Modal pembayaran komisi (admin) — pilih transaksi mana yang dibayar.
     const payModal = useRef();
     const [payRow, setPayRow] = useState(null);
+    const [selected, setSelected] = useState(() => new Set());
     const payForm = useForm({ proof: null, note: '' });
     const openPay = (row) => {
         setPayRow(row);
+        setSelected(new Set(row.details.filter((d) => !d.is_paid).map((d) => d.id)));
         payForm.reset();
         payForm.clearErrors();
         payModal.current?.showModal();
     };
+    const toggleSel = (id) =>
+        setSelected((prev) => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    const unpaidDetails = payRow ? payRow.details.filter((d) => !d.is_paid) : [];
+    const allSelected = unpaidDetails.length > 0 && unpaidDetails.every((d) => selected.has(d.id));
+    const toggleAll = () =>
+        setSelected(allSelected ? new Set() : new Set(unpaidDetails.map((d) => d.id)));
+    const selectedTotal = unpaidDetails
+        .filter((d) => selected.has(d.id))
+        .reduce((s, d) => s + d.commission, 0);
     const submitPay = (e) => {
         e.preventDefault();
-        payForm.post(route('admin.affiliates.pay', [payRow.event_id, payRow.promoter_id]), {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                payModal.current?.close();
-                payForm.reset();
-            },
-        });
+        payForm
+            .transform((data) => ({ ...data, transaction_ids: [...selected] }))
+            .post(route('admin.affiliates.pay', [payRow.event_id, payRow.promoter_id]), {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    payModal.current?.close();
+                    payForm.reset();
+                },
+            });
     };
 
     const isFirst = useRef(true);
@@ -339,9 +356,31 @@ export default function Report({ rows, total_commission, filters }) {
                         )}
                         <form onSubmit={submitPay} className="space-y-4">
                             <div>
-                                <label className="label"><span className="label-text">Jumlah dibayar</span></label>
-                                <input type="text" readOnly value={payRow ? formatRupiah(payRow.unpaid) : ''} className="input input-bordered w-full bg-base-200" />
-                                <p className="text-xs text-base-content/50 mt-1">Melunasi seluruh komisi terutang event ini.</p>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="label-text">Pilih komisi yang dibayar</label>
+                                    {unpaidDetails.length > 0 && (
+                                        <button type="button" onClick={toggleAll} className="btn btn-ghost btn-xs">
+                                            {allSelected ? 'Kosongkan' : 'Pilih semua'}
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="max-h-60 overflow-y-auto border border-base-200 rounded-lg divide-y divide-base-200">
+                                    {unpaidDetails.map((d) => (
+                                        <label key={d.id} className="flex items-center gap-2 p-2 cursor-pointer hover:bg-base-200/50">
+                                            <input type="checkbox" className="checkbox checkbox-sm" checked={selected.has(d.id)} onChange={() => toggleSel(d.id)} />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">{d.buyer}</p>
+                                                <p className="text-xs text-base-content/50 truncate">{d.ticket_type} · {d.qty} tiket</p>
+                                            </div>
+                                            <span className="text-sm text-primary shrink-0">{formatRupiah(d.commission)}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                                {payForm.errors.transaction_ids && <p className="text-xs text-error mt-1">{payForm.errors.transaction_ids}</p>}
+                                <div className="flex items-center justify-between mt-2">
+                                    <span className="text-sm text-base-content/70">Total dibayar ({selected.size} transaksi)</span>
+                                    <span className="font-bold text-primary">{formatRupiah(selectedTotal)}</span>
+                                </div>
                             </div>
                             <div>
                                 <label className="label"><span className="label-text">Bukti transfer <span className="text-error">*</span></span></label>
@@ -365,7 +404,7 @@ export default function Report({ rows, total_commission, filters }) {
                             </div>
                             <div className="modal-action">
                                 <button type="button" className="btn btn-ghost" onClick={() => payModal.current?.close()}>Batal</button>
-                                <button type="submit" className="btn btn-primary" disabled={payForm.processing || !payForm.data.proof}>
+                                <button type="submit" className="btn btn-primary" disabled={payForm.processing || !payForm.data.proof || selected.size === 0}>
                                     {payForm.processing ? 'Menyimpan...' : 'Simpan Pembayaran'}
                                 </button>
                             </div>
