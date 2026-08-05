@@ -53,9 +53,11 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     // Affiliate (sisi user): halaman status + pengajuan
     Route::get('/affiliate', [AffiliateController::class, 'me'])->name('affiliate.me');
     Route::post('/affiliate/apply', [AffiliateController::class, 'apply'])->name('affiliate.apply');
-    // Bukti pembayaran komisi (disk privat) — otorisasi admin/pemilik di controller.
-    Route::get('/affiliate/payouts/{payout}/proof', [AffiliateController::class, 'payoutProof'])->name('affiliate.payout.proof');
 });
+
+// Bukti pembayaran komisi (disk privat). Di luar grup role — bisa diakses admin
+// maupun affiliate pemiliknya; otorisasi ditangani di controller.
+Route::middleware('auth')->get('/affiliate/payouts/{payout}/proof', [AffiliateController::class, 'payoutProof'])->name('affiliate.payout.proof');
 
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
