@@ -78,16 +78,15 @@ export default function Report({ rows, total_commission, filters }) {
         .reduce((s, d) => s + d.commission, 0);
     const submitPay = (e) => {
         e.preventDefault();
-        payForm
-            .transform((data) => ({ ...data, transaction_ids: [...selected] }))
-            .post(route('admin.affiliates.pay', [payRow.event_id, payRow.promoter_id]), {
-                forceFormData: true,
-                preserveScroll: true,
-                onSuccess: () => {
-                    payModal.current?.close();
-                    payForm.reset();
-                },
-            });
+        payForm.transform((data) => ({ ...data, transaction_ids: [...selected] }));
+        payForm.post(route('admin.affiliates.pay', [payRow.event_id, payRow.promoter_id]), {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                payModal.current?.close();
+                payForm.reset();
+            },
+        });
     };
 
     const isFirst = useRef(true);
