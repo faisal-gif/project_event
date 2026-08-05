@@ -6,6 +6,36 @@ import { Wallet, Download, ChevronRight, CheckCircle2, FileText } from 'lucide-r
 import { formatRupiah, formatDate } from '@/Utils/formatter';
 import FlashAlert from '@/Components/FlashAlert';
 
+function RowStatus({ unpaid }) {
+    return unpaid > 0 ? (
+        <span className="badge badge-warning badge-outline whitespace-nowrap">Sisa {formatRupiah(unpaid)}</span>
+    ) : (
+        <span className="badge badge-success badge-outline gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Lunas</span>
+    );
+}
+
+function PayoutHistory({ payouts }) {
+    if (!payouts?.length) return null;
+    return (
+        <div className="px-4 py-3 border-t border-base-200">
+            <p className="text-xs font-semibold text-base-content/60 mb-1.5">Riwayat Pembayaran</p>
+            <ul className="text-xs space-y-1">
+                {payouts.map((p, k) => (
+                    <li key={k} className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                        <span className="text-base-content/70">{formatDate(p.paid_at)}</span>
+                        <span className="font-semibold text-primary">{formatRupiah(p.amount)}</span>
+                        {p.by && <span className="text-base-content/50">oleh {p.by}</span>}
+                        {p.note && <span className="text-base-content/50">· {p.note}</span>}
+                        <a href={p.proof_url} target="_blank" rel="noopener noreferrer" className="link link-primary inline-flex items-center gap-1">
+                            <FileText className="w-3 h-3" /> Bukti
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
 export default function Report({ rows, total_commission, filters }) {
     const { auth } = usePage().props;
     const prefix = auth.user.role === 'admin' ? 'admin' : 'organizer';
@@ -157,7 +187,8 @@ export default function Report({ rows, total_commission, filters }) {
                         </div>
                     </div>
 
-                    <div className="card bg-base-100 border border-base-200 shadow-sm">
+                    {/* Desktop: tabel */}
+                    <div className="card bg-base-100 border border-base-200 shadow-sm hidden md:block">
                         <div className="overflow-x-auto">
                             <table className="table">
                                 <thead>
@@ -190,13 +221,7 @@ export default function Report({ rows, total_commission, filters }) {
                                                 <td className="text-right">{row.tickets}</td>
                                                 <td className="text-right">{row.trx_count}</td>
                                                 <td className="text-right font-semibold text-primary">{formatRupiah(row.commission)}</td>
-                                                <td>
-                                                    {row.unpaid > 0 ? (
-                                                        <span className="badge badge-warning badge-outline whitespace-nowrap">Sisa {formatRupiah(row.unpaid)}</span>
-                                                    ) : (
-                                                        <span className="badge badge-success badge-outline gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Lunas</span>
-                                                    )}
-                                                </td>
+                                                <td><RowStatus unpaid={row.unpaid} /></td>
                                                 {prefix === 'admin' && (
                                                     <td className="text-right" onClick={(e) => e.stopPropagation()}>
                                                         {row.unpaid > 0 && (
@@ -238,24 +263,7 @@ export default function Report({ rows, total_commission, filters }) {
                                                                 ))}
                                                             </tbody>
                                                         </table>
-                                                        {row.payouts.length > 0 && (
-                                                            <div className="px-4 py-3 border-t border-base-200">
-                                                                <p className="text-xs font-semibold text-base-content/60 mb-1.5">Riwayat Pembayaran</p>
-                                                                <ul className="text-xs space-y-1">
-                                                                    {row.payouts.map((p, k) => (
-                                                                        <li key={k} className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                                                            <span className="text-base-content/70">{formatDate(p.paid_at)}</span>
-                                                                            <span className="font-semibold text-primary">{formatRupiah(p.amount)}</span>
-                                                                            {p.by && <span className="text-base-content/50">oleh {p.by}</span>}
-                                                                            {p.note && <span className="text-base-content/50">· {p.note}</span>}
-                                                                            <a href={p.proof_url} target="_blank" rel="noopener noreferrer" className="link link-primary inline-flex items-center gap-1">
-                                                                                <FileText className="w-3 h-3" /> Bukti
-                                                                            </a>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )}
+                                                        <PayoutHistory payouts={row.payouts} />
                                                     </td>
                                                 </tr>
                                             )}
@@ -264,6 +272,60 @@ export default function Report({ rows, total_commission, filters }) {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    {/* Mobile: card */}
+                    <div className="md:hidden space-y-3">
+                        {rows.length === 0 && (
+                            <div className="text-center text-base-content/50 py-8">Belum ada komisi affiliate.</div>
+                        )}
+                        {rows.map((row, i) => (
+                            <div key={i} className="card bg-base-100 border border-base-200 shadow-sm">
+                                <div className="card-body p-4 gap-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0">
+                                            <p className="font-semibold leading-snug truncate">{row.event}</p>
+                                            <p className="text-xs text-base-content/60 truncate">{row.affiliate} · {row.affiliate_email}</p>
+                                        </div>
+                                        <RowStatus unpaid={row.unpaid} />
+                                    </div>
+                                    <div className="flex items-end justify-between gap-2">
+                                        <p className="text-xs text-base-content/60">{row.tickets} tiket · {row.trx_count} transaksi</p>
+                                        <p className="font-bold text-primary">{formatRupiah(row.commission)}</p>
+                                    </div>
+                                    <div className="flex gap-2 mt-1">
+                                        <button type="button" onClick={() => toggle(i)} className="btn btn-xs btn-ghost flex-1">
+                                            <ChevronRight className={`w-3.5 h-3.5 transition-transform ${open.has(i) ? 'rotate-90' : ''}`} />
+                                            {open.has(i) ? 'Tutup' : 'Rincian'}
+                                        </button>
+                                        {prefix === 'admin' && row.unpaid > 0 && (
+                                            <button type="button" onClick={() => openPay(row)} className="btn btn-xs btn-primary flex-1">
+                                                <Wallet className="w-3.5 h-3.5 mr-1" /> Bayar
+                                            </button>
+                                        )}
+                                    </div>
+                                    {open.has(i) && (
+                                        <div className="mt-1 border-t border-base-200 pt-2 space-y-2">
+                                            {row.details.map((d, j) => (
+                                                <div key={j} className="flex items-start justify-between gap-2 text-xs">
+                                                    <div className="min-w-0">
+                                                        <p className="font-medium truncate">{d.buyer}</p>
+                                                        <p className="text-base-content/50">{d.ticket_type} · {d.qty}× {formatRupiah(d.price)}</p>
+                                                    </div>
+                                                    <div className="text-right shrink-0">
+                                                        <p className="text-primary">{formatRupiah(d.commission_per_ticket)}/tiket</p>
+                                                        {d.is_paid
+                                                            ? <span className="badge badge-success badge-xs">Lunas</span>
+                                                            : <span className="badge badge-ghost badge-xs">Belum</span>}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <PayoutHistory payouts={row.payouts} />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
