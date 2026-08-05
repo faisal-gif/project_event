@@ -219,7 +219,12 @@ class AffiliateController extends Controller
         abort_unless($actor->role === 'admin' || $payout->promoter_id === $actor->id, 403);
         abort_unless(Storage::disk('local')->exists($payout->proof_path), 404);
 
-        return Storage::disk('local')->response($payout->proof_path);
+        // Baca konten langsung (file_get_contents) — hindari Storage::response()
+        // yang memakai fpassthru(), yang di-disable di server ini.
+        return response(Storage::disk('local')->get($payout->proof_path), 200, [
+            'Content-Type' => Storage::disk('local')->mimeType($payout->proof_path),
+            'Content-Disposition' => 'inline; filename="' . basename($payout->proof_path) . '"',
+        ]);
     }
 
     // Query agregasi komisi per event + per user (dipakai report & export).
