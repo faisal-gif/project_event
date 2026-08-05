@@ -84,7 +84,7 @@ export default function Index({ vouchers, events }) {
             <Head title="Voucher" />
 
             <div className="py-10">
-                <div className="mx-auto max-w-5xl px-4 lg:px-8 space-y-4">
+                <div className="mx-auto max-w-6xl px-4 lg:px-8 space-y-4">
                     <FlashAlert />
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

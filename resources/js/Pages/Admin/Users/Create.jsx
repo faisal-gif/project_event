@@ -34,7 +34,7 @@ export default function Create({ events }) {
             <Head title="Tambah User" />
 
             <div className="py-10">
-                <div className="mx-auto max-w-2xl px-4 lg:px-8">
+                <div className="mx-auto max-w-6xl px-4 lg:px-8">
                     <Link href={route('admin.users.index')} className="inline-flex items-center gap-1 text-sm text-base-content/60 hover:text-primary mb-4">
                         <ArrowLeft className="w-4 h-4" /> Kembali ke daftar user
                     </Link>

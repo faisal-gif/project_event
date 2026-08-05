@@ -125,7 +125,7 @@ export default function Report({ rows, total_commission, filters }) {
             <Head title="Komisi Affiliate" />
 
             <div className="py-10">
-                <div className="mx-auto max-w-5xl px-4 lg:px-8">
+                <div className="mx-auto max-w-6xl px-4 lg:px-8">
                     <FlashAlert />
                     <div className="flex items-center justify-between gap-3 mb-4">
                         <div className="flex items-center gap-2">
