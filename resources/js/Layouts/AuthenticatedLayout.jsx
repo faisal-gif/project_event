@@ -36,7 +36,7 @@ export default function AuthenticatedLayout({ children }) {
                             </svg>
                         </label>
                     </div>
-                    <div className="flex-none">
+                    <div className="flex gap-2 items-center">
                         <ThemeToggle />
                         <Dropdown>
                             <Dropdown.Trigger>
