@@ -41,7 +41,7 @@ export default function Applications({ applications }) {
             <Head title="Pengajuan Affiliate" />
 
             <div className="py-12">
-                <div className="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                <div className="mx-auto max-w-5xl px-4 lg:px-8 space-y-6">
                     <FlashAlert />
 
                     <div className="tabs tabs-boxed bg-base-200 w-fit">
