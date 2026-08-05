@@ -154,19 +154,29 @@ class AffiliateController extends Controller
                         ->orWhereHas('promoter', fn ($p) => $p->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
                 });
             })
-            ->selectRaw('event_id, promoter_id, SUM(commission_earned) as commission, SUM(quantity) as tickets, COUNT(*) as trx_count')
-            ->groupBy('event_id', 'promoter_id')
-            ->with(['event:id,title', 'promoter:id,name,email'])
-            ->orderByDesc('commission')
+            ->with(['event:id,title', 'promoter:id,name,email', 'user:id,name', 'ticketType:id,name,price'])
+            ->orderByDesc('paid_at')
             ->get()
-            ->map(fn ($row) => [
-                'event' => $row->event?->title ?? 'Event dihapus',
-                'affiliate' => $row->promoter?->name ?? 'User dihapus',
-                'affiliate_email' => $row->promoter?->email,
-                'tickets' => (int) $row->tickets,
-                'trx_count' => (int) $row->trx_count,
-                'commission' => (float) $row->commission,
-            ]);
+            ->groupBy(fn ($t) => $t->event_id . '-' . $t->promoter_id)
+            ->map(fn ($group) => [
+                'event' => $group->first()->event?->title ?? 'Event dihapus',
+                'affiliate' => $group->first()->promoter?->name ?? 'User dihapus',
+                'affiliate_email' => $group->first()->promoter?->email,
+                'tickets' => (int) $group->sum('quantity'),
+                'trx_count' => $group->count(),
+                'commission' => (float) $group->sum('commission_earned'),
+                // Rincian tiap transaksi di dalam grup ini (dipakai drill-down index & export).
+                'details' => $group->map(fn ($t) => [
+                    'buyer' => $t->user?->name ?? 'Tamu',
+                    'ticket_type' => $t->ticketType?->name ?? '-',
+                    'price' => (float) ($t->ticketType?->price ?? ($t->quantity ? $t->subtotal / $t->quantity : 0)),
+                    'qty' => (int) $t->quantity,
+                    'commission_per_ticket' => (float) ($t->quantity ? $t->commission_earned / $t->quantity : $t->commission_earned),
+                    'commission' => (float) $t->commission_earned,
+                ])->values(),
+            ])
+            ->sortByDesc('commission')
+            ->values();
     }
 
     // Pencarian event (yang punya komisi affiliate) untuk AsyncSelect (JSON, maks 20).

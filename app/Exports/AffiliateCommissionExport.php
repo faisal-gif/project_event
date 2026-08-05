@@ -21,26 +21,45 @@ class AffiliateCommissionExport implements FromCollection, WithHeadings, WithMap
 
     public function collection()
     {
-        $rows = $this->rows->values();
+        // Flatten agregat -> satu baris per transaksi (rincian).
+        $flat = collect();
+        foreach ($this->rows as $row) {
+            foreach ($row['details'] as $d) {
+                $flat->push([
+                    'event' => $row['event'],
+                    'affiliate' => $row['affiliate'],
+                    'affiliate_email' => $row['affiliate_email'],
+                    'buyer' => $d['buyer'],
+                    'ticket_type' => $d['ticket_type'],
+                    'price' => $d['price'],
+                    'qty' => $d['qty'],
+                    'commission_per_ticket' => $d['commission_per_ticket'],
+                    'commission' => $d['commission'],
+                ]);
+            }
+        }
 
-        if ($rows->isEmpty()) {
-            return $rows;
+        if ($flat->isEmpty()) {
+            return $flat;
         }
 
         // Baris total di paling bawah.
-        return $rows->push([
+        return $flat->push([
             'event' => '',
-            'affiliate' => 'TOTAL',
+            'affiliate' => '',
             'affiliate_email' => '',
-            'tickets' => $rows->sum('tickets'),
-            'trx_count' => $rows->sum('trx_count'),
-            'commission' => $rows->sum('commission'),
+            'buyer' => '',
+            'ticket_type' => '',
+            'price' => 'TOTAL',
+            'qty' => $flat->sum('qty'),
+            'commission_per_ticket' => '',
+            'commission' => $flat->sum('commission'),
         ]);
     }
 
     public function headings(): array
     {
-        return ['Event', 'Affiliate', 'Email', 'Tiket Terjual', 'Transaksi', 'Komisi (Rp)'];
+        return ['Event', 'Affiliate', 'Email', 'Pembeli', 'Jenis Tiket', 'Harga Tiket', 'Jumlah Tiket', 'Komisi/Tiket', 'Komisi (Rp)'];
     }
 
     public function map($row): array
@@ -49,8 +68,11 @@ class AffiliateCommissionExport implements FromCollection, WithHeadings, WithMap
             $row['event'],
             $row['affiliate'],
             $row['affiliate_email'],
-            $row['tickets'],
-            $row['trx_count'],
+            $row['buyer'],
+            $row['ticket_type'],
+            $row['price'],
+            $row['qty'],
+            $row['commission_per_ticket'],
             $row['commission'],
         ];
     }
@@ -62,8 +84,8 @@ class AffiliateCommissionExport implements FromCollection, WithHeadings, WithMap
                 $sheet = $event->sheet->getDelegate();
                 $last = $sheet->getHighestRow();
                 // Bold header + baris total.
-                $sheet->getStyle('A1:F1')->getFont()->setBold(true);
-                $sheet->getStyle("A{$last}:F{$last}")->getFont()->setBold(true);
+                $sheet->getStyle('A1:I1')->getFont()->setBold(true);
+                $sheet->getStyle("A{$last}:I{$last}")->getFont()->setBold(true);
             },
         ];
     }

@@ -13,6 +13,18 @@ function Status({ trx, event, ticket }) {
         }
     }, [flash])
 
+    useEffect(() => {
+        if (trx.status === 'PAID' && window.fbq) {
+            // eventID = reference → dedup jika halaman di-reload / dipakai server-side CAPI nanti
+            window.fbq('track', 'Purchase', {
+                value: Number(trx.subtotal),
+                currency: 'IDR',
+                content_name: trx.event?.title,
+                content_type: 'product',
+            }, { eventID: trx.reference })
+        }
+    }, [trx.status, trx.reference])
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',

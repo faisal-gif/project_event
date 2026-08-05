@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import AsyncSelect from 'react-select/async';
-import { Wallet, Download } from 'lucide-react';
+import { Wallet, Download, ChevronRight } from 'lucide-react';
 import { formatRupiah } from '@/Utils/formatter';
 
 export default function Report({ rows, total_commission, filters }) {
@@ -11,6 +11,13 @@ export default function Report({ rows, total_commission, filters }) {
 
     const [search, setSearch] = useState(filters?.search || '');
     const [eventOpt, setEventOpt] = useState(null);
+    const [open, setOpen] = useState(() => new Set());
+    const toggle = (i) =>
+        setOpen((prev) => {
+            const next = new Set(prev);
+            next.has(i) ? next.delete(i) : next.add(i);
+            return next;
+        });
     const isFirst = useRef(true);
     const searchTimer = useRef();
     const eventTimer = useRef();
@@ -129,6 +136,7 @@ export default function Report({ rows, total_commission, filters }) {
                             <table className="table">
                                 <thead>
                                     <tr>
+                                        <th className="w-8"></th>
                                         <th>Event</th>
                                         <th>Affiliate</th>
                                         <th className="text-right">Tiket Terjual</th>
@@ -138,19 +146,52 @@ export default function Report({ rows, total_commission, filters }) {
                                 </thead>
                                 <tbody>
                                     {rows.length === 0 && (
-                                        <tr><td colSpan={5} className="text-center text-base-content/50 py-8">Belum ada komisi affiliate.</td></tr>
+                                        <tr><td colSpan={6} className="text-center text-base-content/50 py-8">Belum ada komisi affiliate.</td></tr>
                                     )}
                                     {rows.map((row, i) => (
-                                        <tr key={i} className="hover">
-                                            <td className="font-medium max-w-[220px] truncate">{row.event}</td>
-                                            <td>
-                                                <div className="font-medium">{row.affiliate}</div>
-                                                <div className="text-xs text-base-content/60">{row.affiliate_email}</div>
-                                            </td>
-                                            <td className="text-right">{row.tickets}</td>
-                                            <td className="text-right">{row.trx_count}</td>
-                                            <td className="text-right font-semibold text-primary">{formatRupiah(row.commission)}</td>
-                                        </tr>
+                                        <Fragment key={i}>
+                                            <tr className="hover cursor-pointer" onClick={() => toggle(i)}>
+                                                <td>
+                                                    <ChevronRight className={`w-4 h-4 transition-transform ${open.has(i) ? 'rotate-90' : ''}`} />
+                                                </td>
+                                                <td className="font-medium max-w-[220px] truncate">{row.event}</td>
+                                                <td>
+                                                    <div className="font-medium">{row.affiliate}</div>
+                                                    <div className="text-xs text-base-content/60">{row.affiliate_email}</div>
+                                                </td>
+                                                <td className="text-right">{row.tickets}</td>
+                                                <td className="text-right">{row.trx_count}</td>
+                                                <td className="text-right font-semibold text-primary">{formatRupiah(row.commission)}</td>
+                                            </tr>
+                                            {open.has(i) && (
+                                                <tr className="bg-base-200/40">
+                                                    <td colSpan={6} className="p-0">
+                                                        <table className="table table-sm">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Pembeli</th>
+                                                                    <th>Jenis Tiket</th>
+                                                                    <th className="text-right">Harga Tiket</th>
+                                                                    <th className="text-right">Jumlah</th>
+                                                                    <th className="text-right">Komisi/Tiket</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {row.details.map((d, j) => (
+                                                                    <tr key={j}>
+                                                                        <td>{d.buyer}</td>
+                                                                        <td>{d.ticket_type}</td>
+                                                                        <td className="text-right">{formatRupiah(d.price)}</td>
+                                                                        <td className="text-right">{d.qty}</td>
+                                                                        <td className="text-right text-primary">{formatRupiah(d.commission_per_ticket)}</td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </Fragment>
                                     ))}
                                 </tbody>
                             </table>

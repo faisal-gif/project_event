@@ -55,7 +55,8 @@ export default function Applications({ applications }) {
                             <h2 className="text-lg font-semibold">Pengajuan Affiliate</h2>
                         </div>
 
-                        <div className="overflow-x-auto">
+                        {/* Desktop: tabel */}
+                        <div className="overflow-x-auto hidden md:block">
                             <table className="table">
                                 <thead>
                                     <tr>
@@ -94,6 +95,41 @@ export default function Applications({ applications }) {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+
+                        {/* Mobile: card */}
+                        <div className="md:hidden space-y-3">
+                            {applications.data.length === 0 && (
+                                <div className="text-center text-base-content/50 py-6">Belum ada pengajuan.</div>
+                            )}
+                            {applications.data.map((u) => (
+                                <div key={u.id} className="card bg-base-100 border border-base-200 shadow-sm">
+                                    <div className="card-body p-4 gap-2">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="min-w-0">
+                                                <p className="font-semibold leading-snug truncate">{u.name}</p>
+                                                <p className="text-sm text-base-content/60 truncate">{u.email}</p>
+                                            </div>
+                                            <span className={`badge shrink-0 ${BADGE[u.affiliate_status]}`}>{u.affiliate_status}</span>
+                                        </div>
+                                        <p className="text-sm text-base-content/60">
+                                            Diajukan: <span className="text-base-content/80">{u.affiliate_requested_at ? formatDateLong(u.affiliate_requested_at) : '-'}</span>
+                                        </p>
+                                        <div className="flex gap-2 mt-1">
+                                            {u.affiliate_status !== 'approved' && (
+                                                <button type="button" onClick={() => act(u.id, 'approve')} className="btn btn-sm btn-success flex-1">
+                                                    <Check className="w-4 h-4 mr-1" /> Setujui
+                                                </button>
+                                            )}
+                                            {u.affiliate_status !== 'rejected' && (
+                                                <button type="button" onClick={() => act(u.id, 'reject')} className="btn btn-sm btn-outline btn-error flex-1">
+                                                    <X className="w-4 h-4 mr-1" /> Tolak
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         <Pagination links={applications.links} />
