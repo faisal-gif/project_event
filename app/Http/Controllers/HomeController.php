@@ -48,6 +48,13 @@ class HomeController extends Controller
             return redirect('/');
         }
 
+        // Affiliate yang sudah disetujui otomatis dapat link ber-referral saat membuka
+        // event yang afiliasinya aktif — jadi URL di address bar langsung bisa dishare.
+        $user = $request->user();
+        if (!$request->has('ref') && $event->is_affiliate_enabled && $user && $user->isApprovedAffiliate()) {
+            return redirect()->to($request->fullUrlWithQuery(['ref' => $user->id]));
+        }
+
         if ($request->has('ref')) {
             session(['referral_id' => $request->query('ref')]);
         }
