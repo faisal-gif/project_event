@@ -255,6 +255,7 @@ export default function Report({ rows, total_commission, filters }) {
                                                         <table className="table table-sm">
                                                             <thead>
                                                                 <tr>
+                                                                    <th>Tanggal</th>
                                                                     <th>Pembeli</th>
                                                                     <th>Jenis Tiket</th>
                                                                     <th className="text-right">Harga Tiket</th>
@@ -266,6 +267,7 @@ export default function Report({ rows, total_commission, filters }) {
                                                             <tbody>
                                                                 {row.details.map((d, j) => (
                                                                     <tr key={j}>
+                                                                        <td className="whitespace-nowrap">{formatDate(d.date)}</td>
                                                                         <td>{d.buyer}</td>
                                                                         <td>{d.ticket_type}</td>
                                                                         <td className="text-right">{formatRupiah(d.price)}</td>
@@ -328,6 +330,7 @@ export default function Report({ rows, total_commission, filters }) {
                                                     <div className="min-w-0">
                                                         <p className="font-medium truncate">{d.buyer}</p>
                                                         <p className="text-base-content/50">{d.ticket_type} · {d.qty}× {formatRupiah(d.price)}</p>
+                                                        <p className="text-base-content/40">{formatDate(d.date)}</p>
                                                     </div>
                                                     <div className="text-right shrink-0">
                                                         <p className="text-primary">{formatRupiah(d.commission_per_ticket)}/tiket</p>
@@ -370,7 +373,7 @@ export default function Report({ rows, total_commission, filters }) {
                                             <input type="checkbox" className="checkbox checkbox-sm" checked={selected.has(d.id)} onChange={() => toggleSel(d.id)} />
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium truncate">{d.buyer}</p>
-                                                <p className="text-xs text-base-content/50 truncate">{d.ticket_type} · {d.qty} tiket</p>
+                                                <p className="text-xs text-base-content/50 truncate">{formatDate(d.date)} · {d.ticket_type} · {d.qty} tiket</p>
                                             </div>
                                             <span className="text-sm text-primary shrink-0">{formatRupiah(d.commission)}</span>
                                         </label>

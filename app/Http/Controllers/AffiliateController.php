@@ -268,6 +268,7 @@ class AffiliateController extends Controller
                 // Rincian tiap transaksi di dalam grup ini (dipakai drill-down index & export).
                 'details' => $group->map(fn ($t) => [
                     'id' => $t->id,
+                    'date' => $t->paid_at,
                     'buyer' => $t->user?->name ?? 'Tamu',
                     'ticket_type' => $t->ticketType?->name ?? '-',
                     'price' => (float) ($t->ticketType?->price ?? ($t->quantity ? $t->subtotal / $t->quantity : 0)),
