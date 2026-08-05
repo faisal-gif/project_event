@@ -53,6 +53,8 @@ Route::middleware(['auth', 'user'])->prefix('users')->group(function () {
     // Affiliate (sisi user): halaman status + pengajuan
     Route::get('/affiliate', [AffiliateController::class, 'me'])->name('affiliate.me');
     Route::post('/affiliate/apply', [AffiliateController::class, 'apply'])->name('affiliate.apply');
+    // Bukti pembayaran komisi (disk privat) — otorisasi admin/pemilik di controller.
+    Route::get('/affiliate/payouts/{payout}/proof', [AffiliateController::class, 'payoutProof'])->name('affiliate.payout.proof');
 });
 
 
@@ -77,6 +79,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('affiliates/report/event-search', [AffiliateController::class, 'reportEventSearch'])->name('affiliates.report.eventSearch');
     Route::patch('affiliates/{user}/approve', [AffiliateController::class, 'approve'])->name('affiliates.approve');
     Route::patch('affiliates/{user}/reject', [AffiliateController::class, 'reject'])->name('affiliates.reject');
+    // Bayar komisi (manual) untuk 1 affiliate di 1 event.
+    Route::post('affiliates/{event}/{user}/pay', [AffiliateController::class, 'pay'])->name('affiliates.pay');
 
     Route::get('transactions/search', [AdminTransactionController::class, 'search'])->name('transactions.search');
     Route::get('transactions/event-search', [AdminTransactionController::class, 'eventSearch'])->name('transactions.eventSearch');

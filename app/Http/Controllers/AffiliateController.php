@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AffiliateCommissionExport;
+use App\Models\AffiliatePayout;
 use App\Models\Event;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -27,18 +30,36 @@ class AffiliateController extends Controller
         $availableEvents = collect();
 
         if ($approved) {
-            $perEvent = $user->promotedTransactions()
+            $txns = $user->promotedTransactions()
                 ->where('status', 'PAID')
-                ->selectRaw('event_id, SUM(commission_earned) as commission, SUM(quantity) as tickets, COUNT(*) as trx_count')
-                ->groupBy('event_id')
+                ->where('commission_earned', '>', 0)
                 ->with('event:id,title')
+                ->get();
+
+            // Riwayat pembayaran komisi milik affiliate ini, dikelompokkan per event.
+            $payoutsByEvent = AffiliatePayout::where('promoter_id', $user->id)
+                ->whereIn('event_id', $txns->pluck('event_id')->unique())
+                ->latest('paid_at')
                 ->get()
-                ->map(fn ($row) => [
-                    'event' => $row->event?->title ?? 'Event dihapus',
-                    'commission' => (float) $row->commission,
-                    'tickets' => (int) $row->tickets,
-                    'count' => (int) $row->trx_count,
-                ]);
+                ->groupBy('event_id');
+
+            $perEvent = $txns->groupBy('event_id')
+                ->map(fn ($group) => [
+                    'event' => $group->first()->event?->title ?? 'Event dihapus',
+                    'commission' => (float) $group->sum('commission_earned'),
+                    'tickets' => (int) $group->sum('quantity'),
+                    'count' => $group->count(),
+                    'paid' => (float) $group->whereNotNull('payout_id')->sum('commission_earned'),
+                    'unpaid' => (float) $group->whereNull('payout_id')->sum('commission_earned'),
+                    'payouts' => $payoutsByEvent->get($group->first()->event_id, collect())
+                        ->map(fn ($p) => [
+                            'amount' => (float) $p->amount,
+                            'paid_at' => $p->paid_at,
+                            'note' => $p->note,
+                            'proof_url' => route('affiliate.payout.proof', $p->id),
+                        ])->values(),
+                ])
+                ->values();
 
             $availableEvents = Event::where('is_affiliate_enabled', true)
                 ->select('id', 'slug', 'title', 'affiliate_type', 'affiliate_reward')
@@ -137,12 +158,71 @@ class AffiliateController extends Controller
         ]);
     }
 
+    // Catat pembayaran komisi (manual) untuk 1 affiliate di 1 event.
+    // Melunasi SELURUH komisi terutang event tsb (tanpa partial). Admin only.
+    public function pay(Request $request, Event $event, User $user)
+    {
+        $validated = $request->validate([
+            'proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $payout = DB::transaction(function () use ($request, $event, $user, $validated) {
+            // Lock supaya dua admin tidak dobel-bayar komisi yang sama.
+            $txns = Transaction::query()
+                ->where('status', 'PAID')
+                ->where('event_id', $event->id)
+                ->where('promoter_id', $user->id)
+                ->where('commission_earned', '>', 0)
+                ->whereNull('payout_id')
+                ->lockForUpdate()
+                ->get();
+
+            if ($txns->isEmpty()) {
+                return null;
+            }
+
+            // Bukti disimpan di disk 'local' (privat) — bukan folder publik.
+            $path = $request->file('proof')->store('affiliate-proofs', 'local');
+
+            $payout = AffiliatePayout::create([
+                'promoter_id' => $user->id,
+                'event_id' => $event->id,
+                'amount' => $txns->sum('commission_earned'),
+                'proof_path' => $path,
+                'note' => $validated['note'] ?? null,
+                'paid_at' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            Transaction::whereIn('id', $txns->pluck('id'))->update(['payout_id' => $payout->id]);
+
+            return $payout;
+        });
+
+        if (! $payout) {
+            return back()->with('error', 'Tidak ada komisi terutang untuk affiliate ini di event tersebut.');
+        }
+
+        return back()->with('success', "Komisi {$user->name} untuk \"{$event->title}\" ditandai lunas.");
+    }
+
+    // Tampilkan bukti transfer (disk privat). Hanya admin atau affiliate pemiliknya.
+    public function payoutProof(AffiliatePayout $payout)
+    {
+        $actor = Auth::user();
+        abort_unless($actor->role === 'admin' || $payout->promoter_id === $actor->id, 403);
+        abort_unless(Storage::disk('local')->exists($payout->proof_path), 404);
+
+        return Storage::disk('local')->response($payout->proof_path);
+    }
+
     // Query agregasi komisi per event + per user (dipakai report & export).
     private function commissionRows(Request $request)
     {
         $user = Auth::user();
 
-        return Transaction::query()
+        $rows = Transaction::query()
             ->where('status', 'PAID')
             ->whereNotNull('promoter_id')
             ->where('commission_earned', '>', 0)
@@ -156,15 +236,30 @@ class AffiliateController extends Controller
             })
             ->with(['event:id,title', 'promoter:id,name,email', 'user:id,name', 'ticketType:id,name,price'])
             ->orderByDesc('paid_at')
+            ->get();
+
+        // Riwayat payout untuk pasangan (event, promoter) yang muncul di laporan.
+        $payouts = AffiliatePayout::query()
+            ->whereIn('event_id', $rows->pluck('event_id')->unique())
+            ->whereIn('promoter_id', $rows->pluck('promoter_id')->unique())
+            ->with('creator:id,name')
+            ->latest('paid_at')
             ->get()
+            ->groupBy(fn ($p) => $p->event_id . '-' . $p->promoter_id);
+
+        return $rows
             ->groupBy(fn ($t) => $t->event_id . '-' . $t->promoter_id)
-            ->map(fn ($group) => [
+            ->map(fn ($group, $key) => [
                 'event' => $group->first()->event?->title ?? 'Event dihapus',
+                'event_id' => $group->first()->event_id,
+                'promoter_id' => $group->first()->promoter_id,
                 'affiliate' => $group->first()->promoter?->name ?? 'User dihapus',
                 'affiliate_email' => $group->first()->promoter?->email,
                 'tickets' => (int) $group->sum('quantity'),
                 'trx_count' => $group->count(),
                 'commission' => (float) $group->sum('commission_earned'),
+                'paid' => (float) $group->whereNotNull('payout_id')->sum('commission_earned'),
+                'unpaid' => (float) $group->whereNull('payout_id')->sum('commission_earned'),
                 // Rincian tiap transaksi di dalam grup ini (dipakai drill-down index & export).
                 'details' => $group->map(fn ($t) => [
                     'buyer' => $t->user?->name ?? 'Tamu',
@@ -173,6 +268,14 @@ class AffiliateController extends Controller
                     'qty' => (int) $t->quantity,
                     'commission_per_ticket' => (float) ($t->quantity ? $t->commission_earned / $t->quantity : $t->commission_earned),
                     'commission' => (float) $t->commission_earned,
+                    'is_paid' => $t->payout_id !== null,
+                ])->values(),
+                'payouts' => $payouts->get($key, collect())->map(fn ($p) => [
+                    'amount' => (float) $p->amount,
+                    'paid_at' => $p->paid_at,
+                    'note' => $p->note,
+                    'by' => $p->creator?->name,
+                    'proof_url' => route('affiliate.payout.proof', $p->id),
                 ])->values(),
             ])
             ->sortByDesc('commission')

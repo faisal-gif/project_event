@@ -36,4 +36,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(TicketType::class);
     }
+
+    // Payout yang melunasi komisi transaksi ini (null = belum dibayar).
+    public function payout()
+    {
+        return $this->belongsTo(AffiliatePayout::class, 'payout_id');
+    }
 }

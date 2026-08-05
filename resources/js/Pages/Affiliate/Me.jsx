@@ -5,8 +5,8 @@ import Card from '@/Components/ui/Card';
 import PrimaryButton from '@/Components/PrimaryButton';
 import FlashAlert from '@/Components/FlashAlert';
 import AffiliateTutorial from '@/Components/AffiliateTutorial';
-import { formatRupiah } from '@/Utils/formatter';
-import { CheckCircle2, Clock, XCircle, Share2, Copy, HelpCircle, FileDown } from 'lucide-react';
+import { formatRupiah, formatDate } from '@/Utils/formatter';
+import { CheckCircle2, Clock, XCircle, Share2, Copy, HelpCircle, FileDown, FileText } from 'lucide-react';
 
 const STATUS = {
     pending: { label: 'Menunggu Persetujuan', cls: 'text-amber-600', Icon: Clock },
@@ -127,15 +127,35 @@ export default function Me({ affiliate }) {
                                     <h3 className="font-semibold mb-3">Komisi per Event</h3>
                                     <div className="divide-y divide-base-200">
                                         {affiliate.per_event.map((row, i) => (
-                                            <div key={i} className="flex items-center justify-between py-3 gap-3">
-                                                <div className="min-w-0">
-                                                    <p className="font-medium truncate">{row.event}</p>
-                                                    <p className="text-xs text-base-content/60">{row.tickets} tiket terjual · {row.count} transaksi</p>
+                                            <div key={i} className="py-3">
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="min-w-0">
+                                                        <p className="font-medium truncate">{row.event}</p>
+                                                        <p className="text-xs text-base-content/60">{row.tickets} tiket terjual · {row.count} transaksi</p>
+                                                    </div>
+                                                    <div className="text-right shrink-0">
+                                                        <p className="font-semibold text-primary">{formatRupiah(row.commission)}</p>
+                                                        {row.unpaid > 0 ? (
+                                                            <span className="badge badge-warning badge-outline badge-sm">Belum dibayar {formatRupiah(row.unpaid)}</span>
+                                                        ) : (
+                                                            <span className="badge badge-success badge-outline badge-sm gap-1"><CheckCircle2 className="w-3 h-3" /> Lunas</span>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div className="text-right shrink-0">
-                                                    <p className="font-semibold text-primary">{formatRupiah(row.commission)}</p>
-                                                    <p className="text-xs text-base-content/60">komisi</p>
-                                                </div>
+                                                {row.payouts?.length > 0 && (
+                                                    <ul className="mt-2 pl-1 text-xs space-y-1">
+                                                        {row.payouts.map((p, k) => (
+                                                            <li key={k} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-base-content/60">
+                                                                <span>Dibayar {formatDate(p.paid_at)}</span>
+                                                                <span className="font-medium text-base-content/80">{formatRupiah(p.amount)}</span>
+                                                                {p.note && <span>· {p.note}</span>}
+                                                                <a href={p.proof_url} target="_blank" rel="noopener noreferrer" className="link link-primary inline-flex items-center gap-1">
+                                                                    <FileText className="w-3 h-3" /> Bukti
+                                                                </a>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
